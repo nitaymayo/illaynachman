@@ -1,0 +1,13 @@
+:root {
+    /* Colors */
+    --black: #000000;
+    --white: #ffffff;
+    --dark-brown: #c18d0b;
+    --lead-brown: #e6ba39;
+    --light-brown: #f3d8a5;
+    --light-text-grey: rgb(192, 192, 192);
+    --dark-text-grey: #91a3b0;
+    /* Fonts */
+    --xsite-font-family: GRADUATE;
+    --xsite-font-size: 16px;
+}

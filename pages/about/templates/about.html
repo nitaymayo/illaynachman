@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% set page_head_title = 'About' %}
+
+{% block page_head_css %}
+    <link rel="stylesheet" href="{{ url_for('about.static', filename='css/about.css') }}"/>
+{% endblock %}
+
+{% block page_body_main_content %}
+<div id="content">
+			<div class="inner-content">
+				<div class="about-page">
+
+					<div class="about-box">
+						<div class="about-content">
+							<div class="about-section">
+								<img alt="" src="{{ url_for('static', filename='media/img/about.png') }}">
+								<h1>About us</h1>
+								<p>This is Photoshop's version  of Lorem Ipsum. Proin gravida nibh vel velit auctor aliquet. Aenean sollicitudin, lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem nibh id elit. Duis sed odio sit amet nibh vulputate cursus a sit amet mauris. Morbi accumsan ipsum velit. Nam nec tellus a odio tincidunt auctor a ornare odio. </p>
+								<p>Sed non  mauris vitae erat consequat auctor eu in elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris in erat justo. Nullam ac urna eu felis dapibus condimentum sit amet a augue. Sed non neque elit. Sed ut imperdiet nisi. Proin condimentum fermentum nunc. Etiam pharetra, erat sed fermentum feugiat, velit mauris egestas quam, ut aliquam massa nisl quis neque. Suspendisse in orci enim.</p>
+							</div>
+							<div class="about-section last-section">
+								<h1>Meet The Team</h1>
+								<div class="team-members">
+									<div class="row">
+										<div class="col-md-4">
+											<div class="team-post">
+												<img alt="" src="{{ url_for('static', filename='media/img/aboutrow1.png') }}">
+												<div class="team-hover">
+													<div class="team-data">
+														<h3>נולד ב1999 בבית החולים צורן</h3>
+														<span> עילי בילה את שנות ילדותו באבן יהודה. אהב מאוד גלגלים ומשאיות זבל. עילי בילה את שנות ילדותו באבן יהודה. אהב מאוד גלגלים ומשאיות זבל. עילי בילה את שנות ילדותו באבן יהודה. אהב מאוד גלגלים ומשאיות זבל. עילי בילה את שנות ילדותו באבן יהודה. אהב מאוד גלגלים ומשאיות זבל. עילי בילה את שנות ילדותו באבן יהודה. אהב מאוד גלגלים ומשאיות זבל.</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="team-post">
+												<img alt="" src="{{ url_for('static', filename='media/img/aboutrow2.png') }}">
+												<div class="team-hover">
+													<div class="team-data">
+														<h3>John Smith</h3>
+														<span>Web Developer</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="team-post">
+												<img alt="" src="{{ url_for('static', filename='media/img/aboutrow3.png') }}">
+												<div class="team-hover">
+													<div class="team-data">
+														<h3>John Smith</h3>
+														<span>Web Developer</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-4">
+											<div class="team-post">
+												<img alt="" src="{{ url_for('static', filename='media/img/aboutrow1.png') }}">
+												<div class="team-hover">
+													<div class="team-data">
+														<h3>John Smith</h3>
+														<span>Web Developer</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="team-post">
+												<img alt="" src="{{ url_for('static', filename='media/img/aboutrow2.png') }}">
+												<div class="team-hover">
+													<div class="team-data">
+														<h3>John Smith</h3>
+														<span>Web Developer</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="team-post">
+												<img alt="" src="{{ url_for('static', filename='media/img/aboutrow3.png') }}">
+												<div class="team-hover">
+													<div class="team-data">
+														<h3>John Smith</h3>
+														<span>Web Developer</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+{#						<div class="sidebar">#}
+{#							<div class="skills-progress">#}
+{#								<h1>Our Skills</h1>#}
+{#								<p>Frontend Development <span>71%</span></p>#}
+{#								<div class="meter nostrips frontend">#}
+{#									<span style="width: 71%"></span>#}
+{#								</div>#}
+{#								<p>Photoshop <span>85%</span></p>#}
+{#								<div class="meter nostrips photoshop">#}
+{#									<span style="width: 85%"></span>#}
+{#								</div>#}
+{#								<p>Wordpress <span>76%</span></p>#}
+{#								<div class="meter nostrips wp">#}
+{#									<span style="width: 76%"></span>#}
+{#								</div>#}
+{#								<p>Plugins <span>53%</span></p>#}
+{#								<div class="meter nostrips plugins">#}
+{#									<span style="width: 53%"></span>#}
+{#								</div>#}
+{#							</div>#}
+{##}
+{#							<div class="testimonial">#}
+{#								<h1>Client Testimonials</h1>#}
+{#								<ul>#}
+{#									<li>#}
+{#										<div class="client-test">#}
+{#											<img alt="" src="upload/avatar2.jpg">#}
+{#											<h3>Collis Ta’eed - CEO at Envato</h3>#}
+{#										</div>#}
+{#										<p>Sollicitudin lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem nibh id elit. Duis sed odio sit amet nibh vulputate cursus a sit amet mauris. Morbi accumsan ipsum velit. Nam nec tellus a odio tincidunt.</p>#}
+{#									</li>#}
+{#									<li>#}
+{#										<div class="client-test">#}
+{#											<img alt="" src="upload/avatar1.jpg">#}
+{#											<h3>John Smith - Web Developer</h3>#}
+{#										</div>#}
+{#										<p>Sollicitudin lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem nibh id elit. Duis sed odio sit amet nibh vulputate cursus a sit amet mauris. Morbi accumsan ipsum velit. Nam nec tellus a odio tincidunt.</p>#}
+{#									</li>#}
+{#								</ul>#}
+{#							</div>#}
+{##}
+{#						</div>#}
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock %}
+
+{% block page_body_js %}
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.migrate.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.imagesloaded.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.quovolver.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/retina-1.1.0.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.nicescroll.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/script.js') }}"></script>
+{% endblock %}

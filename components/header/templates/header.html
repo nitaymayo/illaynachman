@@ -1,0 +1,132 @@
+<header>
+			<div class="logo-box">
+				<a class="logo" href="/"><img alt="" src="{{ url_for('static', filename='media/img/logos/logo.avif') }}"></a>
+				<p class="slogan">Life is a <b>PARTY</b><br>החיים הם <b>חגיגה</b></p>
+                {% if session %}
+                    <br>
+                <p class="username">Hello, {{ session['name'] }} {% if session['is_admin'] %}(admin){% endif %}</p>
+                {% endif %}
+			</div>
+
+			<a class="elemadded responsive-link" href="#">Menu</a>
+
+			<div class="menu-box">
+				<ul class="menu">
+					<li><a class="active" href="/">Home</a></li>
+					<li><a href="/about">About</a></li>
+                    {% if session %}
+                    <li><a href="/home/signout">signout</a></li>
+                    {% else %}
+                    <li><a href="/login">Login</a></li>
+                    {% endif %}
+				</ul>
+			</div>
+
+{#			<div class="archives-box">#}
+{#				<h2>Archives</h2>#}
+{#				<ul class="archives">#}
+{#					<li><a href="#">2023</a></li>#}
+{#					<li><a href="#">2022</a></li>#}
+{#					<li><a href="#">2021</a></li>#}
+{#				</ul>#}
+{#			</div>#}
+
+
+
+			<div class="categories-box">
+				<h2>Categories</h2>
+				<ul class="categories">
+					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Ilay</a></li>
+					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Family</a></li>
+					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Friends</a></li>
+                    <li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Surf</a></li>
+					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Party</a></li>
+				</ul>
+			</div>
+
+             {% if session %}
+                        <div class="post-box">
+                            <a class="btn" id="newpostmodalbtn">
+                                + Upload post
+                            </a>
+                        </div>
+            {% endif %}
+
+			<div class="social-box">
+				<ul class="social-icons">
+					<li><a href="#"><i class="fa fa-facebook-square"></i></a></li>
+					<li><a href="#"><i class="fa fa-twitter-square"></i></a></li>
+					<li><a href="#"><i class="fa fa-rss-square"></i></a></li>
+					<li><a href="#"><i class="fa fa-google-plus-square"></i></a></li>
+					<li><a href="#"><i class="fa fa-linkedin-square"></i></a></li>
+					<li><a href="#"><i class="fa fa-pinterest-square"></i></a></li>
+					<li><a href="#"><i class="fa fa-flickr"></i></a></li>
+					<li><a href="#"><i class="fa fa-youtube-square"></i></a></li>
+					<li><a href="#"><i class="fa fa-instagram"></i></a></li>
+				</ul>
+			</div>
+            <div class="contact-box">
+                <h2>contact us</h2>
+                <ul class="contact">
+					<li><a href="mailto:Info@rememberillay.com"><i class="fa fa-mail-forward"></i>Info@rememberillay.com</a></li>
+                </ul>
+            </div>
+			<p style="position: absolute; bottom: 10px;" class="copyright">&#169; 2014 Grafika, All Rights Reserved</p>
+		</header>
+
+<div id="newpostmodal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="closemodal">&times;</span>
+      <h1>Stage 1: Post Info</h1>
+     <form id="new-post-form" action="/home/newpost" method="post">
+          <div class="imgcontainer">
+            <img src="{{ url_for('static', filename='media/img/logos/tattoo_fish_600x600.webp') }}" alt="Avatar" class="avatar">
+          </div>
+
+          <div class="container">
+            <label for="post_name"><b>Post Name</b></label>
+            <input type="text" placeholder="Enter post name" name="post_name" required>
+
+            <label for="post_year"><b>Approximate Year</b></label>
+            <input type="number" placeholder="Year of the event/moments" min="2000" max="2023" name="post_year" required>
+
+              <label for="free_text"><b>Post Description</b></label>
+              <textarea style="resize: vertical" type="text" maxlength="3000" placeholder="Description of an event, a special/funny/unique moment" name="free_text"></textarea>
+
+
+            <label for="access_type"><b>Access Type</b></label><br>
+            <select name="access_type" id="access_type">
+              <option value="0">Everyone</option>
+              <option value="1">Family and friends only</option>
+              <option value="2">Family only</option>
+              <option value="3">You only</option>
+            </select>
+
+              <label for="tags"><b>Add Tags</b></label><br>
+
+              <input class="checkbox-row" type="checkbox" id="Ilay" name="tag_Ilay" >
+              <label for="Ilay">
+                  Ilay
+              </label><br>
+              <input type="checkbox" id="Family" name="tag_family">
+              <label for="Family">Family</label><br>
+              <input type="checkbox" id="Friends" name="tag_friends" />
+              <label for="Friends">Friends</label><br>
+              <input type="checkbox" id="Surf" name="tag_surf" />
+              <label for="Surf">Surf</label><br>
+              <input type="checkbox" id="Party" name="tag_party" />
+              <label for="Party">Party</label><br>
+          </div>
+     </form>
+      <h1>Stage 2: Image Upload</h1>
+        {{ dropzone.create(id='new_post_dropzone', action='/homepage/uploadpostphotos') }}
+
+
+{#  <div class="container" style="background-color:#f1f1f1">#}
+{#    <button type="button" onclick="document.querySelector('.closemodal').click()" class="cancelbtn">Cancel</button>#}
+{#  </div>#}
+<button id="upload-btn">Post</button>
+  </div>
+ </div>

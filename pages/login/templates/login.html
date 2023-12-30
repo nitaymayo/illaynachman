@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% set page_head_title = 'Login' %}
+
+{% block page_head_css %}
+    <link rel="stylesheet" href="{{ url_for('login.static', filename='css/login.css') }}"/>
+{% endblock %}
+
+{% block page_body_main_content %}
+<div id="content">
+			<div class="inner-content">
+				<div class="login-page">
+					<div class="login-box">
+						<div class="login-content">
+							<div class="login-section last-section">
+                                <form id="login-form" class="" action="/login/checkuser" method="post">
+                                  <div class="imgcontainer">
+                                    <img src="{{ url_for('static', filename='media/img/logos/logo.avif') }}" alt="Avatar" class="avatar">
+                                  </div>
+
+                                  <div class="container">
+                                    <label for="uname"><b>Username</b></label>
+                                    <input type="text" placeholder="Enter Username" name="uname" required>
+
+                                    <label for="password"><b>Password</b></label>
+                                    <input type="password" placeholder="Enter Password" name="password" required>
+
+                                    <button type="submit">Login</button>
+
+                                      <span>First time here? <a onclick="document.getElementById('login-form').classList.add('hidden'); document.getElementById('signup-form').classList.remove('hidden')">Sign up</a></span>
+                                      {% if msg %}
+                                          <br>
+                                      <span style="color: rgba(255,0,0,0.58)">{{ msg }}</span>
+                                      {% endif %}
+                                  </div>
+
+                                  <div class="container" style="background-color:#f1f1f1">
+                                    <span class="psw"><b>Forgot password?</b><br> Please contact us via mail</span>
+                                  </div>
+                                </form>
+
+                                <form id="signup-form" class="hidden" action="/login/register" method="post">
+                                  <div class="imgcontainer">
+                                    <img src="{{ url_for('static', filename='media/img/logos/logo.avif') }}" alt="Avatar" class="avatar">
+                                  </div>
+
+                                  <div class="container">
+                                    <label for="uname"><b>name</b></label>
+                                    <input type="text" placeholder="Enter your name" name="uname" required>
+
+                                    <label for="psw"><b>Password</b></label>
+                                    <input type="password" placeholder="Enter your password" name="psw" required>
+
+                                     <label for="email"><b>Email</b></label>
+                                    <input type="text" placeholder="Enter your email" name="email" required>
+
+                                    <label for="approximation"><b>From where you know Ilay?</b></label><br>
+                                        <select name="approximation" id="approximation" onchange="approximation_change(this)">
+                                          <option value="Family">Family</option>
+                                          <option value="Friend">Friend</option>
+                                          <option value="Army">Army</option>
+                                          <option value="Work">Work</option>
+                                          <option value="Trips">Trips</option>
+                                          <option value="School">School</option>
+                                          <option value="Surf">Surf or the Beach</option>
+                                          <option value="Parties">Parties</option>
+                                          <option value="Other">Other</option>
+                                        </select>
+
+                                    <label class="hidden" for="approximation_more_info" id="approximation_more_info_label"><b></b></label>
+                                    <input class="hidden" type="text" placeholder="" name="approximation_more_info" id="approximation_more_info" value="" required>
+
+
+
+                                    <button type="submit">Signup</button>
+
+                                      <span>Already have an account? <a onclick="document.getElementById('signup-form').classList.add('hidden'); document.getElementById('login-form').classList.remove('hidden')">Log in</a></span>
+                                  </div>
+
+
+                                </form>
+						    </div>
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock %}
+
+{% block page_body_js %}
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.migrate.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.imagesloaded.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.quovolver.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/retina-1.1.0.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.nicescroll.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/script.js') }}"></script>
+{% endblock %}

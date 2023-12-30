@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% set page_head_title = 'contact' %}
+
+{% block page_head_css %}
+    <link rel="stylesheet" href="{{ url_for('contact.static', filename='css/contact.css') }}"/>
+{% endblock %}
+
+{% block page_body_main_content %}
+<div id="content">
+			<div class="inner-content">
+				<div class="contact-page">
+					<div id="map">
+					</div>
+
+					<div class="contact-box">
+						<div class="contact-info">
+							<h1>Get in touch with us</h1>
+							<p>Aenean sollicitudin, lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem nibh id elit. Duis sed odio sit amet nibh vulputate cursus a sit amet mauris. Morbi accumsan ipsum velit. Nam nec tellus a odio tincidunt auctor a ornare odio.</p>
+						</div>
+						<form id="contact-form">
+							<h1>Send us a Message</h1>
+							<div class="text-fields">
+								<div class="float-input">
+									<input name="name" id="name" type="text" placeholder="Name">
+									<span><i class="fa fa-user"></i></span>
+								</div>
+								<div class="float-input">
+									<input name="mail" id="mail" type="text" placeholder="e-mail">
+									<span><i class="fa fa-envelope-o"></i></span>
+								</div>
+								<div class="float-input">
+									<input name="website" id="website" type="text" placeholder="website">
+									<span><i class="fa fa-link"></i></span>
+								</div>
+							</div>
+
+							<div class="submit-area">
+								<textarea name="comment" id="comment" placeholder="Message"></textarea>
+								<input type="submit" id="submit_contact" class="main-button" value="Send Now">
+								<div id="msg" class="message"></div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock %}
+
+{% block page_body_js %}
+	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.migrate.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.imagesloaded.min.js') }}"></script>
+  	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB7z3qSfW7_1ArWHGs69jHLbLw-jOOGwuk"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/gmap3.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/retina-1.1.0.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.nicescroll.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

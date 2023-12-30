@@ -1,0 +1,156 @@
+
+
+{#
+Base page blocks:
+- head
+-- page_head
+-- page_head_meta
+--- page_head_meta_extra
+-- page_head_css
+
+- body
+-- page_body_content
+--- page_body_header
+---- page_body_header_content
+----- page_body_header_content__main_menu
+------ page_body_header_content__main_menu_content
+------- page_body_header_content__main_menu_content_links
+--- page_body_main
+---- page_body_main_content
+--- page_body_footer
+---- page_body_footer_content
+-- page_body_js
+ #}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% block page_head %}
+        {# Title #}
+        <title>{{ page_head_title|default('IllayNachman', true) }}</title>
+
+        {# Meta tags #}
+        {% block page_head_meta %}
+            <meta charset="UTF-8"/>
+	        <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="author" content="Nitay Mayo"/>
+            <meta name="description" content=""/>
+            <meta name="keywords" content=""/>
+            {% block page_head_meta_extra %}{% endblock %}
+        {% endblock %}
+
+        {# favicon #}
+        <link rel="icon" href="{{ url_for('static', filename='') }}"/>
+
+        {# Base #}
+        <base href="/"/>
+
+        {# Dropzone for new posts #}
+        <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+{#        {{ dropzone.load_css() }}#}
+        {# CSS #}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}" media="screen">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/magnific-popup.css') }}" media="screen">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.css') }}" media="screen">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/flexslider.css') }}" media="screen">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" media="screen">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/responsive.css') }}" media="screen">
+        <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('login.static', filename='css/login.css') }}" media="screen">
+
+        {% block page_head_css %}{% endblock %}
+
+
+
+    {% endblock %}
+    </head>
+
+<body>
+
+
+
+
+{% block page_body_content %}
+    <div id="container">
+        {# Header #}
+        {% block page_body_header %}
+            {% include 'header.html' %}
+        {% endblock %}
+        {# Login modal #}
+
+
+        {# Main #}
+        {% block page_body_main %}
+            <main class="page-main">
+                {% block page_body_main_content %}
+                {% endblock %}
+            </main>
+        {% endblock %}
+
+        {# Footer #}
+        {% block page_body_footer %}
+        {% endblock %}
+    </div>
+
+    <div class="preloader">
+        <img alt="" src="{{ url_for('static', filename='media/img/preloader.GIF') }}">
+    </div>
+{% endblock %}
+
+{# JS #}
+<script type="text/javascript" src="{{ url_for('static', filename='js/dropzone.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/base.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.migrate.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.imagesloaded.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.isotope.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.flexslider.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/retina-1.1.0.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.nicescroll.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+Dropzone.forElement(".dropzone").options = {
+    init: function () {
+        // redirect after queue complete
+        // upload queue when button click
+        dz = this;
+        document.getElementById("upload-btn").addEventListener("click", function handler(e) {
+            dz.processQueue();
+        });  // custom init code
+    },
+    // click upload options
+    uploadMultiple: true,
+    parallelUploads: 50,
+    paramName: "file", // The name that will be used to transfer the file
+    maxFilesize: 10, // MB
+    acceptedFiles: "image/*",
+    maxFiles: null,
+    dictDefaultMessage: `Drop files here or click to upload.`, // message display on drop area
+    dictFallbackMessage: "Your browser does not support drag'n'drop file uploads.",
+    dictInvalidFileType: "You can't upload files of this type.",
+    dictFileTooBig: "File is too big {{filesize}}. Max filesize: {{maxFilesize}}MiB.",
+    dictResponseError: "Server error: {{statusCode}}",
+    dictMaxFilesExceeded: "You can't upload any more files.",
+    dictCancelUpload: "Cancel upload",
+    dictRemoveFile: "Remove file",
+    dictCancelUploadConfirmation: "You really want to delete this file?",
+    dictUploadCanceled: "Upload canceled",
+    autoProcessQueue: false,
+    addRemoveLinks: true
+}
+</script>
+{% block page_body_js %}{% endblock %}
+{# Flash zone #}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <script>
+            {% for message in messages %}
+                alert(`{{ message }}`)
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
+</body>
+
+</html>
