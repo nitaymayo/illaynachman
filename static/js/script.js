@@ -632,6 +632,7 @@ function validate_signup_Form() {
 	  showSuccess(email_input)
   }
 
+
   // Other input validation
   if (/|[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
     showError(approximation_input, `This field cannot have the following characters: ${/|[,;\/.\\\]\[{}()\-=+#*`]/}.`);
@@ -650,6 +651,9 @@ function approximation_change(select_element){
 	const approximation_selected = select_element.value;
 	const more_info_input = document.querySelector('#approximation_more_info')
 	const more_info_label = document.querySelector('#approximation_more_info_label')
+
+	// Make requierd
+	more_info_input.setAttribute('required', '')
 
 	// Clear input value
 	more_info_input.value = ''
@@ -673,5 +677,6 @@ function approximation_change(select_element){
 	} else {
 		more_info_input.classList.add('hidden')
 		more_info_label.classList.add('hidden')
+		more_info_input.removeAttribute('required')
 	}
 }
