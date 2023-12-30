@@ -340,6 +340,9 @@ input, select, textarea{
     &.error{
         border-color: red;
     }
+    &.success{
+        border-color: lightgreen;
+    }
 }
 
 /* Set a style for all buttons */

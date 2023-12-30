@@ -155,6 +155,11 @@ def new_post():
         dbManager.commit(query)
         return redirect(url_for('homepage.index'))
 
+    # check if post doesnt have photos
+    if (not os.path.exists(from_dir)):
+        flash('Post uploaded!')
+        return redirect('/')
+
     os.mkdir(to_dir) #Create post dir
 
     # Insert Content to dir and to DB
