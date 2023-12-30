@@ -292,17 +292,112 @@ btn.onclick = function() {
   document.body.style.overflow = 'hidden';
 
   document.getElementById('upload-btn').addEventListener('click', function () {
-		Dropzone.forElement('#new_post_dropzone').on('queuecomplete', function (file) {
-			document.getElementById('new-post-form').submit()
-		})
-		Dropzone.forElement('#new_post_dropzone').processQueue()
+	  if (upload_form_validate()) {
+		  Dropzone.forElement('#new_post_dropzone').on('queuecomplete', function (file) {
+			  document.getElementById('new-post-form').submit()
+		  })
+		  Dropzone.forElement('#new_post_dropzone').processQueue()
+	  }
 	})
 }
 
-// When user clicks on the upload button, process the dropzone queue
-// document.querySelector('#upload-btn').addEventListener('click', function (){
-//
-// })
+
+
+// Check upload form validation
+const showError = (input, message) => {
+    // add the error class
+    input.classList.add('error');
+
+    // show the error message
+    const error = document.querySelector(`.container small.${input.getAttribute('name')}_err`);
+	error.classList.remove('hidden')
+    error.textContent = message;
+};
+
+function new_post_validation() {
+  // Get form elements
+  var nameInput = document.getElementById('post_name');
+  var postYearInput = document.getElementById('post_year');
+  var postDescriptionInput = document.getElementById('free_text');
+
+  // Validation checks for name
+  var name = nameInput.value;
+  if (name.trim() === '') {
+    showError(nameInput, 'Please enter your name.');
+    return false;
+  }
+
+  // Check if name contains restricted characters
+  var restrictedChars = /[\(\)'\/*;.\[\]{}\\`]/;
+  if (restrictedChars.test(name)) {
+    showError(nameInput, 'Name cannot contain characters such as (), \', /, ;, ., \\, [], {}, `.');
+    return false;
+  }
+
+  // Validation check for post_year
+  var postYear = parseInt(postYearInput.value, 10);
+  if (isNaN(postYear) || postYear < 2000 || postYear > 2023) {
+    showError(postYearInput, 'Please enter a valid year between 2000 and 2023.');
+    return false;
+  }
+
+  // Validation check for post_description length
+  var postDescription = postDescriptionInput.value;
+  if (postDescription.length > 3000) {
+    showError(postDescriptionInput, 'Post description must be below 3000 characters.');
+    return false;
+  }
+
+
+  // If all validations pass, the form is considered valid
+  return true;
+}
+
+
+// helper functions for the check
+const isRequired = input => input.value === '' ? false : true;
+const isBetween = (value, min, max) => !(value < min || value > max);
+const showError = (input, message) => {
+    // add the error class
+    input.classList.add('error');
+
+    // show the error message
+    const error = document.querySelector(`.container small.${input.getAttribute('name')}_err`);
+	error.classList.remove('hidden')
+    error.textContent = message;
+};
+
+const showSuccess = (input) => {
+    // add the error class
+    input.classList.remove('error');
+
+    // show the error message
+    const error = document.querySelector(`.container small.${input.getAttribute('name')}_err`);
+	error.classList.add('hidden')
+};
+const isEmailValid = (email) => {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+};
+
+// Check post name input
+function check_post_name(){
+	const input = document.querySelector('#post_name')
+	// check if its not blank
+	if (isRequired(input.value)){
+		showError(input, 'this field is required')
+		return false
+	}
+
+	// check if it doesnt contain bad chars
+	var regName = /^[a-zA-Zא-ת]+ [a-zA-Zא-ת]+$/;
+	if (input.value.includes()){
+
+	}
+}
+function upload_form_validation(){
+
+}
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {

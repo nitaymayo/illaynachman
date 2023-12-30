@@ -87,14 +87,16 @@
 
           <div class="container">
             <label for="post_name"><b>Post Name</b></label>
-            <input type="text" placeholder="Enter post name" name="post_name" required>
+            <input type="text" placeholder="Enter post name" name="post_name" id="post_name" required>
+              <small class="hidden post_name_err">error here</small><br>
 
             <label for="post_year"><b>Approximate Year</b></label>
-            <input type="number" placeholder="Year of the event/moments" min="2000" max="2023" name="post_year" required>
+            <input type="number" placeholder="Year of the event/moments" min="2000" max="2023" id="post_year" name="post_year" required>
+                <small class="hidden post_year_err">error here</small><br>
 
               <label for="free_text"><b>Post Description</b></label>
-              <textarea style="resize: vertical" type="text" maxlength="3000" placeholder="Description of an event, a special/funny/unique moment" name="free_text"></textarea>
-
+              <textarea style="resize: vertical" type="text" maxlength="3000" id="free_text" placeholder="Description of an event, a special/funny/unique moment" name="free_text"></textarea>
+                <small class="hidden free_text_err">error here</small><br>
 
             <label for="access_type"><b>Access Type</b></label><br>
             <select name="access_type" id="access_type">
@@ -122,11 +124,6 @@
      </form>
       <h1>Stage 2: Image Upload</h1>
         {{ dropzone.create(id='new_post_dropzone', action='/homepage/uploadpostphotos') }}
-
-
-{#  <div class="container" style="background-color:#f1f1f1">#}
-{#    <button type="button" onclick="document.querySelector('.closemodal').click()" class="cancelbtn">Cancel</button>#}
-{#  </div>#}
 <button id="upload-btn">Post</button>
   </div>
  </div>

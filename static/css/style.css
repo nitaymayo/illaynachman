@@ -336,6 +336,10 @@ input, select, textarea{
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
+
+    &.error{
+        border-color: red;
+    }
 }
 
 /* Set a style for all buttons */
@@ -377,6 +381,11 @@ button:hover {
 /* Add padding to containers */
 .container {
     padding: 16px;
+
+    & small{
+        color: red;
+        font-size: 1.3rem;
+    }
 }
 
 /* The "Forgot password" text */
