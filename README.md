@@ -20,7 +20,7 @@ Your contributions to this project are not just technical; they are a tribute to
 This project is dedicated to Ilay Nachman, whose light continues to shine in our hearts. May this space be a source of comfort, reflection, and celebration of a life well-lived.
 
 ## 🔗 Access the Memorial:
-[Link to the Memorial](illaynachman.com)
+[Link to the Memorial](www.illaynachman.com)
 
 ## 📌 Note:
 Kindly be respectful and considerate in your contributions, keeping in mind the purpose and sensitivity of this memorial.
