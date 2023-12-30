@@ -39,20 +39,23 @@
                                   </div>
                                 </form>
 
-                                <form id="signup-form" class="hidden" action="/login/register" method="post">
+                                <form id="signup-form" onsubmit="return validate_signup_Form()" class="hidden" action="/login/register" method="post">
                                   <div class="imgcontainer">
                                     <img src="{{ url_for('static', filename='media/img/logos/logo.avif') }}" alt="Avatar" class="avatar">
                                   </div>
 
                                   <div class="container">
-                                    <label for="uname"><b>name</b></label>
-                                    <input type="text" placeholder="Enter your name" name="uname" required>
+                                    <label for="uname"><b>username</b></label>
+                                    <input type="text" placeholder="Enter your name" name="uname" id="uname" required>
+                                    <small class="hidden uname_err">error here</small><br>
 
                                     <label for="psw"><b>Password</b></label>
-                                    <input type="password" placeholder="Enter your password" name="psw" required>
+                                    <input type="password" placeholder="Enter your password" name="psw" id="psw" required>
+                                      <small class="hidden psw_err">error here</small><br>
 
                                      <label for="email"><b>Email</b></label>
-                                    <input type="text" placeholder="Enter your email" name="email" required>
+                                    <input type="text" placeholder="Enter your email" name="email" id="email" required>
+                                      <small class="hidden email_err">error here</small><br>
 
                                     <label for="approximation"><b>From where you know Ilay?</b></label><br>
                                         <select name="approximation" id="approximation" onchange="approximation_change(this)">
@@ -69,6 +72,7 @@
 
                                     <label class="hidden" for="approximation_more_info" id="approximation_more_info_label"><b></b></label>
                                     <input class="hidden" type="text" placeholder="" name="approximation_more_info" id="approximation_more_info" value="" required>
+                                      <small class="hidden approximation_more_info_err">error here</small><br>
 
 
 

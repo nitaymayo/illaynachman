@@ -592,6 +592,58 @@ function exit_edit_mode(){
 // *  Log in page
 // ****************************************************
 
+// log in form validation
+
+
+// sign up form validation
+function validate_signup_Form() {
+	const name_input = document.getElementById('uname')
+	const password_input = document.getElementById('psw')
+	const email_input = document.getElementById('email')
+	const approximation_input = document.getElementById('approximation_more_info')
+	const regExp = /\s|[,;\/.\\\]\[{}()\-=+#*`]/;
+	var valid = true;
+
+  // Username validation
+  if (regExp.test(name_input.value)) {
+      showError(name_input, `Username cannot have whitespace or the following characters: ${regExp}.`);
+    valid = false
+  } else {
+	  showSuccess(name_input)
+  }
+
+  // Password validation
+  if (password_input.length < 8) {
+    showError(password_input, "Password must be at least 8 characters long.");
+    valid = false;
+  } else if (regExp.test(password_input.value)) {
+   showError(password_input, `Password cannot have whitespace or the following characters: ${regExp}.`);
+   valid = false;
+  } else {
+	showSuccess(password_input)
+  }
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email_input.value)) {
+    showError(email_input, "Invalid email format.");
+    valid = false;
+  } else {
+	  showSuccess(email_input)
+  }
+
+  // Other input validation
+  if (/|[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
+    showError(approximation_input, `This field cannot have the following characters: ${/|[,;\/.\\\]\[{}()\-=+#*`]/}.`);
+    valid = false;
+  } else {
+	  showSuccess(approximation_input)
+  }
+
+  return valid
+}
+
+
 // Function used in sign in form
 // when approximation field is changed check if approximation_info input needs to be shown
 function approximation_change(select_element){

@@ -135,15 +135,16 @@ def deletepost():
     if res == -1:
         return "Problem with DB, post not deleted", 404
 
-    # move the images to deleted images directory
-    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # move the images(if exists) to deleted images directory
     from_dir = post_app.config.destination + '/post_id' + str(post_id)
-    to_dir = post_app.config.destination + '/../deleted_posts/post_id' + str(post_id) + "_" + now
-    os.mkdir(to_dir)
-    if os.path.exists(to_dir):
-        for file in os.listdir(from_dir):
-            shutil.move(os.path.join(from_dir, file), to_dir)
-        shutil.rmtree(from_dir)
+    if (os.path.exists(from_dir)):
+        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        to_dir = post_app.config.destination + '/../deleted_posts/post_id' + str(post_id) + "_" + now
+        os.mkdir(to_dir)
+        if os.path.exists(to_dir):
+            for file in os.listdir(from_dir):
+                shutil.move(os.path.join(from_dir, file), to_dir)
+            shutil.rmtree(from_dir)
 
     return "Deleted", 201
 
