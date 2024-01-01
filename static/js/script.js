@@ -318,15 +318,17 @@ btn.onclick = function() {
 
 
 // Check upload form validation
-const showError = (input, message) => {
+
+
+function showError(input, message){
     // add the error class
     input.classList.add('error');
 	input.classList.remove('success');
     // show the error message
-    const error = document.querySelector(`.container small.${input.getAttribute('name')}_err`);
+    const error = document.querySelector(`.container small.${input.getAttribute('id')}_err`);
 	error.classList.remove('hidden')
     error.textContent = message;
-};
+}
 
 const showSuccess = (input) => {
     // add the success class
@@ -616,7 +618,30 @@ function exit_edit_mode(){
 // ****************************************************
 
 // log in form validation
+function validate_login_Form() {
+	const name_input = document.getElementById('username')
+	const password_input = document.getElementById('login_password')
+	const regExp = /\s|[,;\/.\\\]\[{}()\-=+#*`]/;
+	let valid = true;
 
+	// Username validation
+  if (regExp.test(name_input.value)) {
+	  showError(name_input, `Username cannot have whitespace or the following characters: ${regExp}.`);
+	  valid = false
+  } else {
+	  showSuccess(name_input)
+  }
+
+  // Password validation
+  if (regExp.test(password_input.value)) {
+	  showError(password_input, `Password cannot have whitespace or the following characters: ${regExp}.`);
+	  valid = false;
+  } else {
+	  showSuccess(password_input)
+  }
+
+  return valid
+}
 
 // sign up form validation
 function validate_signup_Form() {
@@ -636,7 +661,7 @@ function validate_signup_Form() {
   }
 
   // Password validation
-  if (password_input.length < 8) {
+  if (password_input.value.length < 8) {
     showError(password_input, "Password must be at least 8 characters long.");
     valid = false;
   } else if (regExp.test(password_input.value)) {
@@ -648,7 +673,7 @@ function validate_signup_Form() {
 
   // Email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email_input.value)) {
+	if (!emailRegex.test(email_input.value)) {
     showError(email_input, "Invalid email format.");
     valid = false;
   } else {
