@@ -13,17 +13,19 @@
 					<div class="login-box">
 						<div class="login-content">
 							<div class="login-section last-section">
-                                <form id="login-form" class="" action="/login/checkuser" method="post">
+                                <form id="login-form" class="" onsubmit="return validate_login_Form()" action="/login/checkuser" method="post">
                                   <div class="imgcontainer">
                                     <img src="{{ url_for('static', filename='media/img/logos/logo.avif') }}" alt="Avatar" class="avatar">
                                   </div>
 
                                   <div class="container">
                                     <label for="uname"><b>Username</b></label>
-                                    <input type="text" placeholder="Enter Username" name="uname" required>
+                                    <input type="text" placeholder="Enter Username" name="uname" id="username" required>
+                                  <small class="hidden username_err">error here</small><br>
 
                                     <label for="password"><b>Password</b></label>
-                                    <input type="password" placeholder="Enter Password" name="password" required>
+                                    <input type="password" placeholder="Enter Password" name="password" id="login_password" required>
+                                  <small class="hidden login_password_err">error here</small><br>
 
                                     <button type="submit">Login</button>
 

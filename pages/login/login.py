@@ -41,7 +41,7 @@ def register_user():
     approximation = request.form['approximation']
     approximation_more_info = request.form['approximation_more_info']
 
-    # If the user provided more information aout his proximity to Ilay, then include it in the approximation variable
+    # If the user provided more information about his proximity to Ilay, then include it in the approximation variable
     if approximation_more_info:
         approximation = approximation + ': ' + approximation_more_info
 
