@@ -31,8 +31,6 @@ def check_user():
         session['is_admin'] = res[0].is_admin
         return redirect('/')
 
-    return render_template('login.html')
-
 
 
 @login.route('/login/register', methods=['GET', 'POST'])
@@ -55,6 +53,6 @@ def register_user():
 
     if res == -1:
         flash('Failed to register user')
-        return render_template('login.html')
+        return redirect('/login')
     else:
         return redirect('/')

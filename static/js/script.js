@@ -632,13 +632,14 @@ function validate_signup_Form() {
 	  showSuccess(email_input)
   }
 
-
-  // Other input validation
-  if (/|[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
-    showError(approximation_input, `This field cannot have the following characters: ${/|[,;\/.\\\]\[{}()\-=+#*`]/}.`);
-    valid = false;
-  } else {
-	  showSuccess(approximation_input)
+  if (!approximation_input.classList.contains('hidden')) {
+	  // Other input validation
+	  if (/|[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
+		  showError(approximation_input, `This field cannot have the following characters: ${/|[,;\/.\\\]\[{}()\-=+#*`]/}.`);
+		  valid = false;
+	  } else {
+		  showSuccess(approximation_input)
+	  }
   }
 
   return valid
