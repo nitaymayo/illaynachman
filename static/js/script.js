@@ -114,6 +114,14 @@ $(document).ready(function($) {
 
 	}
 
+	try {
+		var post_description = $("p.post_description");
+		post_description.niceScroll();
+	} catch(err) {
+
+	}
+
+
 	/* ---------------------------------------------------------------------- */
 	/*	project hover effects
 	/* ---------------------------------------------------------------------- */
@@ -528,8 +536,23 @@ function edit_post(post_id){
 	const post_name = document.querySelector('.post_name')
 	const post_description = document.querySelector('.post_description')
 
+	const post_name_input = document.createElement('input')
+	post_name_input.setAttribute('type', 'text')
+	post_name_input.setAttribute('dir', 'auto')
+	post_name_input.setAttribute('class', 'post_name_input')
+	post_name_input.setAttribute('value', post_name.innerText)
+
+	const post_description_input = document.createElement('textarea')
+	post_description_input.setAttribute('style', 'resize: vertical;')
+	post_description_input.setAttribute('maxlength', '3000')
+	post_description_input.setAttribute('class', 'post_description_input')
+	post_description_input.setAttribute('dir', 'auto')
+	post_description_input.innerHTML = post_description.innerText
+
+
 	post_name.innerHTML = `<input type='text' dir="auto" class='post_name_input' value='${post_name.innerText}'/>`
-	post_description.innerHTML = `<textarea style="resize: vertical" maxlength="3000" dir="auto" type='text' class='post_description_input'>${post_description.innerText}</textarea>'`
+	post_description.parentNode.replaceChild(post_description_input, post_description)
+	// post_description.innerHTML = `<textarea style="resize: vertical; height: 100%" maxlength="3000" dir="auto" class='post_description_input'>${post_description.innerText}</textarea>'`
 
 	// show new images upload dropzone
 	document.querySelector('.add_new_images').classList.remove('hidden')

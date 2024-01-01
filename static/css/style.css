@@ -274,9 +274,29 @@ p.copyright {
     line-height: 20px;
 }
 
+.scroll_top_btn{
+    position: fixed;
+    bottom: 15px;
+    left: 30px;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 50%;
+    transition-duration: 30ms;
+    background-color: white;
+    z-index: 3;
+}
+.scroll_top_btn:hover{
+    transform: scale(1.1);
+}
+
 /*-------------------------------------------------*/
 /* =  New post modal
 /*-------------------------------------------------*/
+
+
+.closemodal{
+    font-size: 30px;
+}
 
 /* The Modal (background) */
 .modal {
@@ -295,12 +315,15 @@ p.copyright {
 /* Modal Content/Box */
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
-    width: 55%; /* Could be more or less, depending on screen size */
 }
-
+@media only screen and (min-width: 600px) {
+    .modal-content {
+        margin: 15% auto; /* 15% from the top and centered */
+        width: 55%; /* Could be more or less, depending on screen size */
+    }
+}
 /* The Close Button */
 .close {
     color: #aaa;
@@ -428,7 +451,7 @@ body {
 
 body.active {
     opacity: 1;
-    height:auto!important;
+    height:auto !important;
 }
 
 #container {
@@ -527,6 +550,10 @@ ul li {
     font-weight: 300;
     line-height: 22px;
     margin: 0 0 14px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .post-tags {
@@ -584,6 +611,7 @@ ul li {
     margin: 0;
 }
 
+
 .video-post iframe {
     display: block;
     width: 100%;
@@ -591,6 +619,8 @@ ul li {
     border: none;
     margin: 0;
 }
+
+
 
 .quote-post .post-content {
     background: var(--lead-brown);
@@ -976,9 +1006,10 @@ ul.tab-links li a.active {
 /*-------------------------------------------------*/
 /* =  project-page
 /*-------------------------------------------------*/
-
-.single-project {
-    padding: 30px;
+@media only screen and (min-width: 600px) {
+    .single-project {
+        padding: 30px;
+    }
 }
 
 .single-box {
@@ -998,10 +1029,14 @@ ul.tab-links li a.active {
     float: left;
     padding: 25px;
 }
-
-.project-post-content {
-    padding: 25px 30px 30px;
+@media only screen and (min-width: 600px) {
+    .project-post-content {
+        padding: 25px 30px 30px;
+    }
 }
+.project-post-content {
+        padding: 25px 20px 30px;
+    }
 
 .project-post-content h1,
 .sidebar h1 {
@@ -1009,7 +1044,7 @@ ul.tab-links li a.active {
     font-size: 24px;
     font-family: 'Roboto', sans-serif;
     font-weight: 300;
-    margin: 0 0 5px;
+    margin: 0 0 15px;
     line-height: 30px;
 }
 
@@ -1021,11 +1056,17 @@ ul.tab-links li a.active {
     font-weight: 300;
     margin: 0 0 25px;
     line-height: 30px;
+    white-space: pre-wrap
 }
 
 .project-text {
     border-bottom: 1px solid #e5e5e5;
     margin-bottom: 25px;
+
+    /* Post edit description style */
+    & textarea{
+        height: 400px;
+    }
 }
 
 .similar-projects h1 {
@@ -1165,15 +1206,21 @@ img.selected{
     opacity: 0.5;
 }
 
+/* style for PC for post editing */
+@media only screen and (min-width: 600px){
+    .post_edit{
+        width: 350px !important;
+        left: 15px;
+    }
+}
 .post_edit{
     position: absolute;
     top: 15px;
-    left: 15px;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
     align-items: center;
-    width: 350px;
+    width: 100%;
     z-index: 10;
 
     & button{
@@ -1214,9 +1261,19 @@ img.selected{
 
     & img{
         margin: auto;
-        max-height: 80vh;
+        max-width: 80vw;
         box-shadow: -9px 10px 96px -31px rgba(0,0,0,0.89);
     }
+}
+@media only screen and (min-width: 600px){
+    .showinbig-div img{
+        max-height: 80vh !important;
+    }
+}
+
+.post_description{
+    max-height: 400px;
+    padding: 0 20px
 }
 
 .tags-box {
@@ -1310,8 +1367,10 @@ ul.depth li:before {
 /* =  about-page
 /*-------------------------------------------------*/
 
-.about-page {
-    padding: 30px;
+@media only screen and (min-width: 600px) {
+    .about-page {
+        padding: 30px;
+    }
 }
 
 .about-box {
@@ -1403,8 +1462,9 @@ ul.depth li:before {
 
 .team-data {
     margin-top: -16px;
-    padding: 0 45px;
+    padding: 0 25px;
 }
+
 
 .team-post h3 {
     color: white;
@@ -1546,10 +1606,14 @@ ul.depth li:before {
 .login-box {
     overflow: hidden;
 }
-
-.login-content {
-    min-width: 450px;
-    padding: 30px 30px 30px;
+@media only screen and (min-width: 600px) {
+    .login-content {
+        min-width: 450px;
+        padding: 30px 30px 30px;
+    }
+    form{
+        width: 50%;
+    }
 }
 
 .login-section > img {
@@ -1580,6 +1644,19 @@ ul.depth li:before {
     margin-bottom: 20px;
 }
 
+/*-------------------------------------------------*/
+/* =  Mobile style
+/*-------------------------------------------------*/
+
+/* Home Page */
+/* -------------------- */
+
+
+/* About Page */
+/* -------------------- */
+.about-page{
+
+}
 
 
 /*!*-------------------------------------------------*!*/
