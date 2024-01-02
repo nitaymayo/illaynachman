@@ -228,6 +228,20 @@ $(document).ready(function($) {
 	/* ---------------------------------------------------------------------- */
 	/*	menu responsive
 	/* ---------------------------------------------------------------------- */
+
+	const links = document.querySelectorAll('.menu-box .menu a')
+	let current_page = document.location.href.split('/').slice(-1)[0];
+	if (current_page === ''){current_page = 'home'}
+
+	for (let i = 0; i<links.length; i++){
+		if (links[i].innerHTML.toLowerCase() === current_page){
+			links[i].classList.add('active')
+		} else{
+			links[i].classList.remove('active')
+		}
+	}
+
+
 	var menuClick = $('a.elemadded'),
 		navbarVertical = $('.menu-box');
 		
@@ -248,6 +262,89 @@ $(document).ready(function($) {
 			navbarVertical.slideUp(300).removeClass('active');
 		}
 	});
+
+	/* ---------------------------------------------------------------------- */
+	/*	Load more post btn
+	/* ---------------------------------------------------------------------- */
+
+	// send request to load more posts
+	document.querySelector('a.blog-page-link').addEventListener('click', function (){
+		const xhr = new XMLHttpRequest();
+		const body = document.querySelectorAll('div.post').length;
+		xhr.open("GET", "/homepage/loadmoreposts?posts=" + body.toString());
+
+	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.onload = () => {
+	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+		  if (xhr.status == 201){
+			  var data = JSON.parse(xhr.responseText)
+			  let posts_added = []
+
+			  for (const [post_id, post] of Object.entries(data)) {
+
+
+				  const post_element = document.querySelector('.post').cloneNode(true)
+
+				  // Set main image
+				  post_element.querySelector('ul.slides img').setAttribute('src', Object.values(post['images'].location)[0])
+
+				  // Set post link and name
+				  const post_link = post_element.querySelector('.post-content h2 a')
+				  post_link.setAttribute('href', `/postpage/${post_id}`)
+				  post_link.innerHTML = Object.values(post['data'].name)[0]
+
+				  // Set post description
+				  const post_description = post_element.querySelector('.post-content>p')
+				  post_description.innerText = Object.values(post['data'].description)[0].replace("<br>", "")
+
+				  // Set post tags
+				  // delete all tags of the old post
+				  post_element.querySelectorAll('li.tag').forEach(tag => {tag.remove()})
+
+				  for (const [index, tag] of Object.entries(post['tags'].name)) {
+					  const new_tag = `<li class="tag"><a><i class="fa fa-flag" aria-hidden="true"></i><span class="tag_name">${tag}</span></a></li>`
+					  const post_tag_innerHtml = post_element.querySelector('.post-tags').innerHTML
+					  post_element.querySelector('.post-tags').innerHTML = new_tag + post_tag_innerHtml
+				  }
+
+				  // Set username
+				  post_element.querySelector('li.post_owner span').innerText = Object.values(post['data'].username)[0]
+
+				  // Set post likes
+				  post_element.querySelector('li.post_likes span').innerText = post['likes']
+
+				  // Set post upload time
+				  const days_ago = Object.values(post['data'].uploaded)[0]
+				  let uploaded_time_ago = ""
+				  if (days_ago === 0){
+					  uploaded_time_ago = "uploaded today"
+				  } else if (days_ago < 7){
+					  uploaded_time_ago = `uploaded ${days_ago} day(s) ago`
+				  } else if (days_ago < 365){
+					  uploaded_time_ago = `uploaded ${parseInt(`${days_ago/7}`)} week(s) ago`
+				  } else{
+					  uploaded_time_ago = `uploaded ${parseInt(`${days_ago/365}`)} year(s) ago`
+				  }
+				  post_element.querySelector('li.post_days_ago span').innerText = uploaded_time_ago
+
+				  document.querySelector('div.blog-box').appendChild(post_element)
+				  posts_added.push(post_element)
+			  }
+				$(posts_added).imagesLoaded(function (){
+					$container.isotope('appended', $(posts_added))
+				})
+
+		  } else{
+			  document.querySelector('.blog-page-link').innerText = "No more posts to show"
+			  document.querySelector('.blog-page-link').addEventListener('click', '')
+		  }
+	  } else {
+		console.log(`Error: ${xhr.status}`);
+		alert(xhr.responseText + ` (response code = ${xhr.status})`)
+	  }
+	};
+	xhr.send();
+	})
 
 	/* ---------------------------------------------------------------------- */
 	/*	Contact Form

@@ -1,3 +1,4 @@
+import json
 import os, shutil
 from time import sleep
 from PIL import Image
@@ -29,8 +30,11 @@ def index():
         user_id = 0
 
     # Pull all relavant data from 'post' table (the relevant access_type)
-    posts_query = (f"SELECT *, ABS(DATEDIFF(upload_timestamp, CURRENT_TIMESTAMP)) as uploaded FROM post "
-                   f"WHERE access = {access_type} OR user_id = {user_id}")
+    posts_query = (f"SELECT post.*, ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, user.name as username "
+                   f"FROM post "
+                   f"INNER JOIN user ON post.user_id = user.user_id "
+                   f"WHERE post.access = {access_type} OR post.user_id = {user_id} "
+                   f"ORDER BY upload_timestamp DESC LIMIT 1 ")
     all_posts = dbManager.fetch(posts_query)
     if not all_posts:
         return render_template('homepage.html', username=name)
@@ -97,6 +101,83 @@ def signout():
     session.clear()
     return redirect('/')
 
+@homepage.route('/homepage/loadmoreposts')
+def load_more_posts():
+
+    ### Pull Posts Data
+    if session:
+        name = session['name']
+        access_type = session['access_type']
+        user_id = session['user_id']
+    else:
+        access_type = 0
+        name = None
+        user_id = 0
+
+    # Get how many posts are already shown
+    shown_posts = int(request.args.get('posts'))
+
+    # Pull all relavant data from 'post' table (the relevant access_type)
+    posts_query = (f"SELECT post.*, ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, user.name as username "
+                   f"FROM post "
+                   f"INNER JOIN user ON post.user_id = user.user_id "
+                   f"WHERE post.access = {access_type} OR post.user_id = {user_id} "
+                   f"ORDER BY post.upload_timestamp DESC LIMIT {shown_posts},7 ")
+    all_posts = dbManager.fetch(posts_query)
+    if not all_posts:
+        return "No more posts to show", 204
+
+    all_posts = pd.DataFrame(all_posts)
+    distinct_posts_id = all_posts.post_id.unique()
+
+    allowed_posts_query = (f"SELECT post_id "
+                           f"FROM post "
+                           f"WHERE access <= {access_type} OR user_id = {user_id}")
+
+    # Pull all data from 'image' table
+    query = (f"SELECT * "
+             f"FROM image "
+             f"WHERE post_id in ({allowed_posts_query})")
+
+    all_images = dbManager.fetch(query)
+    all_images = pd.DataFrame(all_images)
+    all_images['location'] = all_images.location.str.replace(post.config.destination,
+                                                             url_for('static', filename='media/posts'))
+
+    # Pull all data from 'tag' table
+    query = (f"SELECT * "
+             f"FROM tag "
+             f"WHERE post_id in ({allowed_posts_query})")
+
+    all_tags = dbManager.fetch(query)
+    all_tags = pd.DataFrame(all_tags)
+
+    # Pull all data from post_likes table
+    query = (f"SELECT post_id, count(*) as total_likes "
+             f"FROM post_likes "
+             f"WHERE post_id IN ({allowed_posts_query}) "
+             f"GROUP BY post_id ")
+
+    likes = dbManager.fetch(query)
+    likes = pd.DataFrame(likes)
+
+    # Divide all variables to separate posts
+    separate_posts = {}
+    for post_id in distinct_posts_id:
+        separate_posts[post_id] = {
+            'data': all_posts[all_posts['post_id'] == post_id],
+            'tags': all_tags[all_tags['post_id'] == post_id],
+            'images': all_images[all_images['post_id'] == post_id]
+        }
+        if not likes.empty and (post_id in list(likes.post_id)):
+            separate_posts[post_id]['likes'] = likes[likes['post_id'] == post_id].values[0][1]
+        else:
+            separate_posts[post_id]['likes'] = 0
+
+    return pd.DataFrame(separate_posts).to_json(), 201
+
+
+    return redirect('/')
 
 @homepage.route('/home/newpost', methods=['GET', 'POST'])
 def new_post():

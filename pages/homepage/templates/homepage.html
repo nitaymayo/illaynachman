@@ -32,19 +32,27 @@
                                         {% for tag in post['tags'].name %}
                                             <li class="tag"><a><i class="fa fa-flag" aria-hidden="true"></i><span class="tag_name">{{ tag }}</span></a></li>
                                         {% endfor %}
-                                        <li><a><i class="fa fa-heart"></i>{{ post['likes'] }} likes</a></li>
+                                        <li class="post_owner"><a><i class="fa fa-user"></i><span>{{ post['data'].username.values[0] }}</span></a></li>
+                                        <li class="post_likes"><a><i class="fa fa-heart"></i><span>{{ post['likes'] }} likes</span></a></li>
 {#										<li><a href="#"><i class="fa fa-comment"></i>3 comments</a></li>#}
-                                        <li>
+                                        <li class="post_days_ago">
                                             <a>
                                             <i class="fa fa-calendar"></i>
-                                                {% if post['data'].uploaded.values[0] == 0 %}
-                                                uploaded today
-                                                {% else %}
-                                                uploaded {{ post['data'].uploaded.values[0] }} days ago
-                                                {% endif %}
+                                                <span>
+                                                    {% set days_ago = post['data'].uploaded.values[0] %}
+                                                    {% if days_ago == 0 %}
+                                                    uploaded today
+                                                    {% elif days_ago < 7 %}
+                                                    uploaded {{ (post['data'].uploaded.values[0])|int }}  day(s) ago
+                                                    {% elif days_ago < 365 %}
+                                                    uploaded {{ (post['data'].uploaded.values[0]/7)|int }} week(s) ago
+                                                    {% else %}
+                                                    uploaded {{ (post['data'].uploaded.values[0]/365)|int }} year(s) ago
+                                                    {% endif %}
+                                                </span>
                                             </a>
                                         </li>
-										<li><a href="#"><i class="fa fa-calendar"></i>from {{ post['data'].year.values[0] }}</a></li>
+{#										<li><a href="#"><i class="fa fa-calendar"></i>from {{ post['data'].year.values[0] }}</a></li>#}
 									</ul>
 								</div>							
 							</div>
@@ -58,7 +66,7 @@
 
 					</div>
 
-					<a class="blog-page-link" href="#">Older Posts</a>
+					<a class="blog-page-link">Older Posts</a>
 				</div>
 			</div>
 		</div>
