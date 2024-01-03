@@ -1648,7 +1648,7 @@ ul.depth li:before {
     margin-bottom: 20px;
 }
 
-.login-section h1 {
+.login-section h1{
     color: #000;
     font-size: 24px;
     font-family: 'Roboto', sans-serif;
@@ -1672,19 +1672,36 @@ ul.depth li:before {
 }
 
 /*-------------------------------------------------*/
-/* =  Mobile style
+/* =  error page 404
 /*-------------------------------------------------*/
 
-/* Home Page */
-/* -------------------- */
-
-
-/* About Page */
-/* -------------------- */
-.about-page{
-
+.error-page {
+    padding: 30px;
 }
 
+.error-box {
+    overflow: hidden;
+}
+@media only screen and (min-width: 600px) {
+    .login-content {
+        min-width: 450px;
+        padding: 30px 30px 30px;
+    }
+}
+.error-content{
+    text-align: center;
+    padding: 20px;
+    border: 3px solid lightgray;
+    border-radius: 30px;
+}
+
+ .error-content h1 {
+     color: #000;
+    font-size: 40px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    margin: 0 0 5px;
+ }
 
 /*!*-------------------------------------------------*!*/
 /*!* =  contact-page*/

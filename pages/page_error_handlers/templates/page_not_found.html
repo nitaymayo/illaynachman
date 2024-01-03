@@ -12,11 +12,30 @@
 {% endblock %}
 
 {% block page_body_main_content %}
-    <h1>Page not found!</h1>
-    <h2>Sorry! Requested page was not found.</h2>
+    <div id="content">
+			<div class="inner-content">
+				<div class="error-page">
+					<div class="error-box">
+						<div class="error-content">
+							<h1>Sorry! page not found :(</h1>
+					</div>
+				</div>
+			</div>
+		</div>
 {% endblock %}
 
 {% block page_body_js %}
-    <script src="{{ url_for('page_error_handlers.static', filename='js/page_error_handlers.js') }}"></script>
-    <script src="{{ url_for('page_error_handlers.static', filename='js/page_not_found.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.migrate.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.imagesloaded.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.quovolver.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/retina-1.1.0.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.nicescroll.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='js/script.js') }}"></script>
 {% endblock %}
+
+{#{% block page_body_js %}#}
+{#    <script src="{{ url_for('page_error_handlers.static', filename='js/page_error_handlers.js') }}"></script>#}
+{#    <script src="{{ url_for('page_error_handlers.static', filename='js/page_not_found.js') }}"></script>#}
+{#{% endblock %}#}
