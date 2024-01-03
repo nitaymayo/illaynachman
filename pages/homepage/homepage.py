@@ -34,7 +34,7 @@ def index():
                    f"FROM post "
                    f"INNER JOIN user ON post.user_id = user.user_id "
                    f"WHERE post.access = {access_type} OR post.user_id = {user_id} "
-                   f"ORDER BY upload_timestamp DESC LIMIT 1 ")
+                   f"ORDER BY upload_timestamp DESC LIMIT 15 ")
     all_posts = dbManager.fetch(posts_query)
     if not all_posts:
         return render_template('homepage.html', username=name)
