@@ -19,11 +19,11 @@
                                   </div>
 
                                   <div class="container">
-                                    <label for="uname"><b>Username</b></label>
+                                    <label for="username"><b>Username</b></label>
                                     <input type="text" placeholder="Enter Username" name="uname" id="username" required>
                                   <small class="hidden username_err">error here</small><br>
 
-                                    <label for="password"><b>Password</b></label>
+                                    <label for="login_password"><b>Password</b></label>
                                     <input type="password" placeholder="Enter Password" name="password" id="login_password" required>
                                   <small class="hidden login_password_err">error here</small><br>
 
@@ -89,15 +89,5 @@
 				</div>
 			</div>
 		</div>
-{% endblock %}
-
-{% block page_body_js %}
-	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
-	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.migrate.js') }}"></script>
-	<script type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.js') }}"></script>
-	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.imagesloaded.min.js') }}"></script>
-	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.quovolver.js') }}"></script>
-	<script type="text/javascript" src="{{ url_for('static',filename='js/retina-1.1.0.min.js') }}"></script>
-	<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.nicescroll.min.js') }}"></script>
-	<script type="text/javascript" src="{{ url_for('static',filename='js/script.js') }}"></script>
+</div>
 {% endblock %}

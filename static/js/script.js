@@ -1,5 +1,14 @@
 /*jshint jquery:true */
-/*global $:true */
+// global $:true
+
+// capitalize function
+Object.defineProperty(String.prototype, 'capitalize', {
+  value: function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+  },
+
+  enumerable: false
+});
 
 var $ = jQuery.noConflict();
 
@@ -134,27 +143,6 @@ $(document).ready(function($) {
 	}
 
 	/* ---------------------------------------------------------------------- */
-	/*	Contact Map
-	/* ---------------------------------------------------------------------- */
-	var contact = {"lat":"51.51152", "lon":"-0.104198"}; //Change a map coordinate here!
-
-	try {
-		var mapContainer = $('#map');
-		mapContainer.gmap3({
-			action: 'addMarker',
-			latLng: [contact.lat, contact.lon],
-			map:{
-				center: [contact.lat, contact.lon],
-				zoom: 14
-				},
-			},
-			{action: 'setOptions', args:[{scrollwheel:true}]}
-		);
-	} catch(err) {
-
-	}
-
-	/* ---------------------------------------------------------------------- */
 	/*	magnific-popup
 	/* ---------------------------------------------------------------------- */
 
@@ -268,84 +256,88 @@ $(document).ready(function($) {
 	/* ---------------------------------------------------------------------- */
 
 	// send request to load more posts
-	document.querySelector('a.blog-page-link').addEventListener('click', function (){
-		const xhr = new XMLHttpRequest();
-		const body = document.querySelectorAll('div.post').length;
-		xhr.open("GET", "/homepage/loadmoreposts?posts=" + body.toString());
+	const more_post_btn = document.querySelector('a.blog-page-link')
+	if (more_post_btn) {
+		more_post_btn.addEventListener('click', function () {
+			const xhr = new XMLHttpRequest();
+			const body = document.querySelectorAll('div.post').length;
+			xhr.open("GET", "/homepage/loadmoreposts?posts=" + body.toString());
 
-	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.onload = () => {
-	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
-		  if (xhr.status == 201){
-			  var data = JSON.parse(xhr.responseText)
-			  let posts_added = []
+			// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xhr.onload = () => {
+				if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+					if (xhr.status == 201) {
+						var data = JSON.parse(xhr.responseText)
+						let posts_added = []
 
-			  for (const [post_id, post] of Object.entries(data)) {
+						for (const [post_id, post] of Object.entries(data)) {
 
 
-				  const post_element = document.querySelector('.post').cloneNode(true)
+							const post_element = document.querySelector('.post').cloneNode(true)
 
-				  // Set main image
-				  post_element.querySelector('ul.slides img').setAttribute('src', Object.values(post['images'].location)[0])
+							// Set main image
+							post_element.querySelector('ul.slides img').setAttribute('src', Object.values(post['images'].location)[0])
 
-				  // Set post link and name
-				  const post_link = post_element.querySelector('.post-content h2 a')
-				  post_link.setAttribute('href', `/postpage/${post_id}`)
-				  post_link.innerHTML = Object.values(post['data'].name)[0]
+							// Set post link and name
+							const post_link = post_element.querySelector('.post-content h2 a')
+							post_link.setAttribute('href', `/postpage/${post_id}`)
+							post_link.innerHTML = Object.values(post['data'].name)[0]
 
-				  // Set post description
-				  const post_description = post_element.querySelector('.post-content>p')
-				  post_description.innerText = Object.values(post['data'].description)[0].replace("<br>", "")
+							// Set post description
+							const post_description = post_element.querySelector('.post-content>p')
+							post_description.innerText = Object.values(post['data'].description)[0].replace("<br>", "")
 
-				  // Set post tags
-				  // delete all tags of the old post
-				  post_element.querySelectorAll('li.tag').forEach(tag => {tag.remove()})
+							// Set post tags
+							// delete all tags of the old post
+							post_element.querySelectorAll('li.tag').forEach(tag => {
+								tag.remove()
+							})
 
-				  for (const [index, tag] of Object.entries(post['tags'].name)) {
-					  const new_tag = `<li class="tag"><a><i class="fa fa-flag" aria-hidden="true"></i><span class="tag_name">${tag}</span></a></li>`
-					  const post_tag_innerHtml = post_element.querySelector('.post-tags').innerHTML
-					  post_element.querySelector('.post-tags').innerHTML = new_tag + post_tag_innerHtml
-				  }
+							for (const [index, tag] of Object.entries(post['tags'].name)) {
+								const new_tag = `<li class="tag"><a><i class="fa fa-flag" aria-hidden="true"></i><span class="tag_name">${tag}</span></a></li>`
+								const post_tag_innerHtml = post_element.querySelector('.post-tags').innerHTML
+								post_element.querySelector('.post-tags').innerHTML = new_tag + post_tag_innerHtml
+							}
 
-				  // Set username
-				  post_element.querySelector('li.post_owner span').innerText = Object.values(post['data'].username)[0]
+							// Set username
+							post_element.querySelector('li.post_owner span').innerText = Object.values(post['data'].username)[0]
 
-				  // Set post likes
-				  post_element.querySelector('li.post_likes span').innerText = post['likes']
+							// Set post likes
+							post_element.querySelector('li.post_likes span').innerText = post['likes']
 
-				  // Set post upload time
-				  const days_ago = Object.values(post['data'].uploaded)[0]
-				  let uploaded_time_ago = ""
-				  if (days_ago === 0){
-					  uploaded_time_ago = "uploaded today"
-				  } else if (days_ago < 7){
-					  uploaded_time_ago = `uploaded ${days_ago} day(s) ago`
-				  } else if (days_ago < 365){
-					  uploaded_time_ago = `uploaded ${parseInt(`${days_ago/7}`)} week(s) ago`
-				  } else{
-					  uploaded_time_ago = `uploaded ${parseInt(`${days_ago/365}`)} year(s) ago`
-				  }
-				  post_element.querySelector('li.post_days_ago span').innerText = uploaded_time_ago
+							// Set post upload time
+							const days_ago = Object.values(post['data'].uploaded)[0]
+							let uploaded_time_ago = ""
+							if (days_ago === 0) {
+								uploaded_time_ago = "uploaded today"
+							} else if (days_ago < 7) {
+								uploaded_time_ago = `uploaded ${days_ago} day(s) ago`
+							} else if (days_ago < 365) {
+								uploaded_time_ago = `uploaded ${parseInt(`${days_ago / 7}`)} week(s) ago`
+							} else {
+								uploaded_time_ago = `uploaded ${parseInt(`${days_ago / 365}`)} year(s) ago`
+							}
+							post_element.querySelector('li.post_days_ago span').innerText = uploaded_time_ago
 
-				  document.querySelector('div.blog-box').appendChild(post_element)
-				  posts_added.push(post_element)
-			  }
-				$(posts_added).imagesLoaded(function (){
-					$container.isotope('appended', $(posts_added))
-				})
+							document.querySelector('div.blog-box').appendChild(post_element)
+							posts_added.push(post_element)
+						}
+						$(posts_added).imagesLoaded(function () {
+							$container.isotope('appended', $(posts_added))
+						})
 
-		  } else{
-			  document.querySelector('.blog-page-link').innerText = "No more posts to show"
-			  document.querySelector('.blog-page-link').addEventListener('click', '')
-		  }
-	  } else {
-		console.log(`Error: ${xhr.status}`);
-		alert(xhr.responseText + ` (response code = ${xhr.status})`)
-	  }
-	};
-	xhr.send();
-	})
-
+					} else {
+						document.querySelector('.blog-page-link').innerText = "No more posts to show"
+						document.querySelector('.blog-page-link').addEventListener('click', '')
+					}
+				} else {
+					console.log(`Error: ${xhr.status}`);
+					alert(xhr.responseText + ` (response code = ${xhr.status})`)
+				}
+			};
+			xhr.send();
+		})
+	}
 
 	/* ---------------------------------------------------------------------- */
 	/*	Contact Form
@@ -376,6 +368,31 @@ $(document).ready(function($) {
 			}
 		});
 	});
+
+	/* ---------------------------------------------------------------------- */
+	/*	load tags in new post form
+	/* ---------------------------------------------------------------------- */
+
+	if (document.querySelector('#newpostmodalbtn')) {
+		const tags_div = document.querySelector('.new_post_tags')
+
+		async function set_new_post_tags() {
+			const tags = await fetch_tags()
+			if (tags) {
+				let tag_template = ""
+				tags_div.innerHTML = ""
+				for (let i = 0; i < tags.length; i++) {
+					tag_template = `<input type="checkbox" id="${tags[i][0]}" name="tag_${tags[i][0]}">
+						   <label for="${tags[i][0]}">${tags[i][0].capitalize()}</label><br>`
+					tags_div.innerHTML += tag_template
+				}
+			} else {
+				tags_div.innerHTML = `<h3>No tags found</h3>`
+			}
+		}
+		set_new_post_tags()
+	}
+
 });
 
 
@@ -387,36 +404,76 @@ $(document).ready(function($) {
 var modal = document.getElementById("newpostmodal");
 
 // Get the button that opens the modal
-var btn = document.getElementById("newpostmodalbtn");
+var new_post_btn = document.getElementById("newpostmodalbtn");
 
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("closemodal")[0];
 
 // When the user clicks on the button, open the modal
-btn.onclick = function() {
-  modal.style.display = "block";
-  document.body.style.overflow = 'hidden';
-
-  document.getElementById('upload-btn').addEventListener('click', function () {
-	  if (new_post_validation()) {
-		  if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
-			  Dropzone.forElement('#new_post_dropzone').on('queuecomplete', function (file) {
-				  document.getElementById('new-post-form').submit()
-			  })
-			  Dropzone.forElement('#new_post_dropzone').processQueue()
-		  } else {
-			  if (confirm("Do you want to upload a post with out images?")) {
-				  document.getElementById('new-post-form').submit()
-			  }
-		  }
-	  }
-	})
+if (new_post_btn) {
+	new_post_btn.onclick = function () {
+		modal.style.display = "block";
+		document.body.style.overflow = 'hidden';
+		$('html').getNiceScroll().hide();
+	}
 }
 
+// When user clicks upload post buttton
+document.getElementById('upload-btn').addEventListener('click', function () {
+	if (new_post_validation()) {
+		if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
+			Dropzone.forElement('#new_post_dropzone').on('queuecomplete', submit_new_post(true))
+			Dropzone.forElement('#new_post_dropzone').processQueue()
+		} else {
+			if (confirm("Do you want to upload a post with out images?")) {
+				submit_new_post(false);
+			}
+		}
+	} else {
+		$(".modal-content").animate({ scrollTop: 0 }, "smooth");
+	}
+})
 
+// submit new post form
+function  submit_new_post(with_images){
+	const xhr = new XMLHttpRequest();
+	xhr.open("POST", "/home/newpost");
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-// Check upload form validation
+	// get inputs
+	const post_name = document.getElementById('post_name').value
+	const post_year = document.getElementById('post_year').value
+	const post_description = document.getElementById('free_text').value
+	const post_access = document.getElementById('access_type').value
+	let post_tags = []
+	// get tags
+	const tag_checkboxes = document.querySelectorAll('#new-post-form input[type=checkbox]')
 
+	for (let i = 0; i<tag_checkboxes.length; i++){
+		if (tag_checkboxes[i].checked){
+			post_tags.push(tag_checkboxes[i].id.toLowerCase())
+		}
+	}
+
+	const body = JSON.stringify({
+		"post_name": post_name,
+		"post_description": post_description,
+		"post_year": post_year,
+		"post_access": post_access,
+		"post_tags": post_tags,
+		"with_images": with_images //variable to tell the server if the post is imageless
+	});
+	xhr.onload = () => {
+	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+		alert(xhr.responseText)
+		window.location = '/'
+	  } else {
+		console.log(`Error: ${xhr.status}`);
+		alert(xhr.responseText + ` (response code = ${xhr.status})`)
+	  }
+	};
+	xhr.send('data=' + body);
+}
 
 function showError(input, message){
     // add the error class
@@ -425,7 +482,7 @@ function showError(input, message){
     // show the error message
     const error = document.querySelector(`.container small.${input.getAttribute('id')}_err`);
 	error.classList.remove('hidden')
-    error.textContent = message;
+	error.textContent = message;
 }
 
 function showSuccess(input) {
@@ -450,7 +507,7 @@ function new_post_validation() {
   // Validation checks for name
   var name = nameInput.value;
   if (name.trim() === '') {
-    showError(nameInput, 'Please enter your name.');
+    showError(nameInput, 'Please enter post name.');
 	valid = false
   } else {
 	  // Check if name contains restricted characters
@@ -490,17 +547,52 @@ function new_post_validation() {
   return valid;
 }
 
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-  document.body.style.overflow = 'auto';
+// pull tags option from tag-lookup table
+async function fetch_tags() {
+  try {
+    const response = await fetch(
+      "/homepage/gettags",
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data
+  } catch (error) {
+    console.error(`Could not get tags: ${error}`);
+  }
 }
+async function get_tags_options(){
+	// xhr request to pull tags options
+	const xhr = new XMLHttpRequest
+	xhr.open('GET', '/homepage/gettags');
+	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	xhr.onload = () => {
+	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+		  const tags = JSON.parse(xhr.responseText)
+		  return tags[0];
+	  } else {
+		  return false
+	  }
+	}
+
+	xhr.send()
+}
+
+
+// function to execute when user wants to exit new post modal
+function close_modal(){
+	modal.style.display = "none";
+	$('html').getNiceScroll().show();
+}
+// When the user clicks on <span> (x), close the modal
+span.onclick = close_modal
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
   if (event.target == modal) {
-    modal.style.display = "none";
+	  close_modal()
   }
 }
 
@@ -654,27 +746,37 @@ function edit_post(post_id){
 
 	post_name.innerHTML = `<input type='text' dir="auto" class='post_name_input' value='${post_name.innerText}'/>`
 	post_description.parentNode.replaceChild(post_description_input, post_description)
-	// post_description.innerHTML = `<textarea style="resize: vertical; height: 100%" maxlength="3000" dir="auto" class='post_description_input'>${post_description.innerText}</textarea>'`
+
+	// show all tags available
+	document.querySelector('.select-tags-info').classList.remove('hidden')
+	set_postpage_tags()
+
 
 	// show new images upload dropzone
 	document.querySelector('.add_new_images').classList.remove('hidden')
+	$('#upload_new_photos').niceScroll()
 
 
 	// set click listener to the update post btn
-	document.querySelector('#add_post_photos_btn').addEventListener('click', function (){
+	document.querySelector('#update_post_btn').addEventListener('click', function (){
 		// update post name and description + delete selected photos
 		const new_name = document.querySelector('.post_name_input').value
 		const new_description = document.querySelector('.post_description_input').value
 		const new_access = document.querySelector('#new_access_type').value
+		let new_tags = []
+		for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
+			new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
+		}
 		let selected_images = []
-		for (i=0; i < document.querySelectorAll('img.selected').length; i++){
+		for (let i = 0; i < document.querySelectorAll('img.selected').length; i++){
 			selected_images.push(document.querySelectorAll('img.selected')[i].getAttribute('src'))
 		}
 		const data = JSON.stringify({
 			'name': new_name,
 			'description': new_description,
 			'access': new_access,
-			'images': selected_images
+			'images': selected_images,
+			'tags': new_tags
 		})
 		// send xhr post request to do the update
 		const xhr = new XMLHttpRequest();
@@ -702,6 +804,30 @@ function edit_post(post_id){
 	})
 }
 
+// load all tags to the post page when user clicks edit mode
+	async function set_postpage_tags(){
+		const tag_lookup = await fetch_tags()
+		let previous_child= ''
+		let new_child = ''
+		for (let i = 0; i<tag_lookup.length; i++){
+			if (!document.querySelector(`li.${tag_lookup[i][0]}_tag`)){
+				new_child = $.parseHTML(`<li class="${tag_lookup[i][0]}_tag not_selected"><a>${tag_lookup[i][0].capitalize()}</a></li>`)[0]
+				if (!previous_child){
+					document.querySelector('div.tags-box ul').prepend(new_child)
+				} else {
+					previous_child.after(new_child)
+				}
+				previous_child = new_child
+			} else {
+				previous_child = document.querySelector(`li.${tag_lookup[i][0]}_tag`)
+			}
+		}
+		const all_tags = document.querySelectorAll('div.tags-box ul li')
+		for (let i = 0; i<all_tags.length ; i++){
+			all_tags[i].addEventListener('click', () => {all_tags[i].classList.toggle('not_selected')})
+		}
+	}
+
 // function to be used when user wants to exit edit mode without saving
 function exit_edit_mode(){
 	if (confirm('Do you want to exit edit mode? any changes made to the post will not be saved')){
@@ -719,6 +845,14 @@ function exit_edit_mode(){
 
 // log in form validation
 
+let login_button = document.getElementById('login-btn')
+	if (login_button) {
+		login_button.addEventListener('click', function () {
+			if (validate_login_Form()) {
+				document.getElementById('login-form').submit()
+			}
+		})
+	}
 function validate_login_Form() {
 	const name_input = document.getElementById('username')
 	const password_input = document.getElementById('login_password')
@@ -729,16 +863,22 @@ function validate_login_Form() {
   if (regExp.test(name_input.value)) {
 	  showError(name_input, `Username cannot have whitespace or the following characters: ${regExp}.`);
 	  valid = false
+  } else if (name_input.value === "") {
+	  showError(name_input, `Username cannot be blank`);
+	  valid = false
   } else {
-	  showSuccess(name_input)
+		  showSuccess(name_input)
   }
 
   // Password validation
   if (regExp.test(password_input.value)) {
 	  showError(password_input, `Password cannot have whitespace or the following characters: ${regExp}.`);
 	  valid = false;
+  } else if (password_input.value === "") {
+	  showError(password_input, `Password cannot be blank`);
+	  valid = false
   } else {
-	  showSuccess(password_input)
+		  showSuccess(name_input)
   }
 
   return valid

@@ -111,22 +111,13 @@
 
               <label for="tags"><b>Add Tags</b></label><br>
 
-              <input class="checkbox-row" type="checkbox" id="Ilay" name="tag_Ilay" >
-              <label for="Ilay">
-                  Ilay
-              </label><br>
-              <input type="checkbox" id="Family" name="tag_family">
-              <label for="Family">Family</label><br>
-              <input type="checkbox" id="Friends" name="tag_friends" />
-              <label for="Friends">Friends</label><br>
-              <input type="checkbox" id="Surf" name="tag_surf" />
-              <label for="Surf">Surf</label><br>
-              <input type="checkbox" id="Party" name="tag_party" />
-              <label for="Party">Party</label><br>
+              <div class="new_post_tags">
+
+              </div>
           </div>
      </form>
       <h1>Stage 2: Image Upload</h1>
         {{ dropzone.create(id='new_post_dropzone', action='/homepage/uploadpostphotos') }}
-<button id="upload-btn">Post</button>
+<button id="upload-btn" type="button">Post</button>
   </div>
  </div>

@@ -109,37 +109,7 @@ Base page blocks:
 <script type="text/javascript" src="{{ url_for('static', filename='js/retina-1.1.0.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.nicescroll.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
-<script>
-Dropzone.forElement(".dropzone").options = {
-    init: function () {
-        // redirect after queue complete
-        // upload queue when button click
-        dz = this;
-        document.getElementById("upload-btn").addEventListener("click", function handler(e) {
-            dz.processQueue();
-        });  // custom init code
-    },
-    // click upload options
-    uploadMultiple: true,
-    parallelUploads: 50,
-    paramName: "file", // The name that will be used to transfer the file
-    maxFilesize: 10, // MB
-    acceptedFiles: "image/*",
-    maxFiles: null,
-    dictDefaultMessage: `Drop files here or click to upload.`, // message display on drop area
-    dictFallbackMessage: "Your browser does not support drag'n'drop file uploads.",
-    dictInvalidFileType: "You can't upload files of this type.",
-    dictFileTooBig: "File is too big {{filesize}}. Max filesize: {{maxFilesize}}MiB.",
-    dictResponseError: "Server error: {{statusCode}}",
-    dictMaxFilesExceeded: "You can't upload any more files.",
-    dictCancelUpload: "Cancel upload",
-    dictRemoveFile: "Remove file",
-    dictCancelUploadConfirmation: "You really want to delete this file?",
-    dictUploadCanceled: "Upload canceled",
-    autoProcessQueue: false,
-    addRemoveLinks: true
-}
-</script>
+
 {% block page_body_js %}{% endblock %}
 {# Flash zone #}
 {% with messages = get_flashed_messages() %}

@@ -48,7 +48,7 @@ def index(post_id):
                  image]
 
         # Pull tags
-        query = f"SELECT * FROM tag WHERE post_id = {post_id}"
+        query = f"SELECT tag.name FROM tag join tag_lookup as tl ON tag.name = tl.name WHERE post_id = {post_id} ORDER BY tl.tag_index ASC "
         tag = dbManager.fetch(query)
         if tag == False:
             raise SyntaxError("Problem with the DB", errno=3.3)
@@ -169,6 +169,7 @@ def update_post(post_id):
     new_name = data['name']
     new_description = data['description']
     new_access = data['access']
+    new_tags = data['tags']
     # imgs to delete
     images = data['images']
 
@@ -183,6 +184,15 @@ def update_post(post_id):
     if res == -1:
         return "Problem with the DB, post not updated", 301
 
+    ## update post tags
+    if new_tags:
+        # delete current tags
+        query = f"DELETE FROM tag WHERE post_id = {post_id}"
+        res = dbManager.commit(query)
+        query = f"INSERT INTO tag (post_id, name) VALUES "
+        for tag in new_tags:
+            query = query + f"({post_id}, '{tag}'),"
+        res = dbManager.commit(query[:-1])
     # Delete selected images
     query_delete = f"DELETE FROM image WHERE location = "
     images_not_deleted = []
