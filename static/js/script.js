@@ -346,6 +346,7 @@ $(document).ready(function($) {
 	xhr.send();
 	})
 
+
 	/* ---------------------------------------------------------------------- */
 	/*	Contact Form
 	/* ---------------------------------------------------------------------- */
@@ -375,8 +376,8 @@ $(document).ready(function($) {
 			}
 		});
 	});
-
 });
+
 
 /* ---------------------------------------------------------------------- */
 /*	New post modal
@@ -427,7 +428,7 @@ function showError(input, message){
     error.textContent = message;
 }
 
-const showSuccess = (input) => {
+function showSuccess(input) {
     // add the success class
     input.classList.remove('error');
 	input.classList.add('success');
@@ -475,7 +476,9 @@ function new_post_validation() {
 
   // Validation check for post_description length
   var postDescription = postDescriptionInput.value;
-  if (postDescription.length > 3000) {
+  if (/['\/;.\[\]{}\\`]/.test(postDescription)){
+	      showError(postDescriptionInput, 'Post description cannot contain characters such as \', /, ;, ., \\, [], {}, `.');
+  } else if (postDescription.length > 3000) {
     showError(postDescriptionInput, 'Post description must be below 3000 characters.');
     valid = false
   } else {
@@ -715,6 +718,7 @@ function exit_edit_mode(){
 // ****************************************************
 
 // log in form validation
+
 function validate_login_Form() {
 	const name_input = document.getElementById('username')
 	const password_input = document.getElementById('login_password')
@@ -739,6 +743,7 @@ function validate_login_Form() {
 
   return valid
 }
+
 
 // sign up form validation
 function validate_signup_Form() {
@@ -826,3 +831,4 @@ function approximation_change(select_element){
 		more_info_input.removeAttribute('required')
 	}
 }
+
