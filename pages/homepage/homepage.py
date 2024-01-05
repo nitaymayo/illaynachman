@@ -179,17 +179,20 @@ def load_more_posts():
 
     return redirect('/')
 
-@homepage.route('/home/newpost', methods=['GET', 'POST'])
+@homepage.route('/home/newpost', methods=['POST'])
 def new_post():
     if not session:
         flash('Login is required to upload a post')
         return redirect(url_for('login.index'))
 
     from_dir = post.config.destination + '/temp_post_u' + str(session['user_id']) # The path to the directory where the content from upload_post_photos_to_temp() is wating
-    post_name = request.form['post_name']
-    post_year = request.form['post_year']
-    post_description = request.form['free_text']
-    access_type = request.form['access_type']
+    data = json.loads(request.form['data'])
+    post_name = data['post_name']
+    post_year = data['post_year']
+    post_description = data['post_description']
+    access_type = data['post_access']
+    post_tags = data['post_tags']
+    with_images = data['with_images']
 
     # Insert post to db
     query = (f"INSERT INTO post (name, user_id, year, description, access) "
@@ -198,9 +201,8 @@ def new_post():
     res = dbManager.commit(query)
 
     if res == -1:
-        flash('Something went wrong, your post did not uploaded (errcode=1.1)')
         shutil.rmtree(from_dir)
-        return redirect(url_for('homepage.index'))
+        return 'Something went wrong, your post did not uploaded'
 
     # Get post ID
     query = f"SELECT MAX(post_id) as current_post FROM post WHERE user_id = {session['user_id']} and name = '{post_name}' and description = '{post_description}' and year = '{post_year}' and access = '{access_type}'"
@@ -210,36 +212,25 @@ def new_post():
     to_dir = post.config.destination + '/post_id' + str(post_id) # Directory to save the content to
 
     ### Insert Tags
-
-    # Get the tag names from the form
-    keys = request.form.keys()
-    tags = []
-    for key in keys:
-        if key.__contains__('tag_'):
-            tags.append(key[4:])
     try:
-        if tags:
+        if post_tags:
             query = (f"INSERT INTO tag (name, post_id) "
                      f"VALUES ")
-            tag = tags.pop(0)
-            query += f"('{tag}', {res[0].current_post})"
-            for tag in tags:
-                query += f",('{tag}', {res[0].current_post})"
-            res = dbManager.commit(query)
+            for tag in post_tags:
+                query += f"('{tag}', {res[0].current_post}),"
+            res = dbManager.commit(query[:-1])
             if res == -1:
-                raise Exception('Something went wrong')
+                raise Exception('Something went wrong with tags insert query')
     except Exception as e:
-        flash('Something went wrong, Post did not uploaded (errcode=1.2)')
         if os.path.exists(from_dir):
             shutil.rmtree(from_dir)
         query = f"DELETE FROM post WHERE post_id = {post_id}"
         dbManager.commit(query)
-        return redirect(url_for('homepage.index'))
+        return e, 301
 
     # check if post doesnt have photos
-    if (not os.path.exists(from_dir)):
-        flash('Post uploaded!')
-        return redirect('/')
+    if (not with_images):
+        return 'Post uploaded!', 201
 
     os.mkdir(to_dir) #Create post dir
 
@@ -254,16 +245,15 @@ def new_post():
 
         res = dbManager.commit(query)
         if res == -1:
-            raise Exception('Something went wrong with db upload')
+            raise Exception('Something went wrong with the db upload, if error repeats please let us know')
     except Exception as e:
-        flash('Something went wrong, Post did not uploaded (errcode=1.3) ')
         query = f"DELETE FROM post WHERE post_id = {post_id}"
         dbManager.commit(query)
         shutil.rmtree(to_dir)
-        return redirect(url_for('homepage.index'))
+        return e, 301
 
-    flash('Post uploaded!')
-    return redirect('/')
+
+    return 'Post uploaded!', 201
 
 
 @homepage.route('/homepage/uploadpostphotos', methods=['POST'])

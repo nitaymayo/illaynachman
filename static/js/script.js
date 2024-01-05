@@ -408,23 +408,65 @@ if (new_post_btn) {
 		modal.style.display = "block";
 		document.body.style.overflow = 'hidden';
 		$('html').getNiceScroll().hide();
-		document.getElementById('upload-btn').addEventListener('click', function () {
-			if (new_post_validation()) {
-				if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
-					Dropzone.forElement('#new_post_dropzone').on('queuecomplete', function (file) {
-						document.getElementById('new-post-form').submit()
-					})
-					Dropzone.forElement('#new_post_dropzone').processQueue()
-				} else {
-					if (confirm("Do you want to upload a post with out images?")) {
-						document.getElementById('new-post-form').submit()
-					}
-				}
-			}
-		})
 	}
 }
 
+// When user clicks upload post buttton
+document.getElementById('upload-btn').addEventListener('click', function () {
+	if (new_post_validation()) {
+		if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
+			Dropzone.forElement('#new_post_dropzone').on('queuecomplete', submit_new_post(true))
+			Dropzone.forElement('#new_post_dropzone').processQueue()
+		} else {
+			if (confirm("Do you want to upload a post with out images?")) {
+				submit_new_post(false);
+			}
+		}
+	} else {
+		$(".modal-content").animate({ scrollTop: 0 }, "smooth");
+	}
+})
+
+// submit new post form
+function  submit_new_post(with_images){
+	const xhr = new XMLHttpRequest();
+	xhr.open("POST", "/home/newpost");
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	// get inputs
+	const post_name = document.getElementById('post_name').value
+	const post_year = document.getElementById('post_year').value
+	const post_description = document.getElementById('free_text').value
+	const post_access = document.getElementById('access_type').value
+	let post_tags = []
+	// get tags
+	const tag_checkboxes = document.querySelectorAll('#new-post-form input[type=checkbox]')
+
+	for (let i = 0; i<tag_checkboxes.length; i++){
+		if (tag_checkboxes[i].checked){
+			post_tags.push(tag_checkboxes[i].id.toLowerCase())
+		}
+	}
+
+	const body = JSON.stringify({
+		"post_name": post_name,
+		"post_description": post_description,
+		"post_year": post_year,
+		"post_access": post_access,
+		"post_tags": post_tags,
+		"with_images": with_images //variable to tell the server if the post is imageless
+	});
+	xhr.onload = () => {
+	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+		alert(xhr.responseText)
+		window.location = '/'
+	  } else {
+		console.log(`Error: ${xhr.status}`);
+		alert(xhr.responseText + ` (response code = ${xhr.status})`)
+	  }
+	};
+	xhr.send('data=' + body);
+}
 
 // Check upload form validation
 

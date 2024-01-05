@@ -55,7 +55,9 @@ html[xmlns] .slides {display: block;}
 .flexslider.post-slide{
 	height: min-content;
 	max-height: 60vh;
+	min-height: 10vh;
 	overflow: hidden;
+
 	& ul, li{
 		height: min-content;
 	}
