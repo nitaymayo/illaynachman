@@ -13,7 +13,7 @@
 					<div class="login-box">
 						<div class="login-content">
 							<div class="login-section last-section">
-                                <form id="login-form" class="" onsubmit="return validate_login_Form()" action="/login/checkuser" method="post">
+                                <form id="login-form" class="" action="/login/checkuser" method="post">
                                   <div class="imgcontainer">
                                     <img src="{{ url_for('static', filename='media/img/logos/logo.avif') }}" alt="Avatar" class="avatar">
                                   </div>
@@ -27,7 +27,7 @@
                                     <input type="password" placeholder="Enter Password" name="password" id="login_password" required>
                                   <small class="hidden login_password_err">error here</small><br>
 
-                                    <button type="submit">Login</button>
+                                    <button type="button" id="login-btn">Login</button>
 
                                       <span>First time here? <a onclick="document.getElementById('login-form').classList.add('hidden'); document.getElementById('signup-form').classList.remove('hidden')">Sign up</a></span>
                                       {% if msg %}
