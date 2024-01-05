@@ -1317,10 +1317,14 @@ img.selected{
     margin-right: 8px;
     margin-bottom: 10px;
 }
+.tags-box ul li.not_selected a{
+    background-color: lightgrey;
+}
 
 .tags-box ul li a {
     display: inline-block;
     color: #a3a3a3;
+    user-select: none;
     font-size: 13px;
     font-family: 'Roboto', sans-serif;
     font-weight: 300;

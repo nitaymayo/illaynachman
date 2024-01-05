@@ -1,6 +1,15 @@
 /*jshint jquery:true */
 // global $:true
 
+// capitalize function
+Object.defineProperty(String.prototype, 'capitalize', {
+  value: function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+  },
+
+  enumerable: false
+});
+
 var $ = jQuery.noConflict();
 
 $(document).ready(function($) {
@@ -129,27 +138,6 @@ $(document).ready(function($) {
 	try {
 		var projectPost = $('.project-post ');
 		projectPost.each( function() { $(this).hoverdir(); } );
-	} catch(err) {
-
-	}
-
-	/* ---------------------------------------------------------------------- */
-	/*	Contact Map
-	/* ---------------------------------------------------------------------- */
-	var contact = {"lat":"51.51152", "lon":"-0.104198"}; //Change a map coordinate here!
-
-	try {
-		var mapContainer = $('#map');
-		mapContainer.gmap3({
-			action: 'addMarker',
-			latLng: [contact.lat, contact.lon],
-			map:{
-				center: [contact.lat, contact.lon],
-				zoom: 14
-				},
-			},
-			{action: 'setOptions', args:[{scrollwheel:true}]}
-		);
 	} catch(err) {
 
 	}
@@ -382,9 +370,28 @@ $(document).ready(function($) {
 	});
 
 	/* ---------------------------------------------------------------------- */
-	/*	login submit button
+	/*	load tags in new post form
 	/* ---------------------------------------------------------------------- */
 
+	if (document.querySelector('#newpostmodalbtn')) {
+		const tags_div = document.querySelector('.new_post_tags')
+
+		async function set_new_post_tags() {
+			const tags = await fetch_tags()
+			if (tags) {
+				let tag_template = ""
+				tags_div.innerHTML = ""
+				for (let i = 0; i < tags.length; i++) {
+					tag_template = `<input type="checkbox" id="${tags[i][0]}" name="tag_${tags[i][0]}">
+						   <label for="${tags[i][0]}">${tags[i][0].capitalize()}</label><br>`
+					tags_div.innerHTML += tag_template
+				}
+			} else {
+				tags_div.innerHTML = `<h3>No tags found</h3>`
+			}
+		}
+		set_new_post_tags()
+	}
 
 });
 
@@ -468,9 +475,6 @@ function  submit_new_post(with_images){
 	xhr.send('data=' + body);
 }
 
-// Check upload form validation
-
-
 function showError(input, message){
     // add the error class
     input.classList.add('error');
@@ -541,6 +545,39 @@ function new_post_validation() {
 
   // If all validations pass, the form is considered valid
   return valid;
+}
+
+// pull tags option from tag-lookup table
+async function fetch_tags() {
+  try {
+    const response = await fetch(
+      "/homepage/gettags",
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data
+  } catch (error) {
+    console.error(`Could not get tags: ${error}`);
+  }
+}
+async function get_tags_options(){
+	// xhr request to pull tags options
+	const xhr = new XMLHttpRequest
+	xhr.open('GET', '/homepage/gettags');
+	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	xhr.onload = () => {
+	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+		  const tags = JSON.parse(xhr.responseText)
+		  return tags[0];
+	  } else {
+		  return false
+	  }
+	}
+
+	xhr.send()
 }
 
 
@@ -709,7 +746,11 @@ function edit_post(post_id){
 
 	post_name.innerHTML = `<input type='text' dir="auto" class='post_name_input' value='${post_name.innerText}'/>`
 	post_description.parentNode.replaceChild(post_description_input, post_description)
-	// post_description.innerHTML = `<textarea style="resize: vertical; height: 100%" maxlength="3000" dir="auto" class='post_description_input'>${post_description.innerText}</textarea>'`
+
+	// show all tags available
+	document.querySelector('.select-tags-info').classList.remove('hidden')
+	set_postpage_tags()
+
 
 	// show new images upload dropzone
 	document.querySelector('.add_new_images').classList.remove('hidden')
@@ -717,20 +758,25 @@ function edit_post(post_id){
 
 
 	// set click listener to the update post btn
-	document.querySelector('#add_post_photos_btn').addEventListener('click', function (){
+	document.querySelector('#update_post_btn').addEventListener('click', function (){
 		// update post name and description + delete selected photos
 		const new_name = document.querySelector('.post_name_input').value
 		const new_description = document.querySelector('.post_description_input').value
 		const new_access = document.querySelector('#new_access_type').value
+		let new_tags = []
+		for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
+			new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
+		}
 		let selected_images = []
-		for (i=0; i < document.querySelectorAll('img.selected').length; i++){
+		for (let i = 0; i < document.querySelectorAll('img.selected').length; i++){
 			selected_images.push(document.querySelectorAll('img.selected')[i].getAttribute('src'))
 		}
 		const data = JSON.stringify({
 			'name': new_name,
 			'description': new_description,
 			'access': new_access,
-			'images': selected_images
+			'images': selected_images,
+			'tags': new_tags
 		})
 		// send xhr post request to do the update
 		const xhr = new XMLHttpRequest();
@@ -757,6 +803,30 @@ function edit_post(post_id){
 		xhr.send(body)
 	})
 }
+
+// load all tags to the post page when user clicks edit mode
+	async function set_postpage_tags(){
+		const tag_lookup = await fetch_tags()
+		let previous_child= ''
+		let new_child = ''
+		for (let i = 0; i<tag_lookup.length; i++){
+			if (!document.querySelector(`li.${tag_lookup[i][0]}_tag`)){
+				new_child = $.parseHTML(`<li class="${tag_lookup[i][0]}_tag not_selected"><a>${tag_lookup[i][0].capitalize()}</a></li>`)[0]
+				if (!previous_child){
+					document.querySelector('div.tags-box ul').prepend(new_child)
+				} else {
+					previous_child.after(new_child)
+				}
+				previous_child = new_child
+			} else {
+				previous_child = document.querySelector(`li.${tag_lookup[i][0]}_tag`)
+			}
+		}
+		const all_tags = document.querySelectorAll('div.tags-box ul li')
+		for (let i = 0; i<all_tags.length ; i++){
+			all_tags[i].addEventListener('click', () => {all_tags[i].classList.toggle('not_selected')})
+		}
+	}
 
 // function to be used when user wants to exit edit mode without saving
 function exit_edit_mode(){

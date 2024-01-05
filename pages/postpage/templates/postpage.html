@@ -69,7 +69,7 @@
                                     <label class="select-images-info">Want to add images? Images droped here will be uploaded</label>
                                     {{ dropzone.create(id="upload_new_photos", action=("/postpage/addimagestopost/" + post['data'].post_id|string)) }}
 
-                                    <button id="add_post_photos_btn" class="btn">Update post</button>
+                                    <button id="update_post_btn" class="btn">Update post</button>
                                 </div>
 							</div>
 						</div>
@@ -101,10 +101,11 @@
 							</div>
 							<div class="tags-box">
 								<h1>Tags</h1>
+                                <label class="select-tags-info hidden">Want to change tags? choose desired tags here</label>
 								<ul>
                                     {% for tag in post['tags'] %}
-									<li>
-										<a>{{ tag.name }}</a>
+									<li class="{{ tag.name }}_tag">
+										<a>{{ tag.name|capitalize }}</a>
 									</li>
                                     {% endfor %}
 								</ul>

@@ -291,3 +291,18 @@ def upload_post_photos_to_temp():
 
     else:
         return "Method not allowed", 401
+
+
+@homepage.route('/homepage/gettags')
+def gettags():
+
+    if not session:
+        return 'User not logged in', 401
+
+    # pull tags form tag_lookup
+    query = "SELECT name from tag_lookup ORDER BY tag_index "
+    tags = dbManager.fetch(query)
+    if not tags:
+        return 'No tags found', 404
+    tags = json.dumps(tags)
+    return tags, 201
