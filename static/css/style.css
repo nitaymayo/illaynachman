@@ -317,11 +317,13 @@ p.copyright {
     background-color: #fefefe;
     padding: 20px;
     border: 1px solid #888;
+    overflow-y: scroll;
 }
 @media only screen and (min-width: 600px) {
     .modal-content {
-        margin: 15% auto; /* 15% from the top and centered */
+        margin: 20px auto; /* 15% from the top and centered */
         width: 55%; /* Could be more or less, depending on screen size */
+        height: 90vh;
     }
 }
 /* The Close Button */
@@ -352,7 +354,8 @@ p.copyright {
 #newpostmodal .dropzone{
     border: 2px dashed var(--lead-brown) !important;
     margin: 10%;
-    min-height: 400px;
+    height: 400px;
+    overflow-y: scroll;
 }
 
 /* Full-width inputs */
@@ -380,7 +383,7 @@ input, select, textarea{
         width: 60px;
         height: 60px;
     }
-    .dropzone .dz-preview .dz-progress{
+    .dropzone .dz-preview .dz-progress, .dropzone .dz-preview .dz-details{
         display: none;
     }
 }
@@ -1273,6 +1276,8 @@ img.selected{
     border: 2px dashed var(--lead-brown) !important;
     margin: 0 auto 25px auto;
     width: 100%;
+    height: 200px;
+    overflow-y: scroll;
 }
 
 .showinbig-div{

@@ -1,5 +1,5 @@
 /*jshint jquery:true */
-/*global $:true */
+// global $:true
 
 var $ = jQuery.noConflict();
 
@@ -268,84 +268,88 @@ $(document).ready(function($) {
 	/* ---------------------------------------------------------------------- */
 
 	// send request to load more posts
-	document.querySelector('a.blog-page-link').addEventListener('click', function (){
-		const xhr = new XMLHttpRequest();
-		const body = document.querySelectorAll('div.post').length;
-		xhr.open("GET", "/homepage/loadmoreposts?posts=" + body.toString());
+	const more_post_btn = document.querySelector('a.blog-page-link')
+	if (more_post_btn) {
+		more_post_btn.addEventListener('click', function () {
+			const xhr = new XMLHttpRequest();
+			const body = document.querySelectorAll('div.post').length;
+			xhr.open("GET", "/homepage/loadmoreposts?posts=" + body.toString());
 
-	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.onload = () => {
-	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
-		  if (xhr.status == 201){
-			  var data = JSON.parse(xhr.responseText)
-			  let posts_added = []
+			// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xhr.onload = () => {
+				if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+					if (xhr.status == 201) {
+						var data = JSON.parse(xhr.responseText)
+						let posts_added = []
 
-			  for (const [post_id, post] of Object.entries(data)) {
+						for (const [post_id, post] of Object.entries(data)) {
 
 
-				  const post_element = document.querySelector('.post').cloneNode(true)
+							const post_element = document.querySelector('.post').cloneNode(true)
 
-				  // Set main image
-				  post_element.querySelector('ul.slides img').setAttribute('src', Object.values(post['images'].location)[0])
+							// Set main image
+							post_element.querySelector('ul.slides img').setAttribute('src', Object.values(post['images'].location)[0])
 
-				  // Set post link and name
-				  const post_link = post_element.querySelector('.post-content h2 a')
-				  post_link.setAttribute('href', `/postpage/${post_id}`)
-				  post_link.innerHTML = Object.values(post['data'].name)[0]
+							// Set post link and name
+							const post_link = post_element.querySelector('.post-content h2 a')
+							post_link.setAttribute('href', `/postpage/${post_id}`)
+							post_link.innerHTML = Object.values(post['data'].name)[0]
 
-				  // Set post description
-				  const post_description = post_element.querySelector('.post-content>p')
-				  post_description.innerText = Object.values(post['data'].description)[0].replace("<br>", "")
+							// Set post description
+							const post_description = post_element.querySelector('.post-content>p')
+							post_description.innerText = Object.values(post['data'].description)[0].replace("<br>", "")
 
-				  // Set post tags
-				  // delete all tags of the old post
-				  post_element.querySelectorAll('li.tag').forEach(tag => {tag.remove()})
+							// Set post tags
+							// delete all tags of the old post
+							post_element.querySelectorAll('li.tag').forEach(tag => {
+								tag.remove()
+							})
 
-				  for (const [index, tag] of Object.entries(post['tags'].name)) {
-					  const new_tag = `<li class="tag"><a><i class="fa fa-flag" aria-hidden="true"></i><span class="tag_name">${tag}</span></a></li>`
-					  const post_tag_innerHtml = post_element.querySelector('.post-tags').innerHTML
-					  post_element.querySelector('.post-tags').innerHTML = new_tag + post_tag_innerHtml
-				  }
+							for (const [index, tag] of Object.entries(post['tags'].name)) {
+								const new_tag = `<li class="tag"><a><i class="fa fa-flag" aria-hidden="true"></i><span class="tag_name">${tag}</span></a></li>`
+								const post_tag_innerHtml = post_element.querySelector('.post-tags').innerHTML
+								post_element.querySelector('.post-tags').innerHTML = new_tag + post_tag_innerHtml
+							}
 
-				  // Set username
-				  post_element.querySelector('li.post_owner span').innerText = Object.values(post['data'].username)[0]
+							// Set username
+							post_element.querySelector('li.post_owner span').innerText = Object.values(post['data'].username)[0]
 
-				  // Set post likes
-				  post_element.querySelector('li.post_likes span').innerText = post['likes']
+							// Set post likes
+							post_element.querySelector('li.post_likes span').innerText = post['likes']
 
-				  // Set post upload time
-				  const days_ago = Object.values(post['data'].uploaded)[0]
-				  let uploaded_time_ago = ""
-				  if (days_ago === 0){
-					  uploaded_time_ago = "uploaded today"
-				  } else if (days_ago < 7){
-					  uploaded_time_ago = `uploaded ${days_ago} day(s) ago`
-				  } else if (days_ago < 365){
-					  uploaded_time_ago = `uploaded ${parseInt(`${days_ago/7}`)} week(s) ago`
-				  } else{
-					  uploaded_time_ago = `uploaded ${parseInt(`${days_ago/365}`)} year(s) ago`
-				  }
-				  post_element.querySelector('li.post_days_ago span').innerText = uploaded_time_ago
+							// Set post upload time
+							const days_ago = Object.values(post['data'].uploaded)[0]
+							let uploaded_time_ago = ""
+							if (days_ago === 0) {
+								uploaded_time_ago = "uploaded today"
+							} else if (days_ago < 7) {
+								uploaded_time_ago = `uploaded ${days_ago} day(s) ago`
+							} else if (days_ago < 365) {
+								uploaded_time_ago = `uploaded ${parseInt(`${days_ago / 7}`)} week(s) ago`
+							} else {
+								uploaded_time_ago = `uploaded ${parseInt(`${days_ago / 365}`)} year(s) ago`
+							}
+							post_element.querySelector('li.post_days_ago span').innerText = uploaded_time_ago
 
-				  document.querySelector('div.blog-box').appendChild(post_element)
-				  posts_added.push(post_element)
-			  }
-				$(posts_added).imagesLoaded(function (){
-					$container.isotope('appended', $(posts_added))
-				})
+							document.querySelector('div.blog-box').appendChild(post_element)
+							posts_added.push(post_element)
+						}
+						$(posts_added).imagesLoaded(function () {
+							$container.isotope('appended', $(posts_added))
+						})
 
-		  } else{
-			  document.querySelector('.blog-page-link').innerText = "No more posts to show"
-			  document.querySelector('.blog-page-link').addEventListener('click', '')
-		  }
-	  } else {
-		console.log(`Error: ${xhr.status}`);
-		alert(xhr.responseText + ` (response code = ${xhr.status})`)
-	  }
-	};
-	xhr.send();
-	})
-
+					} else {
+						document.querySelector('.blog-page-link').innerText = "No more posts to show"
+						document.querySelector('.blog-page-link').addEventListener('click', '')
+					}
+				} else {
+					console.log(`Error: ${xhr.status}`);
+					alert(xhr.responseText + ` (response code = ${xhr.status})`)
+				}
+			};
+			xhr.send();
+		})
+	}
 
 	/* ---------------------------------------------------------------------- */
 	/*	Contact Form
@@ -376,6 +380,12 @@ $(document).ready(function($) {
 			}
 		});
 	});
+
+	/* ---------------------------------------------------------------------- */
+	/*	login submit button
+	/* ---------------------------------------------------------------------- */
+
+
 });
 
 
@@ -387,32 +397,33 @@ $(document).ready(function($) {
 var modal = document.getElementById("newpostmodal");
 
 // Get the button that opens the modal
-var btn = document.getElementById("newpostmodalbtn");
+var new_post_btn = document.getElementById("newpostmodalbtn");
 
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("closemodal")[0];
 
 // When the user clicks on the button, open the modal
-btn.onclick = function() {
-  modal.style.display = "block";
-  document.body.style.overflow = 'hidden';
-
-  document.getElementById('upload-btn').addEventListener('click', function () {
-	  if (new_post_validation()) {
-		  if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
-			  Dropzone.forElement('#new_post_dropzone').on('queuecomplete', function (file) {
-				  document.getElementById('new-post-form').submit()
-			  })
-			  Dropzone.forElement('#new_post_dropzone').processQueue()
-		  } else {
-			  if (confirm("Do you want to upload a post with out images?")) {
-				  document.getElementById('new-post-form').submit()
-			  }
-		  }
-	  }
-	})
+if (new_post_btn) {
+	new_post_btn.onclick = function () {
+		modal.style.display = "block";
+		document.body.style.overflow = 'hidden';
+		$('html').getNiceScroll().hide();
+		document.getElementById('upload-btn').addEventListener('click', function () {
+			if (new_post_validation()) {
+				if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
+					Dropzone.forElement('#new_post_dropzone').on('queuecomplete', function (file) {
+						document.getElementById('new-post-form').submit()
+					})
+					Dropzone.forElement('#new_post_dropzone').processQueue()
+				} else {
+					if (confirm("Do you want to upload a post with out images?")) {
+						document.getElementById('new-post-form').submit()
+					}
+				}
+			}
+		})
+	}
 }
-
 
 
 // Check upload form validation
@@ -425,7 +436,7 @@ function showError(input, message){
     // show the error message
     const error = document.querySelector(`.container small.${input.getAttribute('id')}_err`);
 	error.classList.remove('hidden')
-    error.textContent = message;
+	error.textContent = message;
 }
 
 function showSuccess(input) {
@@ -450,7 +461,7 @@ function new_post_validation() {
   // Validation checks for name
   var name = nameInput.value;
   if (name.trim() === '') {
-    showError(nameInput, 'Please enter your name.');
+    showError(nameInput, 'Please enter post name.');
 	valid = false
   } else {
 	  // Check if name contains restricted characters
@@ -491,16 +502,18 @@ function new_post_validation() {
 }
 
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-  document.body.style.overflow = 'auto';
+// function to execute when user wants to exit new post modal
+function close_modal(){
+	modal.style.display = "none";
+	$('html').getNiceScroll().show();
 }
+// When the user clicks on <span> (x), close the modal
+span.onclick = close_modal
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
   if (event.target == modal) {
-    modal.style.display = "none";
+	  close_modal()
   }
 }
 
@@ -658,6 +671,7 @@ function edit_post(post_id){
 
 	// show new images upload dropzone
 	document.querySelector('.add_new_images').classList.remove('hidden')
+	$('#upload_new_photos').niceScroll()
 
 
 	// set click listener to the update post btn
@@ -719,6 +733,14 @@ function exit_edit_mode(){
 
 // log in form validation
 
+let login_button = document.getElementById('login-btn')
+	if (login_button) {
+		login_button.addEventListener('click', function () {
+			if (validate_login_Form()) {
+				document.getElementById('login-form').submit()
+			}
+		})
+	}
 function validate_login_Form() {
 	const name_input = document.getElementById('username')
 	const password_input = document.getElementById('login_password')
@@ -729,16 +751,22 @@ function validate_login_Form() {
   if (regExp.test(name_input.value)) {
 	  showError(name_input, `Username cannot have whitespace or the following characters: ${regExp}.`);
 	  valid = false
+  } else if (name_input.value === "") {
+	  showError(name_input, `Username cannot be blank`);
+	  valid = false
   } else {
-	  showSuccess(name_input)
+		  showSuccess(name_input)
   }
 
   // Password validation
   if (regExp.test(password_input.value)) {
 	  showError(password_input, `Password cannot have whitespace or the following characters: ${regExp}.`);
 	  valid = false;
+  } else if (password_input.value === "") {
+	  showError(password_input, `Password cannot be blank`);
+	  valid = false
   } else {
-	  showSuccess(password_input)
+		  showSuccess(name_input)
   }
 
   return valid
