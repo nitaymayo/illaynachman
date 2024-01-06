@@ -1,4 +1,3 @@
 /static/media/posts/*
 /static/media/deleted_posts/*
-/__pycache__
-/.idea
+/.idea/
