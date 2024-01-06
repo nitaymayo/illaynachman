@@ -49,6 +49,13 @@ def index(post_id):
             raise Exception("Problem with the DB", 304)
         image = [img.location.replace(post_app.config.destination, url_for('static', filename='media/posts')) for img in
                  image]
+        # Pull cover images
+        query = f"SELECT * FROM image WHERE post_id = {post_id} AND cover = b'1'"
+        cover_image = dbManager.fetch(query)
+        if cover_image == False:
+            raise Exception("Problem with the DB", 304)
+        cover_image = [img.location.replace(post_app.config.destination, url_for('static', filename='media/posts')) for
+                       img in cover_image]
 
         # Pull tags
         query = f"SELECT tag.name FROM tag join tag_lookup as tl ON tag.name = tl.name WHERE post_id = {post_id} ORDER BY tl.tag_index ASC "
@@ -79,6 +86,7 @@ def index(post_id):
             'data': post_data,
             'likes': likes,
             'images': image,
+            'cover_images': cover_image,
             'tags': tag,
             'user_liked': user_liked
         }
@@ -176,6 +184,8 @@ def update_post(post_id):
     new_tags = data['tags']
     # imgs to delete
     images = data['images']
+    # new cover images
+    cover_images = data['cover_images']
 
     # post update query
     query = (f"UPDATE post SET "
@@ -198,6 +208,26 @@ def update_post(post_id):
         for tag in new_tags:
             query = query + f"({post_id}, '{tag}'),"
         res = dbManager.commit(query[:-1])
+
+    # Set new cover photos
+    new_cover_images = []
+    for img in cover_images:
+        img_name = img.split(f"post_id{post_id}/")[-1]
+        img_location = f"{post_app.config.destination}/post_id{post_id}/{img_name}"
+        new_cover_images.append(img_location)
+
+    query = (f"UPDATE image SET "
+             f"cover = b'0' "
+             f"WHERE post_id = {post_id}")
+    res = dbManager.commit(query)
+    location_string = ','.join([f"'{str(img)}'" for img in new_cover_images])
+    query = (f"UPDATE image SET "
+             f"cover = b'1' "
+             f"WHERE location in ({location_string})")
+    res = dbManager.commit(query)
+    if res == -1:
+        pass
+
     # Delete selected images
     query_delete = f"DELETE FROM image WHERE location = "
     images_not_deleted = []
@@ -215,7 +245,6 @@ def update_post(post_id):
                 images_not_deleted.append(img_name)
 
     return "update success", 200
-
 
 
 @postpage.route('/postpage/addimagestopost/<int:post_id>', methods=['GET', 'POST'])
@@ -263,7 +292,7 @@ def add_images_to_post(post_id):
         if bad_files:
             bad_file_string = "some images could not be uploaded:\n"
             for i, file in enumerate(bad_files):
-                bad_file_string = bad_file_string + f"{i+1}) {file}\n"
+                bad_file_string = bad_file_string + f"{i + 1}) {file}\n"
             flash(bad_file_string + "Please try changing their name and make sure they are valid content")
         return "uploading..."
     else:

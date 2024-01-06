@@ -650,12 +650,59 @@ function edit_post(post_id){
 	document.querySelector('.access_type_label').classList.remove('hidden')
 	document.querySelector('.access_type').classList.remove('hidden')
 
-	// make images selectable to allow user to delete them
+	// show cover images section
+	const cover_container = document.querySelector('div.cover_images')
+	cover_container.classList.remove('hidden')
+	// set cover_container drop listiners
+	cover_container.addEventListener('dragover', function(event){
+		event.preventDefault()
+	})
+	cover_container.addEventListener('drop',function (event){
+		// if there is already 3 images selected (3+the label) remove the last
+		if (cover_container.children.length === 4){
+			cover_container.children[3].remove();
+		}
+		// get dropped img
+		const dropped_img = $.parseHTML(event.dataTransfer.getData("text/html"))[0]
+		dropped_img.removeAttribute('onclick')
+		dropped_img.draggable = false
+		const container = $.parseHTML(`<div class="post-columns"><div class="img-card">${dropped_img.outerHTML}</div></div></div>`)[0]
+
+		// append the new img after the label
+		cover_container.insertBefore(container, cover_container.children[1])
+	})
 	document.querySelector('.select-images-info').classList.remove('hidden')
-	const post_imgs = document.querySelectorAll('div.img-card>img')
-	for (i = 0; i < post_imgs.length; i++){
+	const post_imgs = document.querySelectorAll('div:not(.cover_images)>div.post-columns>div.img-card>img')
+	for (let i = 0; i < post_imgs.length; i++){
+		// make images selectable to allow user to delete them
 		post_imgs[i].setAttribute('onclick', "this.classList.toggle('selected')")
+		// set drag and drop function for cover images selection
+		var stop = true;
+		post_imgs[i].addEventListener('drag', function (event){
+			stop = true;
+
+        if (event.clientY < 150) {
+            stop = false;
+            scroll(-1)
+        }
+
+        if (event.clientY > ($(window).height() - 150)) {
+            stop = false;
+            scroll(1)
+        }
+		})
+		post_imgs[i].addEventListener("dragend", function (event) {
+         stop = true;
+    });
 	}
+	// function used to allow screen scroll while draging img
+	var scroll = function (step) {
+        var scrollY = $(window).scrollTop();
+        $(window).scrollTop(scrollY + step);
+        if (!stop) {
+            setTimeout(function () { scroll(step) }, 20);
+        }
+    }
 
 	// make post name an input to allow user to change it
 	const post_name = document.querySelector('.post_name')
@@ -709,12 +756,17 @@ function edit_post(post_id){
 		for (let i = 0; i < document.querySelectorAll('img.selected').length; i++){
 			selected_images.push(document.querySelectorAll('img.selected')[i].getAttribute('src'))
 		}
+		let cover_images = []
+		for (let i = 0; i < document.querySelectorAll('div.cover_images img').length; i++){
+			cover_images.push(document.querySelectorAll('div.cover_images img')[i].getAttribute('src'))
+		}
 		const data = JSON.stringify({
 			'name': new_name,
 			'description': new_description,
 			'year': new_year,
 			'access': new_access,
 			'images': selected_images,
+			'cover_images': cover_images,
 			'tags': new_tags
 		})
 		// send xhr post request to do the update

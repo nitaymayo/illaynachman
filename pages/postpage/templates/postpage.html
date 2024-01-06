@@ -18,7 +18,7 @@
 							<div class="flexslider post-slide">
                             {% set images = post['images'] %}
 								<ul class="slides">
-                                    {% for img_url in images[:3]  %}
+                                    {% for img_url in post['cover_images']  %}
 									<li>
 										<img alt="" src="{{ img_url }}" />
 									</li>
@@ -46,13 +46,23 @@
 								</div>
                             {# This code block devide the images to 3 columns, the first 2 show 2/3 of the photos and the third column (separate for loop below) show the rest #}
                                 {% set third_of_images = ((images|length)/3)|int %}
+                                <div class="cover_images post-images hidden">
+                                    <label class="cover-images-info ">drag images here to change the cover photos</label>
+                                    {% for img_url in post['cover_images'] %}
+                                    <div class="post-columns">
+                                        <div class="img-card">
+                                            <img alt="{{ img_url }}" src="{{ img_url }}">
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                                 <label class="select-images-info hidden">Want to delete images? Images selected here will be deleted</label>
                                 <div class="post-images">
                                     {% for column in [0,1] %}
                                         <div class="post-columns">
                                             {% for img_url in images[third_of_images*column:third_of_images*(column + 1)] %}
-                                            <div class="img-card">
-                                                <img onclick="showinbig(this)" src="{{ img_url }}">
+                                            <div class="img-card" draggable="true">
+                                                <img onclick="showinbig(this)" src="{{ img_url }}" alt="{{ img_url }}">
                                             </div>
                                             {% endfor %}
                                         </div>
@@ -84,8 +94,8 @@
 										<span class="postlikebtn" onclick="toggle_like({{ post['data'].post_id }}, this)"><i class="fa fa-heart"></i></span><a><a class="like_number">{{ post['likes'] }}</a> Likes</a>
 									</li>
 									<li class="post_year">
-                                        <span><i class="fa fa-calendar"></i></span><a>from <span class="post_year">{{ post['data'].year }}</span>, {{ post['data'].period|capitalize }}</a><br>
-                                        <label class="change-year-info hidden">Change post year here</label>
+                                        <label class="change-year-info hidden">Change post year here</label><br>
+                                        <span><i class="fa fa-calendar"></i></span><a>from <span class="post_year">{{ post['data'].year }}</span>, {{ post['data'].period|capitalize }}</a>
 
 									</li>
                                     <li>

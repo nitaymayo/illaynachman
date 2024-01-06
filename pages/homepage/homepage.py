@@ -49,7 +49,7 @@ def index():
     # Pull all data from 'image' table
     query = (f"SELECT * "
              f"FROM image "
-             f"WHERE post_id in ({allowed_posts_query})")
+             f"WHERE post_id in ({allowed_posts_query}) AND cover = b'1'")
 
     all_images = dbManager.fetch(query)
     all_images = pd.DataFrame(all_images)
@@ -248,6 +248,13 @@ def new_post():
         res = dbManager.commit(query)
         if res == -1:
             raise Exception('Something went wrong with the db upload, if error repeats please let us know')
+
+        # choose randomly 3 photos as cover photos
+        query = (f"UPDATE image "
+                 f"SET cover = b'1' "
+                 f"WHERE post_id = {post_id} "
+                 f"ORDER BY post_id LIMIT 3")
+        res = dbManager.commit(query)
     except Exception as e:
         query = f"DELETE FROM post WHERE post_id = {post_id}"
         dbManager.commit(query)
