@@ -10,14 +10,14 @@
                     {% if posts %}
 						<!-- blog-post -->
                         {% for post in posts %}
-                            <div class="blog-post post gallery-post">
+
+                            <div class="blog-post post gallery-post" lifeperiod="{{ post['data'].period.values[0] }}">
 							<div class="inner-post">
 								<div class="flexslider">
 									<ul class="slides">
-{#                                    {% set num_of_imgs_to_show = ((post['images'].location|length)/10)|round(0, 'ceil')|int %}#}
-{#                                        {% for img in post['images'].location[:num_of_imgs_to_show] %}#}
+{#                                        {% for img in post['images'].location %}#}
 {#										<li>#}
-{#											<img alt="" src="{{ img }}" />#}
+{#											<img alt="{{ img }}" src="{{ img }}" />#}
 {#										</li>#}
 {#                                        {% endfor %}#}
                                         <li>
@@ -30,8 +30,9 @@
 									<p dir="auto">{{ post['data'].description.values[0] }}</p>
 									<ul class="post-tags">
                                         {% for tag in post['tags'].name %}
-                                            <li class="tag"><a><i class="fa fa-flag" aria-hidden="true"></i><span class="tag_name">{{ tag }}</span></a></li>
+                                            <li class="tag"><a><i class="fa fa-flag" aria-hidden="true"></i><span class="tag_name">{{ tag|capitalize }}</span></a></li>
                                         {% endfor %}
+                                        <li class="post_owner"><a><i class="fa fa-clock-o"></i><span>{{ post['data'].period.values[0]|capitalize }}</span></a></li>
                                         <li class="post_owner"><a><i class="fa fa-user"></i><span>{{ post['data'].username.values[0] }}</span></a></li>
                                         <li class="post_likes"><a><i class="fa fa-heart"></i><span>{{ post['likes'] }} likes</span></a></li>
 {#										<li><a href="#"><i class="fa fa-comment"></i>3 comments</a></li>#}

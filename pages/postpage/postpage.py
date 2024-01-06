@@ -18,7 +18,10 @@ postpage = Blueprint('postpage', __name__, static_folder='static', static_url_pa
 def index(post_id):
     try:
         # pull post data
-        query = f"SELECT *, ABS(DATEDIFF(upload_timestamp, CURRENT_TIMESTAMP)) as uploaded FROM post WHERE post_id = {post_id}"
+        query = (f"SELECT *, ABS(DATEDIFF(upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, "
+                 f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period "
+                 f"FROM post "
+                 f"WHERE post_id = {post_id}")
         res = dbManager.fetch(query)
         if res == False:
             raise Exception("Problem with the DB", 303)
@@ -43,15 +46,22 @@ def index(post_id):
         query = f"SELECT * FROM image WHERE post_id = {post_id}"
         image = dbManager.fetch(query)
         if image == False:
-            raise Exception("Problem with the DB", errno=3.2)
+            raise Exception("Problem with the DB", 304)
         image = [img.location.replace(post_app.config.destination, url_for('static', filename='media/posts')) for img in
                  image]
+        # Pull cover images
+        query = f"SELECT * FROM image WHERE post_id = {post_id} AND cover = b'1'"
+        cover_image = dbManager.fetch(query)
+        if cover_image == False:
+            raise Exception("Problem with the DB", 304)
+        cover_image = [img.location.replace(post_app.config.destination, url_for('static', filename='media/posts')) for
+                       img in cover_image]
 
         # Pull tags
         query = f"SELECT tag.name FROM tag join tag_lookup as tl ON tag.name = tl.name WHERE post_id = {post_id} ORDER BY tl.tag_index ASC "
         tag = dbManager.fetch(query)
         if tag == False:
-            raise SyntaxError("Problem with the DB", errno=3.3)
+            raise SyntaxError("Problem with the DB", 305)
 
         # Pull likes
         query = f"SELECT count(*) as total_likes FROM post_likes WHERE post_id = {post_id}"
@@ -76,6 +86,7 @@ def index(post_id):
             'data': post_data,
             'likes': likes,
             'images': image,
+            'cover_images': cover_image,
             'tags': tag,
             'user_liked': user_liked
         }
@@ -169,14 +180,18 @@ def update_post(post_id):
     new_name = data['name']
     new_description = data['description']
     new_access = data['access']
+    new_year = data['year']
     new_tags = data['tags']
     # imgs to delete
     images = data['images']
+    # new cover images
+    cover_images = data['cover_images']
 
     # post update query
     query = (f"UPDATE post SET "
              f"name = '{new_name}', "
              f"description = '{new_description}', "
+             f"year = {new_year}, "
              f"access= {new_access} "
              f"WHERE post_id = {post_id}")
     res = dbManager.commit(query)
@@ -193,6 +208,26 @@ def update_post(post_id):
         for tag in new_tags:
             query = query + f"({post_id}, '{tag}'),"
         res = dbManager.commit(query[:-1])
+
+    # Set new cover photos
+    new_cover_images = []
+    for img in cover_images:
+        img_name = img.split(f"post_id{post_id}/")[-1]
+        img_location = f"{post_app.config.destination}/post_id{post_id}/{img_name}"
+        new_cover_images.append(img_location)
+
+    query = (f"UPDATE image SET "
+             f"cover = b'0' "
+             f"WHERE post_id = {post_id}")
+    res = dbManager.commit(query)
+    location_string = ','.join([f"'{str(img)}'" for img in new_cover_images])
+    query = (f"UPDATE image SET "
+             f"cover = b'1' "
+             f"WHERE location in ({location_string})")
+    res = dbManager.commit(query)
+    if res == -1:
+        pass
+
     # Delete selected images
     query_delete = f"DELETE FROM image WHERE location = "
     images_not_deleted = []
@@ -210,7 +245,6 @@ def update_post(post_id):
                 images_not_deleted.append(img_name)
 
     return "update success", 200
-
 
 
 @postpage.route('/postpage/addimagestopost/<int:post_id>', methods=['GET', 'POST'])
@@ -258,7 +292,7 @@ def add_images_to_post(post_id):
         if bad_files:
             bad_file_string = "some images could not be uploaded:\n"
             for i, file in enumerate(bad_files):
-                bad_file_string = bad_file_string + f"{i+1}) {file}\n"
+                bad_file_string = bad_file_string + f"{i + 1}) {file}\n"
             flash(bad_file_string + "Please try changing their name and make sure they are valid content")
         return "uploading..."
     else:

@@ -393,6 +393,13 @@ $(document).ready(function($) {
 		set_new_post_tags()
 	}
 
+	// call load tags in header function to load the tags and periods filter in the side header
+	async function load_header_filters() {
+		await load_tags_in_header()
+		await load_periods_in_header()
+	}
+	load_header_filters()
+
 });
 
 
@@ -547,38 +554,8 @@ function new_post_validation() {
   return valid;
 }
 
-// pull tags option from tag-lookup table
-async function fetch_tags() {
-  try {
-    const response = await fetch(
-      "/homepage/gettags",
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`);
-    }
-    const data = await response.json();
-    return data
-  } catch (error) {
-    console.error(`Could not get tags: ${error}`);
-  }
-}
-async function get_tags_options(){
-	// xhr request to pull tags options
-	const xhr = new XMLHttpRequest
-	xhr.open('GET', '/homepage/gettags');
-	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-	xhr.onload = () => {
-	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
-		  const tags = JSON.parse(xhr.responseText)
-		  return tags[0];
-	  } else {
-		  return false
-	  }
-	}
 
-	xhr.send()
-}
 
 
 // function to execute when user wants to exit new post modal
@@ -589,7 +566,7 @@ function close_modal(){
 // When the user clicks on <span> (x), close the modal
 span.onclick = close_modal
 
-// When the user clicks anywhere outside of the modal, close it
+// When the user clicks anywhere outside the modal, close it
 window.onclick = function(event) {
   if (event.target == modal) {
 	  close_modal()
@@ -602,52 +579,6 @@ function showinbig(img){
 	showinbig.classList.remove('hidden')
 	showinbig.querySelector('img').setAttribute('src', img.getAttribute('src'))
 }
-
-// Function used when clicking a tag, shows only the post with that specific tag
-// pressing again on an activated tag disables it and shows all posts
-function tag_press(tag){
-	const all_posts = document.querySelectorAll('.blog-box > .post');
-	const tag_name = tag.innerText.toLowerCase();
-
-	// Show all posts
-	for (i = 0; i < all_posts.length; ++i) {
-			all_posts[i].classList.remove('hidden')
-	}
-
-	// If an active tag filter has been pressed -> remove filter
-	if (tag.querySelector('i').classList.contains('fa-arrow-circle-right')){
-		tag.querySelector('i').classList.remove('fa-arrow-circle-right')
-
-	// Otherwise -> change filter to the pressed one
-	} else {
-		// Remove active marker from the previous filter btn
-		const tags_btn = document.querySelectorAll('ul.categories i.fa')
-		for (i = 0; i < tags_btn.length; i++){
-		tags_btn[i].classList.remove('fa-arrow-circle-right')
-		}
-
-		// Hide irelevant posts
-		for (i = 0; i < all_posts.length; ++i) {
-			if (!get_tags(all_posts[i]).includes(tag_name)) {
-				all_posts[i].classList.add('hidden')
-			}
-		}
-		tag.querySelector('i').classList.add('fa-arrow-circle-right')
-	}
-	let winDow = $(window)
-	winDow.resize()
-}
-
-//returns all tags of a post
-function get_tags(post){
-	let tags = [];
-	var all_tags = post.querySelectorAll('.tag_name')
-	for (j = 0; j < all_tags.length ; ++j ){
-		tags.push(all_tags[j].innerText)
-	}
-	return tags
-}
-
 
 // like/dislike function - add or remove like from a post
 function toggle_like(current_post_id, element){
@@ -719,12 +650,59 @@ function edit_post(post_id){
 	document.querySelector('.access_type_label').classList.remove('hidden')
 	document.querySelector('.access_type').classList.remove('hidden')
 
-	// make images selectable to allow user to delete them
+	// show cover images section
+	const cover_container = document.querySelector('div.cover_images')
+	cover_container.classList.remove('hidden')
+	// set cover_container drop listiners
+	cover_container.addEventListener('dragover', function(event){
+		event.preventDefault()
+	})
+	cover_container.addEventListener('drop',function (event){
+		// if there is already 3 images selected (3+the label) remove the last
+		if (cover_container.children.length === 4){
+			cover_container.children[3].remove();
+		}
+		// get dropped img
+		const dropped_img = $.parseHTML(event.dataTransfer.getData("text/html"))[0]
+		dropped_img.removeAttribute('onclick')
+		dropped_img.draggable = false
+		const container = $.parseHTML(`<div class="post-columns"><div class="img-card">${dropped_img.outerHTML}</div></div></div>`)[0]
+
+		// append the new img after the label
+		cover_container.insertBefore(container, cover_container.children[1])
+	})
 	document.querySelector('.select-images-info').classList.remove('hidden')
-	const post_imgs = document.querySelectorAll('div.img-card>img')
-	for (i = 0; i < post_imgs.length; i++){
+	const post_imgs = document.querySelectorAll('div:not(.cover_images)>div.post-columns>div.img-card>img')
+	for (let i = 0; i < post_imgs.length; i++){
+		// make images selectable to allow user to delete them
 		post_imgs[i].setAttribute('onclick', "this.classList.toggle('selected')")
+		// set drag and drop function for cover images selection
+		var stop = true;
+		post_imgs[i].addEventListener('drag', function (event){
+			stop = true;
+
+        if (event.clientY < 150) {
+            stop = false;
+            scroll(-1)
+        }
+
+        if (event.clientY > ($(window).height() - 150)) {
+            stop = false;
+            scroll(1)
+        }
+		})
+		post_imgs[i].addEventListener("dragend", function (event) {
+         stop = true;
+    });
 	}
+	// function used to allow screen scroll while draging img
+	var scroll = function (step) {
+        var scrollY = $(window).scrollTop();
+        $(window).scrollTop(scrollY + step);
+        if (!stop) {
+            setTimeout(function () { scroll(step) }, 20);
+        }
+    }
 
 	// make post name an input to allow user to change it
 	const post_name = document.querySelector('.post_name')
@@ -747,6 +725,12 @@ function edit_post(post_id){
 	post_name.innerHTML = `<input type='text' dir="auto" class='post_name_input' value='${post_name.innerText}'/>`
 	post_description.parentNode.replaceChild(post_description_input, post_description)
 
+	// make post year an input
+	const post_year = document.querySelector('div.post-info span.post_year')
+	const post_year_input = $.parseHTML(`<input type='number' min="2000" max="2023" class='post_year_input' value='${post_year.innerHTML}'/>`)[0]
+	document.querySelector('div.post-info li.post_year a').replaceChild(post_year_input, post_year)
+	document.querySelector('label.change-year-info').classList.remove('hidden')
+
 	// show all tags available
 	document.querySelector('.select-tags-info').classList.remove('hidden')
 	set_postpage_tags()
@@ -760,9 +744,10 @@ function edit_post(post_id){
 	// set click listener to the update post btn
 	document.querySelector('#update_post_btn').addEventListener('click', function (){
 		// update post name and description + delete selected photos
-		const new_name = document.querySelector('.post_name_input').value
-		const new_description = document.querySelector('.post_description_input').value
+		const new_name = post_name_input.value
+		const new_description = post_description_input.value
 		const new_access = document.querySelector('#new_access_type').value
+		const new_year = post_year_input.value
 		let new_tags = []
 		for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
 			new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
@@ -771,11 +756,17 @@ function edit_post(post_id){
 		for (let i = 0; i < document.querySelectorAll('img.selected').length; i++){
 			selected_images.push(document.querySelectorAll('img.selected')[i].getAttribute('src'))
 		}
+		let cover_images = []
+		for (let i = 0; i < document.querySelectorAll('div.cover_images img').length; i++){
+			cover_images.push(document.querySelectorAll('div.cover_images img')[i].getAttribute('src'))
+		}
 		const data = JSON.stringify({
 			'name': new_name,
 			'description': new_description,
+			'year': new_year,
 			'access': new_access,
 			'images': selected_images,
+			'cover_images': cover_images,
 			'tags': new_tags
 		})
 		// send xhr post request to do the update
@@ -972,3 +963,151 @@ function approximation_change(select_element){
 	}
 }
 
+// *---------------------------------
+// * Header function
+// *---------------------------------
+
+// pull tags option from tag-lookup table
+async function fetch_tags() {
+  try {
+    const response = await fetch(
+      "/homepage/gettags",
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data
+  } catch (error) {
+    console.error(`Could not get tags: ${error}`);
+	setTimeout(() => {
+		return fetch_tags()
+	}, 5000)
+  }
+}
+
+// Function used when clicking a tag, shows only the post with that specific tag
+// pressing again on an activated tag disables it and shows all posts
+function tag_press(tag){
+	const all_posts = document.querySelectorAll('.blog-box > .post');
+	const tag_name = tag.innerText.toLowerCase();
+
+	// Show all posts
+	for (i = 0; i < all_posts.length; ++i) {
+			all_posts[i].classList.remove('hidden')
+	}
+
+	// If an active tag filter has been pressed -> remove filter
+	if (tag.querySelector('i').classList.contains('fa-arrow-circle-right')){
+		tag.querySelector('i').classList.remove('fa-arrow-circle-right')
+
+	// Otherwise -> change filter to the pressed one
+	} else {
+		// Remove active marker from the previous filter btn
+		const tags_btn = document.querySelectorAll('ul.categories i.fa')
+		for (i = 0; i < tags_btn.length; i++){
+		tags_btn[i].classList.remove('fa-arrow-circle-right')
+		}
+
+		// Hide irelevant posts
+		for (i = 0; i < all_posts.length; ++i) {
+			if (!get_tags(all_posts[i]).includes(tag_name)) {
+				all_posts[i].classList.add('hidden')
+			}
+		}
+		tag.querySelector('i').classList.add('fa-arrow-circle-right')
+	}
+	let winDow = $(window)
+	winDow.resize()
+}
+
+//returns all tags of a post
+function get_tags(post){
+	let tags = [];
+	var all_tags = post.querySelectorAll('.tag_name')
+	for (j = 0; j < all_tags.length ; ++j ){
+		tags.push(all_tags[j].innerText.toLowerCase())
+	}
+	return tags
+}
+
+// Load tags on sidebar for filter options
+// this function is called on the document onload function above
+function load_tags_in_header(){
+	const tagsPromise = fetch_tags()
+	const tag_box = document.querySelector('.categories-box ul.categories')
+	let tag_tamplate = ""
+	tagsPromise.then((tags) => {
+		for (let i = 0; i < tags.length ; i++){
+			tag_box.innerHTML += `<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>${tags[i][0].capitalize()}</a></li>`
+		}
+	})
+}
+
+// Load periods on sidebar for filter options
+// this function is called on the document onload function above
+function load_periods_in_header(){
+	const periodsPromise = fetch_periods()
+	const period_box = document.querySelector('.periods-box ul.periods')
+	let period_tamplate = ""
+	periodsPromise.then((periods) => {
+		for (let i = 0; i < periods.length ; i++){
+			period_box.innerHTML += `<li><a onclick="period_press(this)"><i class="fa" aria-hidden="true"></i>${periods[i][0].capitalize()}</a></li>`
+		}
+	})
+}
+
+// pull periods option from period-lookup table
+async function fetch_periods() {
+  try {
+    const response = await fetch(
+      "/homepage/getperiods",
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data
+  } catch (error) {
+    console.error(`Could not get periods: ${error}, retry in 5s`);
+    setTimeout(() => {
+		return fetch_periods()
+	}, 5000)
+
+  }
+}
+
+// Function used when clicking a period, shows only the post with that specific period
+// pressing again on an activated period disables it and shows all posts
+function period_press(period){
+	const all_posts = document.querySelectorAll('.blog-box > .post');
+	const period_name = period.innerText.toLowerCase();
+
+	// Show all posts
+	for (i = 0; i < all_posts.length; ++i) {
+			all_posts[i].classList.remove('hidden')
+	}
+
+	// If an active period filter has been pressed -> remove filter
+	if (period.querySelector('i').classList.contains('fa-arrow-circle-right')){
+		period.querySelector('i').classList.remove('fa-arrow-circle-right')
+
+	// Otherwise -> change filter to the pressed one
+	} else {
+		// Remove active marker from the previous filter btn
+		const periods_btn = document.querySelectorAll('ul.periods i.fa')
+		for (i = 0; i < periods_btn.length; i++){
+		periods_btn[i].classList.remove('fa-arrow-circle-right')
+		}
+
+		// Hide irelevant posts
+		for (i = 0; i < all_posts.length; ++i) {
+			if (all_posts[i].getAttribute('lifeperiod') !== period_name) {
+				all_posts[i].classList.add('hidden')
+			}
+		}
+		period.querySelector('i').classList.add('fa-arrow-circle-right')
+	}
+	let winDow = $(window)
+	winDow.resize()
+}

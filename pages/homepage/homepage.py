@@ -3,7 +3,7 @@ import os, shutil
 from time import sleep
 from PIL import Image
 from flask import Blueprint, render_template, redirect, url_for, session, flash, request
-from utilities.db.db_manager import dbManager
+from utilities.db.db_manager import dbManager, DBManager
 from app import post
 import pandas as pd
 
@@ -30,7 +30,8 @@ def index():
         user_id = 0
 
     # Pull all relavant data from 'post' table (the relevant access_type)
-    posts_query = (f"SELECT post.*, ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, user.name as username "
+    posts_query = (f"SELECT post.*, ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, user.name as username, "
+                   f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period "
                    f"FROM post "
                    f"INNER JOIN user ON post.user_id = user.user_id "
                    f"WHERE post.access = {access_type} OR post.user_id = {user_id} "
@@ -48,16 +49,17 @@ def index():
     # Pull all data from 'image' table
     query = (f"SELECT * "
              f"FROM image "
-             f"WHERE post_id in ({allowed_posts_query})")
+             f"WHERE post_id in ({allowed_posts_query}) AND cover = b'1'")
 
     all_images = dbManager.fetch(query)
     all_images = pd.DataFrame(all_images)
     all_images['location'] = all_images.location.str.replace(post.config.destination, url_for('static', filename='media/posts'))
 
     # Pull all data from 'tag' table
-    query = (f"SELECT * "
-             f"FROM tag "
-             f"WHERE post_id in ({allowed_posts_query})")
+    query = (f"SELECT tag.name, tag.post_id "
+             f"FROM tag join tag_lookup as tl ON tag.name = tl.name "
+             f"WHERE post_id in ({allowed_posts_query}) "
+             f"ORDER BY tl.tag_index ASC ")
 
     all_tags = dbManager.fetch(query)
     all_tags = pd.DataFrame(all_tags)
@@ -246,6 +248,13 @@ def new_post():
         res = dbManager.commit(query)
         if res == -1:
             raise Exception('Something went wrong with the db upload, if error repeats please let us know')
+
+        # choose randomly 3 photos as cover photos
+        query = (f"UPDATE image "
+                 f"SET cover = b'1' "
+                 f"WHERE post_id = {post_id} "
+                 f"ORDER BY post_id LIMIT 3")
+        res = dbManager.commit(query)
     except Exception as e:
         query = f"DELETE FROM post WHERE post_id = {post_id}"
         dbManager.commit(query)
@@ -295,14 +304,22 @@ def upload_post_photos_to_temp():
 
 @homepage.route('/homepage/gettags')
 def gettags():
-
-    if not session:
-        return 'User not logged in', 401
-
     # pull tags form tag_lookup
     query = "SELECT name from tag_lookup ORDER BY tag_index "
-    tags = dbManager.fetch(query)
+    localDBmanager = DBManager()
+    tags = localDBmanager.fetch(query)
     if not tags:
         return 'No tags found', 404
     tags = json.dumps(tags)
     return tags, 201
+
+@homepage.route('/homepage/getperiods')
+def getperiods():
+    # pull tags form tag_lookup
+    query = "SELECT name from period_lookup ORDER BY start_year "
+    localDBmanager = DBManager()
+    periods = localDBmanager.fetch(query)
+    if not periods:
+        return 'No periods found', 404
+    periods = json.dumps(periods)
+    return periods, 201
