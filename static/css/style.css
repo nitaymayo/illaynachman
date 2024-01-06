@@ -93,7 +93,8 @@ p.username{
 
 ul.menu,
 ul.contact,
-ul.categories {
+ul.categories,
+ul.periods{
     padding: 0;
     margin: 0;
 }
@@ -171,13 +172,15 @@ ul.menu li a:hover {
 }
 .post-box,
 .contact-box,
-.categories-box {
+.categories-box,
+.periods-box{
     padding: 30px 30px 15px;
     border-bottom: 1px solid #e5e5e5;
 }
 
 .contact-box h2,
-.categories-box h2 {
+.categories-box h2,
+.periods-box h2{
     font-size: 16px;
     font-family: 'Roboto', sans-serif;
     text-transform: uppercase;
@@ -186,13 +189,15 @@ ul.menu li a:hover {
 }
 
 ul.contact li,
-ul.categories li {
+ul.categories li,
+ul.periods li{
     list-style: none;
     margin-bottom: 6px;
 }
 
 ul.contact li a,
-ul.categories li a {
+ul.categories li a,
+ul.periods li a {
     display: inline-block;
     color: #787878;
     font-family: 'Roboto', sans-serif;
@@ -206,11 +211,13 @@ ul.categories li a {
 }
 
 ul.contact li a:hover,
-ul.categories li a:hover {
+ul.categories li a:hover,
+ul.periods li a:hover{
     color: #000000;
 }
 
-ul.categories a{
+ul.categories a,
+ul.periods a{
     user-select: none;
 }
 

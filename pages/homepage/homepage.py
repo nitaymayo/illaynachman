@@ -3,7 +3,7 @@ import os, shutil
 from time import sleep
 from PIL import Image
 from flask import Blueprint, render_template, redirect, url_for, session, flash, request
-from utilities.db.db_manager import dbManager
+from utilities.db.db_manager import dbManager, DBManager
 from app import post
 import pandas as pd
 
@@ -30,7 +30,8 @@ def index():
         user_id = 0
 
     # Pull all relavant data from 'post' table (the relevant access_type)
-    posts_query = (f"SELECT post.*, ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, user.name as username "
+    posts_query = (f"SELECT post.*, ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, user.name as username, "
+                   f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period "
                    f"FROM post "
                    f"INNER JOIN user ON post.user_id = user.user_id "
                    f"WHERE post.access = {access_type} OR post.user_id = {user_id} "
@@ -295,14 +296,22 @@ def upload_post_photos_to_temp():
 
 @homepage.route('/homepage/gettags')
 def gettags():
-
-    if not session:
-        return 'User not logged in', 401
-
     # pull tags form tag_lookup
     query = "SELECT name from tag_lookup ORDER BY tag_index "
-    tags = dbManager.fetch(query)
+    localDBmanager = DBManager()
+    tags = localDBmanager.fetch(query)
     if not tags:
         return 'No tags found', 404
     tags = json.dumps(tags)
     return tags, 201
+
+@homepage.route('/homepage/getperiods')
+def getperiods():
+    # pull tags form tag_lookup
+    query = "SELECT name from period_lookup ORDER BY start_year "
+    localDBmanager = DBManager()
+    periods = localDBmanager.fetch(query)
+    if not periods:
+        return 'No periods found', 404
+    periods = json.dumps(periods)
+    return periods, 201

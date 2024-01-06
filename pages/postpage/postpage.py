@@ -43,7 +43,7 @@ def index(post_id):
         query = f"SELECT * FROM image WHERE post_id = {post_id}"
         image = dbManager.fetch(query)
         if image == False:
-            raise Exception("Problem with the DB", errno=3.2)
+            raise Exception("Problem with the DB", 304)
         image = [img.location.replace(post_app.config.destination, url_for('static', filename='media/posts')) for img in
                  image]
 
@@ -51,7 +51,7 @@ def index(post_id):
         query = f"SELECT tag.name FROM tag join tag_lookup as tl ON tag.name = tl.name WHERE post_id = {post_id} ORDER BY tl.tag_index ASC "
         tag = dbManager.fetch(query)
         if tag == False:
-            raise SyntaxError("Problem with the DB", errno=3.3)
+            raise SyntaxError("Problem with the DB", 305)
 
         # Pull likes
         query = f"SELECT count(*) as total_likes FROM post_likes WHERE post_id = {post_id}"

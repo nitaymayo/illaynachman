@@ -393,6 +393,13 @@ $(document).ready(function($) {
 		set_new_post_tags()
 	}
 
+	// call load tags in header function to load the tags and periods filter in the side header
+	async function load_header_filters() {
+		await load_tags_in_header()
+		await load_periods_in_header()
+	}
+	load_header_filters()
+
 });
 
 
@@ -547,38 +554,8 @@ function new_post_validation() {
   return valid;
 }
 
-// pull tags option from tag-lookup table
-async function fetch_tags() {
-  try {
-    const response = await fetch(
-      "/homepage/gettags",
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`);
-    }
-    const data = await response.json();
-    return data
-  } catch (error) {
-    console.error(`Could not get tags: ${error}`);
-  }
-}
-async function get_tags_options(){
-	// xhr request to pull tags options
-	const xhr = new XMLHttpRequest
-	xhr.open('GET', '/homepage/gettags');
-	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-	xhr.onload = () => {
-	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
-		  const tags = JSON.parse(xhr.responseText)
-		  return tags[0];
-	  } else {
-		  return false
-	  }
-	}
 
-	xhr.send()
-}
 
 
 // function to execute when user wants to exit new post modal
@@ -589,7 +566,7 @@ function close_modal(){
 // When the user clicks on <span> (x), close the modal
 span.onclick = close_modal
 
-// When the user clicks anywhere outside of the modal, close it
+// When the user clicks anywhere outside the modal, close it
 window.onclick = function(event) {
   if (event.target == modal) {
 	  close_modal()
@@ -602,52 +579,6 @@ function showinbig(img){
 	showinbig.classList.remove('hidden')
 	showinbig.querySelector('img').setAttribute('src', img.getAttribute('src'))
 }
-
-// Function used when clicking a tag, shows only the post with that specific tag
-// pressing again on an activated tag disables it and shows all posts
-function tag_press(tag){
-	const all_posts = document.querySelectorAll('.blog-box > .post');
-	const tag_name = tag.innerText.toLowerCase();
-
-	// Show all posts
-	for (i = 0; i < all_posts.length; ++i) {
-			all_posts[i].classList.remove('hidden')
-	}
-
-	// If an active tag filter has been pressed -> remove filter
-	if (tag.querySelector('i').classList.contains('fa-arrow-circle-right')){
-		tag.querySelector('i').classList.remove('fa-arrow-circle-right')
-
-	// Otherwise -> change filter to the pressed one
-	} else {
-		// Remove active marker from the previous filter btn
-		const tags_btn = document.querySelectorAll('ul.categories i.fa')
-		for (i = 0; i < tags_btn.length; i++){
-		tags_btn[i].classList.remove('fa-arrow-circle-right')
-		}
-
-		// Hide irelevant posts
-		for (i = 0; i < all_posts.length; ++i) {
-			if (!get_tags(all_posts[i]).includes(tag_name)) {
-				all_posts[i].classList.add('hidden')
-			}
-		}
-		tag.querySelector('i').classList.add('fa-arrow-circle-right')
-	}
-	let winDow = $(window)
-	winDow.resize()
-}
-
-//returns all tags of a post
-function get_tags(post){
-	let tags = [];
-	var all_tags = post.querySelectorAll('.tag_name')
-	for (j = 0; j < all_tags.length ; ++j ){
-		tags.push(all_tags[j].innerText)
-	}
-	return tags
-}
-
 
 // like/dislike function - add or remove like from a post
 function toggle_like(current_post_id, element){
@@ -972,3 +903,151 @@ function approximation_change(select_element){
 	}
 }
 
+// *---------------------------------
+// * Header function
+// *---------------------------------
+
+// pull tags option from tag-lookup table
+async function fetch_tags() {
+  try {
+    const response = await fetch(
+      "/homepage/gettags",
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data
+  } catch (error) {
+    console.error(`Could not get tags: ${error}`);
+	setTimeout(() => {
+		return fetch_tags()
+	}, 5000)
+  }
+}
+
+// Function used when clicking a tag, shows only the post with that specific tag
+// pressing again on an activated tag disables it and shows all posts
+function tag_press(tag){
+	const all_posts = document.querySelectorAll('.blog-box > .post');
+	const tag_name = tag.innerText.toLowerCase();
+
+	// Show all posts
+	for (i = 0; i < all_posts.length; ++i) {
+			all_posts[i].classList.remove('hidden')
+	}
+
+	// If an active tag filter has been pressed -> remove filter
+	if (tag.querySelector('i').classList.contains('fa-arrow-circle-right')){
+		tag.querySelector('i').classList.remove('fa-arrow-circle-right')
+
+	// Otherwise -> change filter to the pressed one
+	} else {
+		// Remove active marker from the previous filter btn
+		const tags_btn = document.querySelectorAll('ul.categories i.fa')
+		for (i = 0; i < tags_btn.length; i++){
+		tags_btn[i].classList.remove('fa-arrow-circle-right')
+		}
+
+		// Hide irelevant posts
+		for (i = 0; i < all_posts.length; ++i) {
+			if (!get_tags(all_posts[i]).includes(tag_name)) {
+				all_posts[i].classList.add('hidden')
+			}
+		}
+		tag.querySelector('i').classList.add('fa-arrow-circle-right')
+	}
+	let winDow = $(window)
+	winDow.resize()
+}
+
+//returns all tags of a post
+function get_tags(post){
+	let tags = [];
+	var all_tags = post.querySelectorAll('.tag_name')
+	for (j = 0; j < all_tags.length ; ++j ){
+		tags.push(all_tags[j].innerText)
+	}
+	return tags
+}
+
+// Load tags on sidebar for filter options
+// this function is called on the document onload function above
+function load_tags_in_header(){
+	const tagsPromise = fetch_tags()
+	const tag_box = document.querySelector('.categories-box ul.categories')
+	let tag_tamplate = ""
+	tagsPromise.then((tags) => {
+		for (let i = 0; i < tags.length ; i++){
+			tag_box.innerHTML += `<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>${tags[i][0].capitalize()}</a></li>`
+		}
+	})
+}
+
+// Load periods on sidebar for filter options
+// this function is called on the document onload function above
+function load_periods_in_header(){
+	const periodsPromise = fetch_periods()
+	const period_box = document.querySelector('.periods-box ul.periods')
+	let period_tamplate = ""
+	periodsPromise.then((periods) => {
+		for (let i = 0; i < periods.length ; i++){
+			period_box.innerHTML += `<li><a onclick="period_press(this)"><i class="fa" aria-hidden="true"></i>${periods[i][0].capitalize()}</a></li>`
+		}
+	})
+}
+
+// pull periods option from period-lookup table
+async function fetch_periods() {
+  try {
+    const response = await fetch(
+      "/homepage/getperiods",
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data
+  } catch (error) {
+    console.error(`Could not get periods: ${error}, retry in 5s`);
+    setTimeout(() => {
+		return fetch_periods()
+	}, 5000)
+
+  }
+}
+
+// Function used when clicking a period, shows only the post with that specific period
+// pressing again on an activated period disables it and shows all posts
+function period_press(period){
+	const all_posts = document.querySelectorAll('.blog-box > .post');
+	const period_name = period.innerText.toLowerCase();
+
+	// Show all posts
+	for (i = 0; i < all_posts.length; ++i) {
+			all_posts[i].classList.remove('hidden')
+	}
+
+	// If an active period filter has been pressed -> remove filter
+	if (period.querySelector('i').classList.contains('fa-arrow-circle-right')){
+		period.querySelector('i').classList.remove('fa-arrow-circle-right')
+
+	// Otherwise -> change filter to the pressed one
+	} else {
+		// Remove active marker from the previous filter btn
+		const periods_btn = document.querySelectorAll('ul.periods i.fa')
+		for (i = 0; i < periods_btn.length; i++){
+		periods_btn[i].classList.remove('fa-arrow-circle-right')
+		}
+
+		// Hide irelevant posts
+		for (i = 0; i < all_posts.length; ++i) {
+			if (all_posts[i].getAttribute('lifeperiod') !== period_name) {
+				all_posts[i].classList.add('hidden')
+			}
+		}
+		period.querySelector('i').classList.add('fa-arrow-circle-right')
+	}
+	let winDow = $(window)
+	winDow.resize()
+}
