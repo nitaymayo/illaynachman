@@ -18,7 +18,10 @@ postpage = Blueprint('postpage', __name__, static_folder='static', static_url_pa
 def index(post_id):
     try:
         # pull post data
-        query = f"SELECT *, ABS(DATEDIFF(upload_timestamp, CURRENT_TIMESTAMP)) as uploaded FROM post WHERE post_id = {post_id}"
+        query = (f"SELECT *, ABS(DATEDIFF(upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, "
+                 f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period "
+                 f"FROM post "
+                 f"WHERE post_id = {post_id}")
         res = dbManager.fetch(query)
         if res == False:
             raise Exception("Problem with the DB", 303)
@@ -169,6 +172,7 @@ def update_post(post_id):
     new_name = data['name']
     new_description = data['description']
     new_access = data['access']
+    new_year = data['year']
     new_tags = data['tags']
     # imgs to delete
     images = data['images']
@@ -177,6 +181,7 @@ def update_post(post_id):
     query = (f"UPDATE post SET "
              f"name = '{new_name}', "
              f"description = '{new_description}', "
+             f"year = {new_year}, "
              f"access= {new_access} "
              f"WHERE post_id = {post_id}")
     res = dbManager.commit(query)

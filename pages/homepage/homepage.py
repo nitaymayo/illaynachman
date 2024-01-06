@@ -56,9 +56,10 @@ def index():
     all_images['location'] = all_images.location.str.replace(post.config.destination, url_for('static', filename='media/posts'))
 
     # Pull all data from 'tag' table
-    query = (f"SELECT * "
-             f"FROM tag "
-             f"WHERE post_id in ({allowed_posts_query})")
+    query = (f"SELECT tag.name, tag.post_id "
+             f"FROM tag join tag_lookup as tl ON tag.name = tl.name "
+             f"WHERE post_id in ({allowed_posts_query}) "
+             f"ORDER BY tl.tag_index ASC ")
 
     all_tags = dbManager.fetch(query)
     all_tags = pd.DataFrame(all_tags)

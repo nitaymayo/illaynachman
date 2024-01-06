@@ -284,14 +284,32 @@ p.copyright {
 .scroll_top_btn{
     position: fixed;
     bottom: 15px;
-    left: 30px;
-    padding: 10px;
+    right: 30px;
+    padding: 5px;
     border: 2px solid black;
     border-radius: 50%;
     transition-duration: 30ms;
     background-color: white;
     z-index: 3;
+
+    & i{
+        font-size: 2.5rem;
+    }
 }
+
+
+@media only screen and (min-width: 600px) {
+    .scroll_top_btn{
+        left: 30px;
+        right: auto;
+        padding: 10px;
+        & i{
+            font-size: 3rem;
+        }
+    }
+
+}
+
 .scroll_top_btn:hover{
     transform: scale(1.1);
 }
@@ -1131,7 +1149,7 @@ ul.tab-links li a.active {
     padding: 0 0 14px;
 }
 
-.post-info ul li span {
+.post-info ul li>span {
     display: inline-block;
     width: 32px;
     height: 32px;
@@ -1159,6 +1177,8 @@ ul.tab-links li a.active {
     font-weight: 300;
     line-height: 32px;
 }
+
+
 
 .project-gallery ul {
     overflow: hidden;
@@ -1274,6 +1294,14 @@ img.selected{
         transform: scale(1.1);
     }
 }
+
+/*edit mode style*/
+.post-info ul li.post_year input {
+    width: fit-content;
+    padding: 0 0 0 3px;
+    margin: 0 5px;
+}
+
 
 .add_new_images{
     margin: 40px 0;

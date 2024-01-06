@@ -678,6 +678,12 @@ function edit_post(post_id){
 	post_name.innerHTML = `<input type='text' dir="auto" class='post_name_input' value='${post_name.innerText}'/>`
 	post_description.parentNode.replaceChild(post_description_input, post_description)
 
+	// make post year an input
+	const post_year = document.querySelector('div.post-info span.post_year')
+	const post_year_input = $.parseHTML(`<input type='number' min="2000" max="2023" class='post_year_input' value='${post_year.innerHTML}'/>`)[0]
+	document.querySelector('div.post-info li.post_year a').replaceChild(post_year_input, post_year)
+	document.querySelector('label.change-year-info').classList.remove('hidden')
+
 	// show all tags available
 	document.querySelector('.select-tags-info').classList.remove('hidden')
 	set_postpage_tags()
@@ -691,9 +697,10 @@ function edit_post(post_id){
 	// set click listener to the update post btn
 	document.querySelector('#update_post_btn').addEventListener('click', function (){
 		// update post name and description + delete selected photos
-		const new_name = document.querySelector('.post_name_input').value
-		const new_description = document.querySelector('.post_description_input').value
+		const new_name = post_name_input.value
+		const new_description = post_description_input.value
 		const new_access = document.querySelector('#new_access_type').value
+		const new_year = post_year_input.value
 		let new_tags = []
 		for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
 			new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
@@ -705,6 +712,7 @@ function edit_post(post_id){
 		const data = JSON.stringify({
 			'name': new_name,
 			'description': new_description,
+			'year': new_year,
 			'access': new_access,
 			'images': selected_images,
 			'tags': new_tags
@@ -966,7 +974,7 @@ function get_tags(post){
 	let tags = [];
 	var all_tags = post.querySelectorAll('.tag_name')
 	for (j = 0; j < all_tags.length ; ++j ){
-		tags.push(all_tags[j].innerText)
+		tags.push(all_tags[j].innerText.toLowerCase())
 	}
 	return tags
 }

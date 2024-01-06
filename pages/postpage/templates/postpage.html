@@ -83,8 +83,10 @@
 									<li>
 										<span class="postlikebtn" onclick="toggle_like({{ post['data'].post_id }}, this)"><i class="fa fa-heart"></i></span><a><a class="like_number">{{ post['likes'] }}</a> Likes</a>
 									</li>
-									<li>
-										<span><i class="fa fa-calendar"></i></span><a>from {{ post['data'].year }}</a>
+									<li class="post_year">
+                                        <span><i class="fa fa-calendar"></i></span><a>from <span class="post_year">{{ post['data'].year }}</span>, {{ post['data'].period|capitalize }}</a><br>
+                                        <label class="change-year-info hidden">Change post year here</label>
+
 									</li>
                                     <li>
 
