@@ -400,6 +400,9 @@ $(document).ready(function($) {
 	}
 	load_header_filters()
 
+	// loads posts to the search modal
+	load_posts_for_search()
+
 });
 
 
@@ -408,21 +411,143 @@ $(document).ready(function($) {
 /* ---------------------------------------------------------------------- */
 
 // Get the modal
-var modal = document.getElementById("newpostmodal");
+var new_post_modal = document.getElementById("newpostmodal");
 
 // Get the button that opens the modal
 var new_post_btn = document.getElementById("newpostmodalbtn");
 
 // Get the <span> element that closes the modal
-var span = document.getElementsByClassName("closemodal")[0];
+var new_post_close_span = document.querySelector("#newpostmodal .closemodal");
 
-// When the user clicks on the button, open the modal
+// When the user clicks on the button, open the new post modal
 if (new_post_btn) {
-	new_post_btn.onclick = function () {
-		modal.style.display = "block";
+	new_post_btn.addEventListener('click', () => {
+		new_post_modal.style.display = "block";
 		document.body.style.overflow = 'hidden';
 		$('html').getNiceScroll().hide();
+		$('#newpostmodal>div.modal-content').niceScroll()
+	})
+}
+
+// When the user clicks on <span> (x), close the modal
+new_post_close_span.onclick = close_modal(new_post_modal)
+
+/* ---------------------------------------------------------------------- */
+/*	search modal
+/* ---------------------------------------------------------------------- */
+
+// Get the modal
+var search_modal = document.getElementById("searchmodal");
+
+// Get the button that opens the modal
+var search_btn = document.getElementById("searchmodalbtn");
+
+// Get the <span> element that closes the modal
+var search_close_span = document.querySelector("#searchmodal .closemodal");
+
+// Get search bar input
+var search_input = document.querySelector('input#search_input')
+
+// When the user clicks on the button, open the new post modal
+if (search_btn) {
+	search_btn.onclick = function () {
+		search_modal.style.display = "block";
+		document.body.style.overflow = 'hidden';
+		$('html').getNiceScroll().hide();
+		$('#searchmodal>div.modal-content').niceScroll()
 	}
+}
+
+// Function to load all valid posts in the search modal
+async function load_posts_for_search(){
+	const container = $('div#searchmodal div.search_results')
+	const searchPostsPromise = await fetch('/homepage/getpostsforsearch');
+	const posts = await searchPostsPromise.json();
+	let reasult_card = ""
+	for (var index in posts){
+		days_ago = posts[index].uploaded
+		let uploaded_ago_str = ''
+		if (days_ago === 0){
+			uploaded_ago_str = "uploaded today"
+		} else if (days_ago < 7){
+			uploaded_ago_str = `uploaded ${days_ago} day(s) ago`
+		} else if (days_ago < 365){
+			uploaded_ago_str = `uploaded ${parseInt(days_ago/7)} week(s) ago`
+		} else {
+			uploaded_ago_str = `uploaded ${parseInt(days_ago/365)} year(s) ago`
+		}
+		reasult_card = `<div class="result_card">
+              <h2 class="post_name"><a href="/postpage/${posts[index].post_id}">${posts[index].name}</a></h2>
+              <h3 class="uploaded_ago"><a>
+                <i class="fa fa-calendar"></i>
+                    <span>
+                    ${uploaded_ago_str}                      
+                    </span>
+                </a>
+              </h3>
+              <ul class="post-tags">
+                    <li class="post_period"><a><i class="fa fa-clock-o"></i><span>${posts[index].period}</span></a></li>
+                    <li class="post_owner"><a><i class="fa fa-user"></i><span>${posts[index].username}</span></a></li>
+                    <li class="post_likes"><a><i class="fa fa-heart"></i><span>${posts[index].likes} likes</span></a></li>
+                </ul>
+          </div>`
+		// reasult_card = $.parseHTML(reasult_card)[0]
+		container.append(reasult_card)
+	}
+}
+
+
+if (search_input){
+
+	search_input.addEventListener('keyup', (event) => {
+		const result_cards = [...document.querySelectorAll('.search_results .result_card')]
+		const search_value = event.target.value
+
+		const relavent_posts = result_cards.filter((post_card) => {
+			let post_card_name = post_card.querySelector('.post_name a')
+			let post_card_owner = post_card.querySelector('li.post_owner span')
+			post_card_name.innerHTML = post_card_name.innerHTML.replace(`<span class="highlight">`, "").replace(`</span>`, "")
+			post_card_owner.innerHTML = post_card_owner.innerHTML.replace(`<span class="highlight">`, "").replace(`</span>`, "")
+
+			if (search_value === ""){
+			result_cards.map((post) => {post.classList.remove('hidden')})
+				return
+			}
+			result_cards.map((post) => {post.classList.add('hidden')})
+			if (post_card_name.textContent.includes(search_value)){
+				post_card_name.innerHTML = post_card_name.innerHTML.replace(search_value, `<span class="highlight">${search_value}</span>`)
+				return true
+			} else if (post_card_owner.textContent.includes(search_value)){
+				post_card_owner.innerHTML = post_card_owner.innerHTML.replace(search_value, `<span class="highlight">${search_value}</span>`)
+				return true
+			} else {
+				return false
+			}
+		})
+		relavent_posts.map((post) => {post.classList.remove('hidden')})
+	})
+}
+
+
+
+// When the user clicks on <span> (x), close the modal
+search_close_span.addEventListener('click', () => {close_modal(search_modal)})
+
+
+
+// function to execute when user wants to exit modal
+function close_modal(modal){
+	modal.style.display = "none";
+	$('html').getNiceScroll().show();
+}
+
+// When the user clicks anywhere outside the modal, close it
+window.onclick = function(event) {
+  if (event.target === new_post_modal) {
+	  close_modal(new_post_modal)
+  } else if (event.target === search_modal){
+	  close_modal(search_modal)
+  }
 }
 
 // When user clicks upload post buttton
@@ -552,25 +677,6 @@ function new_post_validation() {
 
   // If all validations pass, the form is considered valid
   return valid;
-}
-
-
-
-
-
-// function to execute when user wants to exit new post modal
-function close_modal(){
-	modal.style.display = "none";
-	$('html').getNiceScroll().show();
-}
-// When the user clicks on <span> (x), close the modal
-span.onclick = close_modal
-
-// When the user clicks anywhere outside the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-	  close_modal()
-  }
 }
 
 // Function used in post page, makes the clicked photo appear big in the center of the screen
@@ -744,7 +850,7 @@ function edit_post(post_id){
 	// set click listener to the update post btn
 	document.querySelector('#update_post_btn').addEventListener('click', function (){
 		// update post name and description + delete selected photos
-		const new_name = post_name_input.value
+		const new_name = document.querySelector('.single-box-content input.post_name_input').value
 		const new_description = post_description_input.value
 		const new_access = document.querySelector('#new_access_type').value
 		const new_year = post_year_input.value

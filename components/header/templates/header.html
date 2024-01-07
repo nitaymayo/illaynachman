@@ -13,6 +13,7 @@
 			<div class="menu-box">
 				<ul class="menu">
 					<li><a class="active" href="/">Home</a></li>
+                    <li><a id="searchmodalbtn">Search</a></li>
 					<li><a href="/about">About</a></li>
                     {% if session %}
                     <li><a href="/home/signout">signout</a></li>
@@ -86,9 +87,47 @@
 			<p style="position: absolute; bottom: 10px;" class="copyright">&#169; 2014 Grafika, All Rights Reserved</p>
 		</header>
 
-<div id="newpostmodal" class="modal">
-
+<!-- search post modal -->
+<div id="searchmodal" class="modal">
   <!-- Modal content -->
+  <div class="modal-content">
+    <span class="closemodal">&times;</span>
+      <div class="search_container">
+    <input type="search" id="search_input" placeholder="Start searching here" />
+          </div>
+      <div class="search_results">
+{#          <div class="result_card">#}
+{#              <h2 class="post_name"><a>first post name here</a></h2>#}
+{#              <h3 class="uploaded_ago"><a>#}
+{#                <i class="fa fa-calendar"></i>#}
+{#                    <span>#}
+{#                        {% set days_ago = post['data'].uploaded.values[0] %}#}
+{#                        {% if days_ago == 0 %}#}
+{#                        uploaded today#}
+{#                        {% elif days_ago < 7 %}#}
+{#                        uploaded {{ (post['data'].uploaded.values[0])|int }}  day(s) ago#}
+{#                        {% elif days_ago < 365 %}#}
+{#                        uploaded {{ (post['data'].uploaded.values[0]/7)|int }} week(s) ago#}
+{#                        {% else %}#}
+{#                        uploaded {{ (post['data'].uploaded.values[0]/365)|int }} year(s) ago#}
+{#                        {% endif %}#}
+{#                        uploaded 3 day(s) ago#}
+{#                    </span>#}
+{#                </a>#}
+{#              </h3>#}
+{#              <ul class="post-tags">#}
+{#                    <li class="post_period"><a><i class="fa fa-clock-o"></i><span>Child</span></a></li>#}
+{#                    <li class="post_owner"><a><i class="fa fa-user"></i><span>Nitay_mayo</span></a></li>#}
+{#                    <li class="post_likes"><a><i class="fa fa-heart"></i><span>5 likes</span></a></li>#}
+{#                </ul>#}
+{#          </div>#}
+      </div>
+  </div>
+ </div>
+
+<!-- new post modal -->
+<div id="newpostmodal" class="modal">
+  <!-- New Post Modal content -->
   <div class="modal-content">
     <span class="closemodal">&times;</span>
       <h1>Stage 1: Post Info</h1>
