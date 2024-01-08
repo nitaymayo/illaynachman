@@ -315,12 +315,48 @@ p.copyright {
 }
 
 /*-------------------------------------------------*/
+/* =  Search modal
+/*-------------------------------------------------*/
+
+.highlight{
+    background-color: var(--lead-brown);
+}
+
+.search_container{
+    position: sticky;
+    top: 0;
+}
+
+.result_card{
+    padding: 10px;
+    border-top: 1px solid lightgrey
+}
+
+.result_card .post_name{
+    margin: 0;
+}
+.result_card .uploaded_ago{
+    font-size: 15px;
+    margin-top: 5px;
+    & a{
+        color: gray;
+    }
+}
+
+.result_card a{
+    color: initial;
+    user-select: none;
+}
+
+
+/*-------------------------------------------------*/
 /* =  New post modal
 /*-------------------------------------------------*/
 
 
 .closemodal{
     font-size: 30px;
+    user-select: none;
 }
 
 /* The Modal (background) */

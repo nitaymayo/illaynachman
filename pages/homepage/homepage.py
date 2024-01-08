@@ -34,7 +34,7 @@ def index():
                    f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period "
                    f"FROM post "
                    f"INNER JOIN user ON post.user_id = user.user_id "
-                   f"WHERE post.access = {access_type} OR post.user_id = {user_id} "
+                   f"WHERE post.access <= {access_type} OR post.user_id = {user_id} "
                    f"ORDER BY upload_timestamp DESC LIMIT 15 ")
     all_posts = dbManager.fetch(posts_query)
     if not all_posts:
@@ -323,3 +323,36 @@ def getperiods():
         return 'No periods found', 404
     periods = json.dumps(periods)
     return periods, 201
+
+@homepage.route('/homepage/getpostsforsearch')
+def getpostsforsearch():
+
+    if session:
+        access_type = session['access_type']
+        user_id = session['user_id']
+    else:
+        access_type = 0
+        user_id = 0
+
+    query = (f"SELECT post.post_id, "
+             f"post.name, "
+             f"ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, "
+             f"user.name as username, "
+             f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period, "
+             f"COUNT(likes.user_id) as likes "
+             f"from post join user on post.user_id = user.user_id join post_likes as likes on post.post_id = likes.post_id "
+             f"WHERE post.access <= {access_type} OR post.user_id = {user_id} "
+             f"GROUP BY likes.post_id "
+             f"ORDER BY uploaded ASC")
+    localdb = DBManager()
+
+    data = localdb.fetch(query)
+
+    # data = [{
+    #     'name': post.name,
+    #     'uploaded': post.uploaded,
+    #     'username': post.username
+    # } for post in data]
+
+    data = pd.DataFrame(data).T.to_json()
+    return data, 201
