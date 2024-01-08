@@ -811,7 +811,7 @@ function edit_post(post_id){
     }
 
 	// make post name an input to allow user to change it
-	const post_name = document.querySelector('.post_name')
+	const post_name = document.querySelector('.project-text .post_name')
 	const post_description = document.querySelector('.post_description')
 
 	const post_name_input = document.createElement('input')
@@ -828,7 +828,7 @@ function edit_post(post_id){
 	post_description_input.innerHTML = post_description.innerText
 
 
-	post_name.innerHTML = `<input type='text' dir="auto" class='post_name_input' value='${post_name.innerText}'/>`
+	post_name.parentNode.replaceChild(post_name_input, post_name)
 	post_description.parentNode.replaceChild(post_description_input, post_description)
 
 	// make post year an input

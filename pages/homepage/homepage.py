@@ -34,7 +34,7 @@ def index():
                    f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period "
                    f"FROM post "
                    f"INNER JOIN user ON post.user_id = user.user_id "
-                   f"WHERE post.access = {access_type} OR post.user_id = {user_id} "
+                   f"WHERE post.access <= {access_type} OR post.user_id = {user_id} "
                    f"ORDER BY upload_timestamp DESC LIMIT 15 ")
     all_posts = dbManager.fetch(posts_query)
     if not all_posts:
@@ -345,6 +345,7 @@ def getpostsforsearch():
              f"GROUP BY likes.post_id "
              f"ORDER BY uploaded ASC")
     localdb = DBManager()
+
     data = localdb.fetch(query)
 
     # data = [{
