@@ -20,7 +20,7 @@
 								<ul class="slides">
                                     {% for img_url in post['cover_images']  %}
 									<li>
-										<img alt="" src="{{ img_url }}" />
+										<img alt="" src="{{ url_for('static', filename=('media/posts' + img_url)) }}" />
 									</li>
                                     {% endfor %}
 								</ul>
@@ -51,7 +51,7 @@
                                     {% for img_url in post['cover_images'] %}
                                     <div class="post-columns">
                                         <div class="img-card">
-                                            <img alt="{{ img_url }}" src="{{ img_url }}">
+                                            <img alt="{{ img_url }}" src="{{ url_for('static', filename=('media/posts' + img_url)) }}">
                                         </div>
                                     </div>
                                     {% endfor %}
@@ -62,7 +62,7 @@
                                         <div class="post-columns">
                                             {% for img_url in images[third_of_images*column:third_of_images*(column + 1)] %}
                                             <div class="img-card" draggable="true">
-                                                <img onclick="showinbig(this)" src="{{ img_url }}" alt="{{ img_url }}">
+                                                <img onclick="showinbig(this)" src="{{ url_for('static', filename=('media/posts' + img_url)) }}" alt="{{ img_url }}">
                                             </div>
                                             {% endfor %}
                                         </div>
@@ -70,7 +70,7 @@
                                         <div class="post-columns">
                                             {% for img_url in images[third_of_images*2:] %}
                                             <div class="img-card">
-                                                <img onclick="showinbig(this)" src="{{ img_url }}">
+                                                <img onclick="showinbig(this)" src="{{ url_for('static', filename=('media/posts' + img_url)) }}">
                                             </div>
                                             {% endfor %}
                                         </div>

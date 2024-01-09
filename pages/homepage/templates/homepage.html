@@ -20,9 +20,11 @@
 {#											<img alt="{{ img }}" src="{{ img }}" />#}
 {#										</li>#}
 {#                                        {% endfor %}#}
+                                        {% if post['images'].location.values.any() %}
                                         <li>
-                                            <img alt="" src="{{ post['images'].location.values[0] }}" />
+                                            <img alt="" src="{{ url_for('static', filename=('media/posts' + post['images'].location.values[0])) }}" />
 										</li>
+                                        {% endif %}
 									</ul>
 								</div>
 								<div class="post-content">
