@@ -1,12 +1,10 @@
 import os
 import shutil
 from datetime import datetime
-from multiprocessing import AuthenticationError
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, json
 from utilities.db.db_manager import dbManager
 from app import post as post_app
-from werkzeug.datastructures import ImmutableMultiDict
 
 # postpage blueprint definition
 postpage = Blueprint('postpage', __name__, static_folder='static', static_url_path='/postpage',
@@ -151,7 +149,7 @@ def deletepost():
     if (os.path.exists(from_dir)):
         now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         to_dir = post_app.config.destination + '/../deleted_posts/post_id' + str(post_id) + "_" + now
-        os.mkdir(to_dir)
+        os.makedirs(to_dir)
         if os.path.exists(to_dir):
             for file in os.listdir(from_dir):
                 shutil.move(os.path.join(from_dir, file), to_dir)
@@ -213,7 +211,7 @@ def update_post(post_id):
     new_cover_images = []
     for img in cover_images:
         img_name = img.split(f"post_id{post_id}/")[-1]
-        img_location = f"{post_app.config.destination}/post_id{post_id}/{img_name}"
+        img_location = f"/post_id{post_id}/{img_name}"
         new_cover_images.append(img_location)
 
     query = (f"UPDATE image SET "
@@ -234,13 +232,13 @@ def update_post(post_id):
     if images:
         for img in images:
             img_name = img.split(f"post_id{post_id}/")[-1]
-            img_location = f"{post_app.config.destination}/post_id{post_id}/{img_name}"
-            delete_to_location = img_location.split("/posts/")[0] + "/deleted_posts/images_deleted_from_posts"
+            img_location = f"/post_id{post_id}/{img_name}"
+            delete_to_location = post_app.config.destination + "/../deleted_posts/images_deleted_from_posts"
             res = dbManager.commit(query_delete + f"'{img_location}'")
             if res:
                 if not os.path.exists(delete_to_location):
-                    os.mkdir(delete_to_location)
-                shutil.move(img_location, delete_to_location)
+                    os.makedirs(delete_to_location, exist_ok=True)
+                shutil.move(post_app.config.destination + img_location, delete_to_location)
             else:
                 images_not_deleted.append(img_name)
 
@@ -266,14 +264,14 @@ def add_images_to_post(post_id):
         post_dir = f"post_id{post_id}"
         to_dir = post_app.config.destination + '/' + post_dir
         if not os.path.exists(to_dir):
-            os.mkdir(to_dir)
+            os.makedirs(to_dir)
         file_obj = request.files
         bad_files = []
         for f in file_obj:
 
             file = request.files.get(f)
             # try to insert img to db
-            query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '{os.path.join(to_dir, file.filename)}')"
+            query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '/post_id{post_id}/{file.filename}')"
             res = dbManager.commit(query)
             try:
                 # if successful save it to folder, else raise exception
@@ -286,7 +284,7 @@ def add_images_to_post(post_id):
                 else:
                     bad_files.append(file.filename)
             except Exception as e:
-                query = f"DELETE FROM image WHERE post_id={post_id} AND location='{os.path.join(to_dir, file.filename)}'"
+                query = f"DELETE FROM image WHERE post_id={post_id} AND location='/post_id{post_id}/{file.filename}'"
                 res = dbManager.commit(query)
                 bad_files.append(file.filename)
         if bad_files:
