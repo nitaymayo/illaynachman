@@ -1,4 +1,4 @@
-absl-py @ file:///croot/absl-py_1666362940888/work
+absl-py
 aiohttp @ file:///tmp/build/80754af9/aiohttp_1646806365970/work
 aiosignal @ file:///tmp/build/80754af9/aiosignal_1637843061372/work
 asgiref==3.6.0
