@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+   - /bin/git add pages/homepage/homepage.py
+   - /bin/git add pages/postpage/postpage.py
+   - /bin/git commit -m "commit from cpanel server"
+   - /bin/git git push origin deploy
