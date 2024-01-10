@@ -1,12 +1,9 @@
 import os
 import shutil
 from datetime import datetime
-from multiprocessing import AuthenticationError
-
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, json
 from utilities.db.db_manager import dbManager
 from app import post as post_app
-from werkzeug.datastructures import ImmutableMultiDict
 
 # postpage blueprint definition
 postpage = Blueprint('postpage', __name__, static_folder='static', static_url_path='/postpage',
@@ -91,7 +88,7 @@ def index(post_id):
             'user_liked': user_liked
         }
     except Exception as e:
-        pass
+        return e.args[0], 301
     return render_template('postpage.html', post=post)
 
 
@@ -121,7 +118,7 @@ def togglelike():
                 raise Exception("Problem with the DB")
             return "like deleted", 202
     except Exception as e:
-        return str(e), 500
+        return e.args[0], 500
 
 
 @postpage.route('/postpage/deletepost', methods=['POST'])
@@ -220,7 +217,7 @@ def update_post(post_id):
              f"cover = b'0' "
              f"WHERE post_id = {post_id}")
     res = dbManager.commit(query)
-    location_string = ','.join([f"'{str(img)}'" for img in new_cover_images])
+    location_string = ','.join([f"'{str(img).replace(' ', '+')}'" for img in new_cover_images])
     query = (f"UPDATE image SET "
              f"cover = b'1' "
              f"WHERE location in ({location_string})")
@@ -272,8 +269,9 @@ def add_images_to_post(post_id):
         for f in file_obj:
 
             file = request.files.get(f)
+            new_file_name = file.filename.replace(" ", "+")
             # try to insert img to db
-            query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '{os.path.join(to_dir, file.filename)}')"
+            query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '{new_file_name}')"
             res = dbManager.commit(query)
             try:
                 # if successful save it to folder, else raise exception
@@ -281,7 +279,7 @@ def add_images_to_post(post_id):
                     # save the file to our photos folder
                     file_name = post_app.save(
                         file,
-                        name=os.path.join(post_dir, file.filename)
+                        name=os.path.join(post_dir, new_file_name)
                     )
                 else:
                     bad_files.append(file.filename)
