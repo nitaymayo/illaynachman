@@ -234,14 +234,14 @@ def new_post():
     if (not with_images):
         return 'Post uploaded!', 201
 
-    os.mkdir(to_dir) #Create post dir
+    os.makedirs(to_dir) #Create post dir
 
     # Insert Content to dir and to DB
     query = "INSERT INTO image (location, post_id) VALUES "
     try:
         for file in os.listdir(from_dir):
             shutil.move(os.path.join(from_dir, file), to_dir)
-            query += f"('{to_dir + '/' + file}', {post_id}),"
+            query += f"('/post_id{post_id}/{file}', {post_id}),"
         shutil.rmtree(from_dir)
         query = query[:-1]
 
