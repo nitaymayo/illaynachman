@@ -49,11 +49,9 @@
                                 <div class="cover_images post-images hidden">
                                     <label class="cover-images-info ">drag images here to change the cover photos</label>
                                     {% for img_url in post['cover_images'] %}
-                                    <div class="post-columns">
                                         <div class="img-card">
                                             <img alt="{{ img_url }}" src="{{ url_for('static', filename=('media/posts' + img_url)) }}">
                                         </div>
-                                    </div>
                                     {% endfor %}
                                 </div>
                                 <label class="select-images-info hidden">Want to delete images? Images selected here will be deleted</label>
