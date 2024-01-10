@@ -158,8 +158,8 @@ ul.menu li a:hover {
 
 .post-box {
     padding: 15px 30px !important;
-
-    & a.btn {
+}
+.post-box a.btn {
         width: 100%;
         margin: auto;
         display: block;
@@ -169,7 +169,7 @@ ul.menu li a:hover {
         font-family: 'Roboto', sans-serif;
         line-height: 20px;
     }
-}
+
 .post-box,
 .contact-box,
 .categories-box,
@@ -291,10 +291,10 @@ p.copyright {
     transition-duration: 30ms;
     background-color: white;
     z-index: 3;
+}
 
-    & i{
-        font-size: 2.5rem;
-    }
+.scroll_top_btn i{
+    font-size: 2.5rem;
 }
 
 
@@ -303,9 +303,9 @@ p.copyright {
         left: 30px;
         right: auto;
         padding: 10px;
-        & i{
-            font-size: 3rem;
-        }
+    }
+    .scroll_top_btn i{
+        font-size: 3rem;
     }
 
 }
@@ -338,9 +338,9 @@ p.copyright {
 .result_card .uploaded_ago{
     font-size: 15px;
     margin-top: 5px;
-    & a{
-        color: gray;
-    }
+}
+.result_card .uploaded_ago a{
+    color: gray;
 }
 
 .result_card a{
@@ -497,11 +497,11 @@ button:hover {
 /* Add padding to containers */
 .container {
     padding: 16px;
+}
 
-    & small{
-        color: red;
-        font-size: 1.3rem;
-    }
+.container small{
+    color: red;
+    font-size: 1.3rem;
 }
 
 /* The "Forgot password" text */
@@ -1153,11 +1153,10 @@ ul.tab-links li a.active {
 .project-text {
     border-bottom: 1px solid #e5e5e5;
     margin-bottom: 25px;
-
-    /* Post edit description style */
-    & textarea{
-        height: 400px;
-    }
+}
+/* Post edit description style */
+.project-text textarea{
+    height: 400px;
 }
 
 .similar-projects h1 {
@@ -1259,49 +1258,47 @@ ul.tab-links li a.active {
     line-height: 32px;
 }
 
-.project-feature ul li:before {
-    content: '\f00c';
-    font-family: 'FontAwesome';
-    margin-right: 8px;
-}
+/*.project-feature ul li:before {*/
+/*    content: '\f00c';*/
+/*    font-family: 'FontAwesome';*/
+/*    margin-right: 8px;*/
+/*}*/
 
 /*-------------------------------------------------*/
 /* =  single post
 /*-------------------------------------------------*/
 
-.post-images{
+.post-images {
     display: flex;
-    flex-flow: row nowrap;
-    width: 100%;
-    & .post-columns {
-        display: flex;
-        flex-flow: column nowrap;
-        width: 30%;
-        margin-right: 6px;
-        .img-card {
-            width: 100%;
-            height: fit-content;
-            margin-bottom: 6px;
-            & img {
-                width: 100%;
-                transition-duration: 60ms;
-            }
+    flex-flow: column wrap;
+    width: 28%;
+    gap: 6px;
+}
 
-            & img:hover {
-                transform: scale(1.1);
-            }
-        }
-    }
+.post-images .img-card{
+        width: 100%;
+}
+
+.post-images .img-card img {
+    width: 100%;
+    transition-duration: 60ms;
+}
+.post-images .img-card img:hover {
+    transform: scale(1.1);
 }
 
 .cover_images{
     border-bottom: 1px solid #e5e5e5;
     margin-bottom: 25px;
     padding-bottom: 10px;
+    flex-flow: row nowrap;
+    width: 100%;
+
+
 }
 .cover-images-info{
     margin: 10px;
-    width: 30%;
+    width: 80%;
 }
 
 img.selected{
@@ -1325,20 +1322,21 @@ img.selected{
     align-items: center;
     width: 100%;
     z-index: 10;
+}
+.post_edit button{
+    width: 40%;
+    transition-duration: 40ms;
+}
 
-    & button{
-        width: 40%;
-        transition-duration: 40ms;
-        &.delete_post{
-            background-color: #ec3939 !important;
-        }
-        &.edit_post{
-            background-color: var(--lead-brown) !important;
-        }
-    }
-    & button:hover{
-        transform: scale(1.1);
-    }
+.post_edit button.delete_post{
+    background-color: #ec3939 !important;
+}
+.post_edit button.edit_post{
+    background-color: var(--lead-brown) !important;
+}
+
+.post_edit button:hover{
+    transform: scale(1.1);
 }
 
 /*edit mode style*/
@@ -1371,13 +1369,13 @@ img.selected{
     display: flex;
     justify-content: center;
     align-content: center;
-
-    & img{
-        margin: auto;
-        max-width: 80vw;
-        box-shadow: -9px 10px 96px -31px rgba(0,0,0,0.89);
-    }
 }
+.showinbig-div img{
+    margin: auto;
+    max-width: 80vw;
+    box-shadow: -9px 10px 96px -31px rgba(0,0,0,0.89);
+}
+
 @media only screen and (min-width: 600px){
     .showinbig-div img{
         max-height: 80vh !important;

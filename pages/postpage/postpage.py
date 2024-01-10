@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, json
 from utilities.db.db_manager import dbManager
@@ -229,17 +230,23 @@ def update_post(post_id):
     query_delete = f"DELETE FROM image WHERE location = "
     images_not_deleted = []
     if images:
+        delete_to_location = post_app.config.destination.removesuffix("/posts") + "/deleted_posts/images_deleted_from_posts"
         for img in images:
-            img_name = img.split(f"post_id{post_id}/")[-1]
-            img_location = f"{post_app.config.destination}/post_id{post_id}/{img_name}"
-            delete_to_location = img_location.split("/posts/")[0] + "/deleted_posts/images_deleted_from_posts"
-            res = dbManager.commit(query_delete + f"'{img_location}'")
+            img_name = img.split(f"/posts")[-1].replace(" ", "+")
+            img_location = post_app.config.destination + img_name
+            res = dbManager.commit(query_delete + f"'{img_name}'")
             if res:
                 if not os.path.exists(delete_to_location):
                     os.makedirs(delete_to_location, exist_ok=True)
                 shutil.move(img_location, delete_to_location)
             else:
                 images_not_deleted.append(img_name)
+
+    if images_not_deleted:
+        images_not_deleted_msg = (f"There are {len(images_not_deleted)} images not deleted because of server error\n "
+                                  f"please try again, if problem persists contact us via email")
+        flash(images_not_deleted_msg)
+        print(f"-------------Images not deleted error-----------\n Images = \n{[str(i) + ': ' + img for i, img in enumerate(images_not_deleted)]}", file=sys.stderr)
 
     return "update success", 200
 
@@ -253,10 +260,12 @@ def add_images_to_post(post_id):
     query = f"SELECT * FROM post WHERE post_id = {post_id}"
     post = dbManager.fetch(query)
     if not post:
-        raise Exception("post not found", 404)
+        flash("post not found")
+        return "post not found", 404
 
     if session["user_id"] != post[0].user_id and not session['is_admin']:
-        raise Exception("you are not authorized to add photos to this post", 301)
+        flash("you are not authorized to add photos to this post")
+        return "permission denied", 301
 
     if request.method == 'POST':
 
@@ -269,7 +278,7 @@ def add_images_to_post(post_id):
         for f in file_obj:
 
             file = request.files.get(f)
-            new_file_name = file.filename.replace(" ", "+")
+            new_file_name = f"/{post_dir}/" + file.filename.replace(" ", "+")
             # try to insert img to db
             query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '{new_file_name}')"
             res = dbManager.commit(query)
@@ -279,18 +288,19 @@ def add_images_to_post(post_id):
                     # save the file to our photos folder
                     file_name = post_app.save(
                         file,
-                        name=os.path.join(post_dir, new_file_name)
+                        name=new_file_name.removeprefix('/')
                     )
                 else:
-                    bad_files.append(file.filename)
+                    bad_files.append([file.filename, "server cant save file, try to change file name"])
             except Exception as e:
                 query = f"DELETE FROM image WHERE post_id={post_id} AND location='{new_file_name}'"
                 res = dbManager.commit(query)
-                bad_files.append(file.filename)
+                bad_files.append([file.filename, e.args[1]])
+
         if bad_files:
             bad_file_string = "some images could not be uploaded:\n"
             for i, file in enumerate(bad_files):
-                bad_file_string = bad_file_string + f"{i + 1}) {file}\n"
+                bad_file_string = bad_file_string + f"{i + 1}) {file[0]}, error: {file[1]}\n"
             flash(bad_file_string + "Please try changing their name and make sure they are valid content")
         return "uploading..."
     else:

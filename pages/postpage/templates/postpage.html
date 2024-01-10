@@ -49,31 +49,19 @@
                                 <div class="cover_images post-images hidden">
                                     <label class="cover-images-info ">drag images here to change the cover photos</label>
                                     {% for img_url in post['cover_images'] %}
-                                    <div class="post-columns">
                                         <div class="img-card">
                                             <img alt="{{ img_url }}" src="{{ url_for('static', filename=('media/posts' + img_url)) }}">
                                         </div>
-                                    </div>
                                     {% endfor %}
                                 </div>
                                 <label class="select-images-info hidden">Want to delete images? Images selected here will be deleted</label>
-                                <div class="post-images">
-                                    {% for column in [0,1] %}
-                                        <div class="post-columns">
-                                            {% for img_url in images[third_of_images*column:third_of_images*(column + 1)] %}
-                                            <div class="img-card" draggable="true">
-                                                <img onclick="showinbig(this)" src="{{ url_for('static', filename=('media/posts' + img_url)) }}" alt="{{ img_url }}">
-                                            </div>
-                                            {% endfor %}
+                                <div class="post-images main-images">
+                                   {% for img_url in images %}
+                                        <div class="img-card" draggable="true">
+                                            <img onclick="showinbig(this)" src="{{ url_for('static', filename=('media/posts' + img_url)) }}" alt="{{ img_url }}">
                                         </div>
-                                {% endfor %}
-                                        <div class="post-columns">
-                                            {% for img_url in images[third_of_images*2:] %}
-                                            <div class="img-card">
-                                                <img onclick="showinbig(this)" src="{{ url_for('static', filename=('media/posts' + img_url)) }}">
-                                            </div>
-                                            {% endfor %}
-                                        </div>
+                                   {% endfor %}
+
                                 </div>
                                 <div class="add_new_images hidden">
                                     <label class="select-images-info">Want to add images? Images droped here will be uploaded</label>

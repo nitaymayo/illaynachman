@@ -249,8 +249,23 @@ $(document).ready(function($) {
 		} else {
 			navbarVertical.slideUp(300).removeClass('active');
 		}
+
 	});
 
+	function set_postpage_images_div() {
+		// Enter this if only on postpage.html (where main_images_div exists)
+		const main_images_div = document.querySelector('.post-images.main-images')
+		if (main_images_div) {
+			let total_children_height = 0
+			const all_images = main_images_div.querySelectorAll('.img-card img')
+			for (let i = 0; i < all_images.length; i++) {
+				total_children_height += all_images[i].clientHeight + 30 // 30px for the gap between the images
+			}
+			main_images_div.style.height = (total_children_height / 3).toString() + "px"
+		}
+	}
+	set_postpage_images_div()
+	winDow.bind('resize',set_postpage_images_div)
 	/* ---------------------------------------------------------------------- */
 	/*	Load more post btn
 	/* ---------------------------------------------------------------------- */
@@ -402,6 +417,9 @@ $(document).ready(function($) {
 
 	// loads posts to the search modal
 	load_posts_for_search()
+
+
+
 
 });
 
@@ -778,7 +796,7 @@ function edit_post(post_id){
 		cover_container.insertBefore(container, cover_container.children[1])
 	})
 	document.querySelector('.select-images-info').classList.remove('hidden')
-	const post_imgs = document.querySelectorAll('div:not(.cover_images)>div.post-columns>div.img-card>img')
+	const post_imgs = document.querySelectorAll('div.main-images div.img-card>img')
 	for (let i = 0; i < post_imgs.length; i++){
 		// make images selectable to allow user to delete them
 		post_imgs[i].setAttribute('onclick', "this.classList.toggle('selected')")
