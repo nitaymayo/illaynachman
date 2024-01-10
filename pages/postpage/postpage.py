@@ -210,7 +210,7 @@ def update_post(post_id):
     new_cover_images = []
     for img in cover_images:
         img_name = img.split(f"post_id{post_id}/")[-1]
-        img_location = f"{post_app.config.destination}/post_id{post_id}/{img_name}"
+        img_location = f"/post_id{post_id}/{img_name}"
         new_cover_images.append(img_location)
 
     query = (f"UPDATE image SET "
