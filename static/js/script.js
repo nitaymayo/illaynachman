@@ -249,6 +249,16 @@ $(document).ready(function($) {
 		} else {
 			navbarVertical.slideUp(300).removeClass('active');
 		}
+		// Enter this if only on postpage.html (where main_images_div exists)
+		if (main_images_div){
+			const main_images_div = document.querySelector('.post-images.main-images')
+			let total_children_height = 0
+			const all_images = main_images_div.querySelectorAll('.img-card')
+			for (let i = 0; i< all_images.length; i++){
+				total_children_height += all_images[i].offsetHeight + 30 // 30px for the gap between the images
+			}
+		main_images_div.style.height = (total_children_height/3).toString() + "px"
+	}
 	});
 
 	/* ---------------------------------------------------------------------- */
@@ -688,15 +698,6 @@ function showinbig(img){
 	showinbig.classList.remove('hidden')
 	showinbig.querySelector('img').setAttribute('src', img.getAttribute('src'))
 }
-
-
-
-// post page main image region height fix
-const main_images_div = document.querySelector('.post-images.main-images')
-	// Enter this if only on postpage.html (where main_images_div exists)
-	if (main_images_div){
-		main_images_div.style.height = (main_images_div.offsetHeight*1.1 / 3).toString() + "px"
-	}
 
 // like/dislike function - add or remove like from a post
 function toggle_like(current_post_id, element){
