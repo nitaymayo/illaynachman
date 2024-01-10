@@ -148,7 +148,7 @@ def deletepost():
     if (os.path.exists(from_dir)):
         now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         to_dir = post_app.config.destination + '/../deleted_posts/post_id' + str(post_id) + "_" + now
-        os.mkdir(to_dir)
+        os.makedirs(to_dir, exist_ok=True)
         if os.path.exists(to_dir):
             for file in os.listdir(from_dir):
                 shutil.move(os.path.join(from_dir, file), to_dir)
@@ -236,7 +236,7 @@ def update_post(post_id):
             res = dbManager.commit(query_delete + f"'{img_location}'")
             if res:
                 if not os.path.exists(delete_to_location):
-                    os.mkdir(delete_to_location)
+                    os.makedirs(delete_to_location, exist_ok=True)
                 shutil.move(img_location, delete_to_location)
             else:
                 images_not_deleted.append(img_name)
@@ -263,7 +263,7 @@ def add_images_to_post(post_id):
         post_dir = f"post_id{post_id}"
         to_dir = post_app.config.destination + '/' + post_dir
         if not os.path.exists(to_dir):
-            os.mkdir(to_dir)
+            os.makedirs(to_dir, exist_ok=True)
         file_obj = request.files
         bad_files = []
         for f in file_obj:
@@ -284,7 +284,7 @@ def add_images_to_post(post_id):
                 else:
                     bad_files.append(file.filename)
             except Exception as e:
-                query = f"DELETE FROM image WHERE post_id={post_id} AND location='{os.path.join(to_dir, file.filename)}'"
+                query = f"DELETE FROM image WHERE post_id={post_id} AND location='{new_file_name}'"
                 res = dbManager.commit(query)
                 bad_files.append(file.filename)
         if bad_files:
