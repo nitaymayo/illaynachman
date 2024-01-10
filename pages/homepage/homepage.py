@@ -228,7 +228,7 @@ def new_post():
             shutil.rmtree(from_dir)
         query = f"DELETE FROM post WHERE post_id = {post_id}"
         dbManager.commit(query)
-        return e, 301
+        return e.args[0], 301
 
     # check if post doesnt have photos
     if (not with_images):
@@ -259,7 +259,7 @@ def new_post():
         query = f"DELETE FROM post WHERE post_id = {post_id}"
         dbManager.commit(query)
         shutil.rmtree(to_dir)
-        return e, 301
+        return e.args[0], 301
 
 
     return 'Post uploaded!', 201
@@ -286,7 +286,7 @@ def upload_post_photos_to_temp():
             try:
                 file_name = post.save(
                     file,
-                    name=os.path.join(temp_dir, file.filename)
+                    name=os.path.join(temp_dir, file.filename.replace(" ", "+"))
                 )
             except Exception as e:
                 bad_files.append(file.filename)
