@@ -403,6 +403,9 @@ $(document).ready(function($) {
 	// loads posts to the search modal
 	load_posts_for_search()
 
+
+
+
 });
 
 
@@ -685,6 +688,15 @@ function showinbig(img){
 	showinbig.classList.remove('hidden')
 	showinbig.querySelector('img').setAttribute('src', img.getAttribute('src'))
 }
+
+
+
+// post page main image region height fix
+const main_images_div = document.querySelector('.post-images.main-images')
+	// Enter this if only on postpage.html (where main_images_div exists)
+	if (main_images_div){
+		main_images_div.style.height = (main_images_div.offsetHeight*1.1 / 3).toString() + "px"
+	}
 
 // like/dislike function - add or remove like from a post
 function toggle_like(current_post_id, element){

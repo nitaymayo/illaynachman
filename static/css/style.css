@@ -1269,28 +1269,50 @@ ul.tab-links li a.active {
 /* =  single post
 /*-------------------------------------------------*/
 
-.post-images{
-    display: flex;
-    flex-flow: row nowrap;
-    width: 100%;
-    & .post-columns {
-        display: flex;
-        flex-flow: column nowrap;
-        width: 30%;
-        margin-right: 6px;
-        .img-card {
-            width: 100%;
-            height: fit-content;
-            margin-bottom: 6px;
-            & img {
-                width: 100%;
-                transition-duration: 60ms;
-            }
+/*.post-images{*/
+/*    display: flex;*/
+/*    flex-flow: row nowrap;*/
+/*    width: 100%;*/
+/*    & .post-columns {*/
+/*        display: flex;*/
+/*        flex-flow: column nowrap;*/
+/*        width: 30%;*/
+/*        margin-right: 6px;*/
+/*        .img-card {*/
+/*            width: 100%;*/
+/*            height: fit-content;*/
+/*            margin-bottom: 6px;*/
+/*            & img {*/
+/*                width: 100%;*/
+/*                transition-duration: 60ms;*/
+/*            }*/
 
-            & img:hover {
-                transform: scale(1.1);
-            }
+/*            & img:hover {*/
+/*                transform: scale(1.1);*/
+/*            }*/
+/*        }*/
+/*    }*/
+/*}*/
+.post-images.main-images {
+    display: flex;
+    flex-flow: column wrap;
+    width: 30%;
+    gap: 6px;
+    & .img-card{
+        height: fit-content;
+        /*margin-bottom: 6px;*/
+        /*margin-right: 6px;*/
+        width: 100%;
+
+        & img {
+            width: 100%;
+            transition-duration: 60ms;
         }
+
+        & img:hover {
+            transform: scale(1.1);
+        }
+
     }
 }
 
