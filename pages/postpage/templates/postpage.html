@@ -67,16 +67,18 @@
                                    {% endfor %}
 
                                 </div>
-                                <div id="uploadNewPhotos" class="add_new_images hidden">
-                                    <label class="select-images-info">Want to add images? Images droped here will be uploaded</label>
+                                <div class="update_post_div hidden">
+                                <div id="uploadNewPhotos" class="add_new_images">
+                                    <label class="select-images-info">Want to add images? Images dropped here will be uploaded</label>
                                     <div class="dz-default dz-message dropzone">
                                      <button class="dz-button" type="button">Drop files here to upload</button>
                                      <div class="dropzone-previews added_images"></div>
-{#                                    {{ dropzone.create(id="upload_new_photos", action=("/postpage/addimagestopost/" + post['data'].post_id|string)) }}#}
                                     </div>
 							    </div>
-                                <button id="update_post_btn" class="btn hidden">Update post</button>
+                                <button id="update_post_btn" class="btn">Update post</button>
+                                </div>
                             </div>
+                        </div>
 						<div class="sidebar">
 							<div class="post-info">
 								<h1>Post Info</h1>
