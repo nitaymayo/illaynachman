@@ -454,7 +454,15 @@ $(document).ready(function($) {
 				  e.preventDefault();
 				  e.stopPropagation();
 				  if (new_post_validation()) {
-					  myDropzone.processQueue();
+					  if (myDropzone.getQueuedFiles().length === 0){
+						  if(confirm('Please confirm you want to upload post without images')) {
+							  var blob = new Blob();
+							  blob.upload = {'chunked': myDropzone.options.chunking};
+							  myDropzone.uploadFile(blob);
+						  }
+					  } else {
+						  myDropzone.processQueue();
+					  }
 				  } else {
 					  $(".modal-content").animate({ scrollTop: 0 }, "smooth");
 				  }
@@ -510,9 +518,9 @@ $(document).ready(function($) {
 				  e.preventDefault();
 				  e.stopPropagation();
 				  if (myDropzone.getQueuedFiles().length === 0){
-					var blob = new Blob();
-					blob.upload = { 'chunked': myDropzone.options.chunking };
-					myDropzone.uploadFile(blob);
+					  var blob = new Blob();
+					  blob.upload = {'chunked': myDropzone.options.chunking};
+					  myDropzone.uploadFile(blob);
 				  } else {
 					  myDropzone.processQueue();
 				  }
@@ -558,39 +566,6 @@ $(document).ready(function($) {
 
 					form.append("data", body);
 				}
-
-
-
-// 	Dropzone.options.newPostDropzone = { // The camelized version of the ID of the form element
-//
-//   // The configuration we've talked about above
-//   autoProcessQueue: false,
-//   uploadMultiple: true,
-//   parallelUploads: 50,
-//   maxFiles: 50,
-//
-//   // The setting up of the dropzone
-//   init: function() {
-//
-//
-//     // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
-//     // of the sending event because uploadMultiple is set to true.
-//     this.on("sendingmultiple", function() {
-//       // Gets triggered when the form is actually being sent.
-//       // Hide the success button or the complete form.
-//     });
-//     this.on("successmultiple", function(files, response) {
-//       // Gets triggered when the files have successfully been sent.
-//       // Redirect user or notify of success.
-//     });
-//     this.on("errormultiple", function(files, response) {
-//       // Gets triggered when there was an error sending the files.
-//       // Maybe show form again, and notify user of error
-//     });
-//   }
-//
-// }
-
 
 });
 

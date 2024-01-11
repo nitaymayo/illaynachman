@@ -222,9 +222,12 @@ def new_post():
         dbManager.commit(query)
         return e.args[0], 301
 
+    flash('Post uploaded!')
+
     # check if post doesnt have photos
-    if not request.files:
-        return 'Post uploaded!', 201
+    files = request.files
+    if files.get('file[0]').filename == 'blob':
+        return 'uploaded', 201
 
     post_dir = 'post_id' + str(post_id)  # Directory to save the content to
     os.makedirs(post.config.destination + '/' + post_dir) #Create post dir
@@ -233,7 +236,7 @@ def new_post():
     query = "INSERT INTO image (location, post_id) VALUES "
     bad_files = []
     good_files = []
-    for f in request.files:
+    for f in files:
         file = request.files.get(f)
         new_file_name = file.filename.replace(" ", "+")
         # save the file to our photos folder
@@ -257,7 +260,7 @@ def new_post():
              f"ORDER BY post_id LIMIT 3")
     res = dbManager.commit(query)
 
-    flash('Post uploaded!')
+
     if bad_files:
         bad_file_string = "some images could not be uploaded:\n"
         for i, file in enumerate(bad_files):
