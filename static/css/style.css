@@ -413,11 +413,15 @@ p.copyright {
     }
 }
 
-#newpostmodal #newPostDropzone{
+.dropzone{
     border: 2px dashed var(--lead-brown) !important;
-    margin: 10%;
+    margin-bottom: 10px;
     height: 400px;
     overflow-y: scroll;
+}
+
+.dz-button{
+    background-color: transparent !important;
 }
 
 /* Full-width inputs */
