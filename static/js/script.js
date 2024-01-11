@@ -432,6 +432,92 @@ $(document).ready(function($) {
 	load_posts_for_search()
 
 
+	Dropzone.autoDiscover = false;
+	$(function (){
+		var postUploadDz = new Dropzone('div#newPostDropzone', {
+			paramName: "file",
+			url: "/home/newpost",
+			previewsContainer: "div.dropzone-previews",
+			addRemoveLinks: true,
+			autoProcessQueue: false,
+			uploadMultiple: true,
+			parallelUploads: 50,
+			maxFiles: 50,
+			init: function (){
+				let myDropzone = this;
+
+				// First change the button to actually tell Dropzone to process the queue.
+				document.querySelector("#upload-btn").addEventListener("click", function(e) {
+				  // Make sure that the form isn't actually being sent.
+				  e.preventDefault();
+				  e.stopPropagation();
+				  if (new_post_validation()) {
+					  myDropzone.processQueue();
+				  } else {
+					  $(".modal-content").animate({ scrollTop: 0 }, "smooth");
+				  }
+				});
+
+				this.on("sendingmultiple", function(file, xhr, form) {
+					const post_name = document.getElementById('post_name').value
+					const post_year = document.getElementById('post_year').value
+					const post_description = document.getElementById('free_text').value
+					const post_access = document.getElementById('access_type').value
+					let post_tags = []
+					// get tags
+					const tag_checkboxes = document.querySelectorAll('#new-post-form input[type=checkbox]')
+
+					for (let i = 0; i<tag_checkboxes.length; i++){
+						if (tag_checkboxes[i].checked){
+							post_tags.push(tag_checkboxes[i].id.toLowerCase())
+						}
+					}
+
+					const body = JSON.stringify({
+						"post_name": post_name,
+						"post_description": post_description,
+						"post_year": post_year,
+						"post_access": post_access,
+						"post_tags": post_tags
+					});
+					form.append("data", body);
+				});
+
+				this.on("successmultiple", function(files, response) {
+			      document.location = '/'
+			    });
+			}
+		})
+	})
+// 	Dropzone.options.newPostDropzone = { // The camelized version of the ID of the form element
+//
+//   // The configuration we've talked about above
+//   autoProcessQueue: false,
+//   uploadMultiple: true,
+//   parallelUploads: 50,
+//   maxFiles: 50,
+//
+//   // The setting up of the dropzone
+//   init: function() {
+//
+//
+//     // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
+//     // of the sending event because uploadMultiple is set to true.
+//     this.on("sendingmultiple", function() {
+//       // Gets triggered when the form is actually being sent.
+//       // Hide the success button or the complete form.
+//     });
+//     this.on("successmultiple", function(files, response) {
+//       // Gets triggered when the files have successfully been sent.
+//       // Redirect user or notify of success.
+//     });
+//     this.on("errormultiple", function(files, response) {
+//       // Gets triggered when there was an error sending the files.
+//       // Maybe show form again, and notify user of error
+//     });
+//   }
+//
+// }
 
 
 });
@@ -458,10 +544,29 @@ if (new_post_btn) {
 		$('html').getNiceScroll().hide();
 		$('#newpostmodal>div.modal-content').niceScroll()
 	})
+
+	// When the user clicks on <span> (x), close the modal
+	new_post_close_span.addEventListener('click', () => {close_modal(new_post_modal)})
+
+	// When user clicks upload post buttton
+// 	document.getElementById('upload-btn').addEventListener('click', function () {
+// 	if (new_post_validation()) {
+// 		if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
+// 			Dropzone.forElement('#new_post_dropzone').on('completemultiple', () => {submit_new_post(true)})
+// 			Dropzone.forElement('#new_post_dropzone').processQueue()
+// 		} else {
+// 			if (confirm("Do you want to upload a post with out images?")) {
+// 				submit_new_post(false);
+// 			}
+// 		}
+// 	} else {
+// 		$(".modal-content").animate({ scrollTop: 0 }, "smooth");
+// 	}
+// })
+
 }
 
-// When the user clicks on <span> (x), close the modal
-new_post_close_span.addEventListener('click', () => {close_modal(new_post_modal)})
+
 
 /* ---------------------------------------------------------------------- */
 /*	search modal
@@ -563,11 +668,6 @@ if (search_input){
 
 }
 
-
-
-
-
-
 // function to execute when user wants to exit modal
 function close_modal(modal){
 	modal.style.display = "none";
@@ -583,21 +683,6 @@ window.onclick = function(event) {
   }
 }
 
-// When user clicks upload post buttton
-document.getElementById('upload-btn').addEventListener('click', function () {
-	if (new_post_validation()) {
-		if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
-			Dropzone.forElement('#new_post_dropzone').on('queuecomplete', submit_new_post(true))
-			Dropzone.forElement('#new_post_dropzone').processQueue()
-		} else {
-			if (confirm("Do you want to upload a post with out images?")) {
-				submit_new_post(false);
-			}
-		}
-	} else {
-		$(".modal-content").animate({ scrollTop: 0 }, "smooth");
-	}
-})
 
 // submit new post form
 function  submit_new_post(with_images){
@@ -625,8 +710,7 @@ function  submit_new_post(with_images){
 		"post_description": post_description,
 		"post_year": post_year,
 		"post_access": post_access,
-		"post_tags": post_tags,
-		"with_images": with_images //variable to tell the server if the post is imageless
+		"post_tags": post_tags //variable to tell the server if the post is imageless
 	});
 	xhr.onload = () => {
 	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
@@ -897,9 +981,9 @@ function edit_post(post_id){
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 		const body = "data=" + data
 		xhr.onload = () => {
-			if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+			if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status <= 299) {
 				// if queue is empty reload page
-				if (Dropzone.forElement('#upload_new_photos').getQueuedFiles().length == 0){
+				if (Dropzone.forElement('#upload_new_photos').getQueuedFiles().length === 0){
 					location.reload()
 				} else {
 					// If the update returned good status, upload new photos

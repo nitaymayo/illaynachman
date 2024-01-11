@@ -413,7 +413,7 @@ p.copyright {
     }
 }
 
-#newpostmodal .dropzone{
+#newpostmodal #newPostDropzone{
     border: 2px dashed var(--lead-brown) !important;
     margin: 10%;
     height: 400px;
