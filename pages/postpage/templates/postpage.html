@@ -45,20 +45,24 @@
                                     </select>
 								</div>
                             {# This code block devide the images to 3 columns, the first 2 show 2/3 of the photos and the third column (separate for loop below) show the rest #}
-                                {% set third_of_images = ((images|length)/3)|int %}
-                                <div class="cover_images post-images hidden">
-                                    <label class="cover-images-info ">drag images here to change the cover photos</label>
-                                    {% for img_url in post['cover_images'] %}
-                                        <div class="img-card">
-                                            <img alt="{{ img_url }}" src="{{ url_for('static', filename=('media/posts' + img_url)) }}">
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                <label class="select-images-info hidden">Want to delete images? Images selected here will be deleted</label>
+{#                                {% set third_of_images = ((images|length)/3)|int %}#}
+{#                                <div class="cover_images post-images hidden">#}
+{#                                    <label class="cover-images-info ">drag images here to change the cover photos</label>#}
+{#                                    {% for img_url in post['cover_images'] %}#}
+{#                                        <div class="img-card">#}
+{#                                            <img alt="{{ img_url }}" src="{{ url_for('static', filename=('media/posts' + img_url)) }}">#}
+{#                                        </div>#}
+{#                                    {% endfor %}#}
+{#                                </div>#}
+                                <label class="select-images-info hidden">Edit post images: <br><i class="fa fa-plus-circle "></i> make image cover (max 3 images allowed)<br><i class="fa fa-trash-o"></i> delete image</label>
                                 <div class="post-images main-images">
-                                   {% for img_url in images %}
-                                        <div class="img-card" draggable="true">
-                                            <img onclick="showinbig(this)" src="{{ url_for('static', filename=('media/posts' + img_url)) }}" alt="{{ img_url }}">
+                                   {% for img in images %}
+                                        <div class="img-card {% if img.cover %}cover-img{% endif %}" draggable="true">
+                                            <img onclick="showinbig(this)" src="{{ url_for('static', filename=('media/posts' + img.location)) }}" alt="{{ img.location }}">
+                                            <div class="edit_image hidden">
+                                                <div class="make_cover"><i class="fa fa-plus-circle "></i> </div>
+                                                <div class="delete_img"><i class="fa fa-trash-o"></i></div>
+                                            </div>
                                         </div>
                                    {% endfor %}
 
@@ -66,7 +70,6 @@
                                 <div class="add_new_images hidden">
                                     <label class="select-images-info">Want to add images? Images droped here will be uploaded</label>
                                     {{ dropzone.create(id="upload_new_photos", action=("/postpage/addimagestopost/" + post['data'].post_id|string)) }}
-
                                     <button id="update_post_btn" class="btn">Update post</button>
                                 </div>
 							</div>

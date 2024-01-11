@@ -45,8 +45,6 @@ def index(post_id):
         image = dbManager.fetch(query)
         if image == False:
             raise Exception("Problem with the DB", 304)
-        image = [img.location.replace(post_app.config.destination, url_for('static', filename='media/posts')) for img in
-                 image]
         # Pull cover images
         query = f"SELECT * FROM image WHERE post_id = {post_id} AND cover = b'1'"
         cover_image = dbManager.fetch(query)

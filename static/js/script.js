@@ -794,79 +794,42 @@ function edit_post(post_id){
 	document.querySelector('.access_type_label').classList.remove('hidden')
 	document.querySelector('.access_type').classList.remove('hidden')
 
-	// show cover images section
-	const cover_container = document.querySelector('div.cover_images')
-	cover_container.classList.remove('hidden')
-	// set cover_container drop listiners
-	cover_container.addEventListener('dragover', function(event){
-		event.preventDefault()
-	})
-	cover_container.addEventListener('drop',function (event){
-		// if there is already 3 images selected (3+the label) remove the last
-		if (cover_container.children.length === 4){
-			cover_container.children[3].remove();
-		}
-		// get dropped img
-		const dropped_img = $.parseHTML(event.dataTransfer.getData("text/html"))[0]
-		dropped_img.removeAttribute('onclick')
-		dropped_img.draggable = false
-		const container = $.parseHTML(`<div class="post-columns"><div class="img-card">${dropped_img.outerHTML}</div></div></div>`)[0]
 
-		// append the new img after the label
-		cover_container.insertBefore(container, cover_container.children[1])
-	})
-	document.querySelector('.select-images-info').classList.remove('hidden')
-	const post_imgs = document.querySelectorAll('div.main-images div.img-card>img')
+
+	// set cover image change and delete image feature
+	const post_imgs = document.querySelectorAll('div.main-images div.img-card')
+	let cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
 	for (let i = 0; i < post_imgs.length; i++){
-		// make images selectable to allow user to delete them
-		post_imgs[i].setAttribute('onclick', "this.classList.toggle('selected')")
+		let make_cover_btn = post_imgs[i].querySelector('.make_cover')
+		let delete_image_btn = post_imgs[i].querySelector('.delete_img')
 
-		// set images drag support for mobile
+		make_cover_btn.parentElement.classList.remove('hidden')
 
-		  /* listen to the touchmove event,
-		  every time it fires, grab the location
-		  of touch and assign it to box */
-	    post_imgs[i].addEventListener('touchmove', function(e) {
-			// grab the location of touch
-			var touchLocation = e.targetTouches[0];
+		make_cover_btn.addEventListener('click', function (event){
+			const img_card = event.target.closest('.img-card')
+			if (img_card.classList.contains('cover-img')){
+				img_card.classList.remove('cover-img')
 
-			// assign box new coordinates based on the touch.
-			post_imgs[i].style.left = touchLocation.pageX + 'px';
-			post_imgs[i].style.top = touchLocation.pageY + 'px';
+			} else {
+				img_card.classList.add('cover-img')
+				if (cover_imgs.length === 3) {
+					let removed_from_cover = cover_imgs.pop()
+					removed_from_cover.classList.remove('cover-img')
+				}
+			}
+			cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
 		})
-		post_imgs[i].addEventListener('touchend', function(e) {
-		// current box position.
-		var x = parseInt(post_imgs[i].style.left);
-		var y = parseInt(post_imgs[i].style.top);
-		  })
-
-		// set drag and drop function for cover images selection
-		var stop = true;
-		post_imgs[i].addEventListener('drag', function (event){
-			stop = true;
-
-        if (event.clientY < 150) {
-            stop = false;
-            scroll(-1)
-        }
-
-        if (event.clientY > ($(window).height() - 150)) {
-            stop = false;
-            scroll(1)
-        }
+		delete_image_btn.addEventListener('click', function (event){
+			const img_card = event.target.closest('.img-card')
+			if (img_card.classList.contains('delete-img')){
+				img_card.classList.remove('delete-img')
+			} else {
+				img_card.classList.add('delete-img')
+			}
 		})
-		post_imgs[i].addEventListener("dragend", function (event) {
-         stop = true;
-    });
 	}
-	// function used to allow screen scroll while draging img
-	var scroll = function (step) {
-        var scrollY = $(window).scrollTop();
-        $(window).scrollTop(scrollY + step);
-        if (!stop) {
-            setTimeout(function () { scroll(step) }, 20);
-        }
-    }
+	document.querySelector('.select-images-info').classList.remove('hidden')
+
 
 	// make post name an input to allow user to change it
 	const post_name = document.querySelector('.project-text .post_name')
@@ -916,21 +879,21 @@ function edit_post(post_id){
 		for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
 			new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
 		}
-		let selected_images = []
-		for (let i = 0; i < document.querySelectorAll('img.selected').length; i++){
-			selected_images.push(document.querySelectorAll('img.selected')[i].getAttribute('src'))
+		let delete_images = []
+		for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
+			delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('src'))
 		}
-		let cover_images = []
-		for (let i = 0; i < document.querySelectorAll('div.cover_images img').length; i++){
-			cover_images.push(document.querySelectorAll('div.cover_images img')[i].getAttribute('src'))
+		let cover_images_src = []
+		for (let i = 0; i < cover_imgs.length; i++){
+			cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('src'))
 		}
 		const data = JSON.stringify({
 			'name': new_name,
 			'description': new_description,
 			'year': new_year,
 			'access': new_access,
-			'images': selected_images,
-			'cover_images': cover_images,
+			'images': delete_images,
+			'cover_images': cover_images_src,
 			'tags': new_tags
 		})
 		// send xhr post request to do the update
