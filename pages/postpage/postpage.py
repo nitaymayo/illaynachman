@@ -230,7 +230,7 @@ def update_post(post_id):
     query_delete = f"DELETE FROM image WHERE location = "
     images_not_deleted = []
     if images:
-        delete_to_location = post_app.config.destination.removesuffix("/posts") + "/deleted_posts/images_deleted_from_posts"
+        delete_to_location = post_app.config.destination.removesuffix("/posts") + f"/deleted_posts/images_deleted_from_posts/deleted_from{post_id}/"
         for img in images:
             img_name = img.split(f"/posts")[-1].replace(" ", "+")
             img_location = post_app.config.destination + img_name

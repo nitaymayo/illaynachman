@@ -254,14 +254,27 @@ $(document).ready(function($) {
 
 	function set_postpage_images_div() {
 		// Enter this if only on postpage.html (where main_images_div exists)
-		const main_images_div = document.querySelector('.post-images.main-images')
+		const main_images_div = document.querySelector('.post-images.main-images');
 		if (main_images_div) {
-			let total_children_height = 0
+			let final_div_height = 0;
 			const all_images = main_images_div.querySelectorAll('.img-card img')
-			for (let i = 0; i < all_images.length; i++) {
-				total_children_height += all_images[i].clientHeight + 30 // 30px for the gap between the images
+			// if 1 or 2 images are present set hight to the hight of the largest
+			if (all_images.length <= 3){
+				// find max
+				for (let i = 0; i < all_images.length; i++){
+					if (all_images[i].clientHeight > final_div_height){
+						final_div_height = all_images[i].clientHeight + 30;
+					}
+				}
+
+
+			} else {
+				for (let i = 0; i < all_images.length; i++) {
+					final_div_height += all_images[i].clientHeight + 30; // 30px for the gap between the images
+				}
+				final_div_height = final_div_height / 3;
 			}
-			main_images_div.style.height = (total_children_height / 3).toString() + "px"
+			main_images_div.style.height = (final_div_height).toString() + "px";
 		}
 	}
 	set_postpage_images_div()
