@@ -270,7 +270,7 @@ $(document).ready(function($) {
 
 			} else {
 				for (let i = 0; i < all_images.length; i++) {
-					final_div_height += all_images[i].clientHeight + 30; // 30px for the gap between the images
+					final_div_height += all_images[i].clientHeight*1.2; // 30px for the gap between the images
 				}
 				final_div_height = final_div_height / 3;
 			}
@@ -396,11 +396,6 @@ $(document).ready(function($) {
 			}
 		});
 	});
-
-	/* ---------------------------------------------------------------------- */
-	/*	set drag support for mobile device
-	/* ---------------------------------------------------------------------- */
-
 
 	/* ---------------------------------------------------------------------- */
 	/*	load tags in new post form
