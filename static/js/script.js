@@ -398,6 +398,11 @@ $(document).ready(function($) {
 	});
 
 	/* ---------------------------------------------------------------------- */
+	/*	set drag support for mobile device
+	/* ---------------------------------------------------------------------- */
+
+
+	/* ---------------------------------------------------------------------- */
 	/*	load tags in new post form
 	/* ---------------------------------------------------------------------- */
 
@@ -461,7 +466,7 @@ if (new_post_btn) {
 }
 
 // When the user clicks on <span> (x), close the modal
-new_post_close_span.onclick = close_modal(new_post_modal)
+new_post_close_span.addEventListener('click', () => {close_modal(new_post_modal)})
 
 /* ---------------------------------------------------------------------- */
 /*	search modal
@@ -557,12 +562,14 @@ if (search_input){
 		})
 		relavent_posts.map((post) => {post.classList.remove('hidden')})
 	})
+
+	// When the user clicks on <span> (x), close the modal
+	search_close_span.addEventListener('click', () => {close_modal(search_modal)})
+
 }
 
 
 
-// When the user clicks on <span> (x), close the modal
-search_close_span.addEventListener('click', () => {close_modal(search_modal)})
 
 
 
@@ -813,6 +820,26 @@ function edit_post(post_id){
 	for (let i = 0; i < post_imgs.length; i++){
 		// make images selectable to allow user to delete them
 		post_imgs[i].setAttribute('onclick', "this.classList.toggle('selected')")
+
+		// set images drag support for mobile
+
+		  /* listen to the touchmove event,
+		  every time it fires, grab the location
+		  of touch and assign it to box */
+	    post_imgs[i].addEventListener('touchmove', function(e) {
+			// grab the location of touch
+			var touchLocation = e.targetTouches[0];
+
+			// assign box new coordinates based on the touch.
+			post_imgs[i].style.left = touchLocation.pageX + 'px';
+			post_imgs[i].style.top = touchLocation.pageY + 'px';
+		})
+		post_imgs[i].addEventListener('touchend', function(e) {
+		// current box position.
+		var x = parseInt(post_imgs[i].style.left);
+		var y = parseInt(post_imgs[i].style.top);
+		  })
+
 		// set drag and drop function for cover images selection
 		var stop = true;
 		post_imgs[i].addEventListener('drag', function (event){
