@@ -22,10 +22,13 @@
                     {% endif %}
 				</ul>
 			</div>
-
-
-
-
+            {% if session %}
+            <div class="post-box">
+                <a class="btn" id="newpostmodalbtn">
+                    + Upload post
+                </a>
+            </div>
+            {% endif %}
 			<div class="categories-box">
 				<h2>Categories</h2>
 				<ul class="categories">
@@ -38,13 +41,7 @@
                 </ul>
 			</div>
 
-             {% if session %}
-                        <div class="post-box">
-                            <a class="btn" id="newpostmodalbtn">
-                                + Upload post
-                            </a>
-                        </div>
-            {% endif %}
+
 
 			<div class="social-box">
 				<ul class="social-icons">

@@ -258,6 +258,22 @@ $(document).ready(function($) {
 
 	});
 
+	if (winDow.width() < 500){
+		const upload_btn = $('.post-box')
+		const social_box = $('.social-box')
+		const contact_box = $('.contact-box')
+
+		const menu_box = $('.menu-box')
+
+		upload_btn.appendTo(menu_box)
+		social_box.appendTo(menu_box)
+		contact_box.appendTo(menu_box)
+	}
+
+	/* ---------------------------------------------------------------------- */
+	/*	post page main div height
+	/* ---------------------------------------------------------------------- */
+
 	function set_postpage_images_div() {
 		// Enter this if only on postpage.html (where main_images_div exists)
 		const main_images_div = document.querySelector('.post-images.main-images');
