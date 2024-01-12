@@ -45,8 +45,6 @@ def index(post_id):
         image = dbManager.fetch(query)
         if image == False:
             raise Exception("Problem with the DB", 304)
-        image = [img.location.replace(post_app.config.destination, url_for('static', filename='media/posts')) for img in
-                 image]
         # Pull cover images
         query = f"SELECT * FROM image WHERE post_id = {post_id} AND cover = b'1'"
         cover_image = dbManager.fetch(query)
@@ -158,10 +156,13 @@ def deletepost():
     return "Deleted", 201
 
 
-@postpage.route('/postpage/updatepost/<int:post_id>', methods=['GET', 'POST'])
-def update_post(post_id):
+@postpage.route('/postpage/updatepost', methods=['POST'])
+def update_post():
     if not session:
         return "Please signin", 401
+
+    data = json.loads(request.form.to_dict()['data'])
+    post_id = data["post_id"]
 
     # Pull post data
     query = f"SELECT * FROM post WHERE post_id = {post_id}"
@@ -174,7 +175,7 @@ def update_post(post_id):
         return "You can't update this post", 301
 
     # pull request data
-    data = json.loads(request.form.to_dict()['data'])
+
     new_name = data['name']
     new_description = data['description']
     new_access = data['access']
@@ -230,15 +231,16 @@ def update_post(post_id):
     query_delete = f"DELETE FROM image WHERE location = "
     images_not_deleted = []
     if images:
-        delete_to_location = post_app.config.destination.removesuffix("/posts") + "/deleted_posts/images_deleted_from_posts"
+        delete_to_location = post_app.config.destination.removesuffix("/posts") + f"/deleted_posts/images_deleted_from_posts/deleted_from{post_id}/"
         for img in images:
             img_name = img.split(f"/posts")[-1].replace(" ", "+")
             img_location = post_app.config.destination + img_name
             res = dbManager.commit(query_delete + f"'{img_name}'")
             if res:
                 if not os.path.exists(delete_to_location):
-                    os.makedirs(delete_to_location, exist_ok=True)
-                shutil.move(img_location, delete_to_location)
+                    os.makedirs(delete_to_location)
+                if os.path.exists(img_location):
+                    shutil.move(img_location, delete_to_location)
             else:
                 images_not_deleted.append(img_name)
 
@@ -248,7 +250,46 @@ def update_post(post_id):
         flash(images_not_deleted_msg)
         print(f"-------------Images not deleted error-----------\n Images = \n{[str(i) + ': ' + img for i, img in enumerate(images_not_deleted)]}", file=sys.stderr)
 
-    return "update success", 200
+
+    # upload new images
+    files = request.files
+    if not files.get('file[0]').filename == 'blob':
+        post_dir = f"post_id{post_id}/"
+        if not os.path.exists(post_app.config.destination + '/' + post_dir):
+            os.makedirs(post_app.config.destination + '/' + post_dir)
+
+        bad_files = []
+        good_files = []
+        for f in files:
+
+            file = request.files.get(f)
+            new_file_name = file.filename.replace(" ", "+")
+            # try to insert img to db
+            query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '/{post_dir + new_file_name}')"
+            res = dbManager.commit(query)
+            try:
+                # if successful save it to folder, else raise exception
+                if res == 1:
+                    # save the file to our photos folder
+                    file_name = post_app.save(
+                        file,
+                        name=(post_dir + new_file_name)
+                    )
+                    good_files.append(file.filename)
+                else:
+                    bad_files.append([file.filename, "server cant save file, try to change file name"])
+            except Exception as e:
+                query = f"DELETE FROM image WHERE post_id={post_id} AND location='{post_dir + new_file_name}'"
+                res = dbManager.commit(query)
+                bad_files.append([file.filename, e.args[1]])
+
+        if bad_files:
+            bad_file_string = "some images could not be uploaded:\n"
+            for i, file in enumerate(bad_files):
+                bad_file_string = bad_file_string + f"{i + 1}) {file[0]}, error: {file[1]}\n"
+            flash(bad_file_string + "Please try changing their name and make sure they are valid content")
+
+    return "update success", 201
 
 
 @postpage.route('/postpage/addimagestopost/<int:post_id>', methods=['GET', 'POST'])

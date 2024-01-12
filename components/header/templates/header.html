@@ -1,6 +1,6 @@
 <header>
 			<div class="logo-box">
-				<a class="logo" href="/"><img alt="" src="{{ url_for('static', filename='media/img/logos/logo.avif') }}"></a>
+				<a class="logo" href="/"><img alt="" src="{{ url_for('static', filename='media/img/logos/illay_logo.png') }}"></a>
 				<p class="slogan">Life is a <b>PARTY</b><br>החיים הם <b>חגיגה</b></p>
                 {% if session %}
                     <br>
@@ -22,45 +22,26 @@
                     {% endif %}
 				</ul>
 			</div>
-
-{#			<div class="archives-box">#}
-{#				<h2>Archives</h2>#}
-{#				<ul class="archives">#}
-{#					<li><a href="#">2023</a></li>#}
-{#					<li><a href="#">2022</a></li>#}
-{#					<li><a href="#">2021</a></li>#}
-{#				</ul>#}
-{#			</div>#}
-
-
-
+            {% if session %}
+            <div class="post-box">
+                <a class="btn" id="newpostmodalbtn">
+                    + Upload post
+                </a>
+            </div>
+            {% endif %}
 			<div class="categories-box">
 				<h2>Categories</h2>
 				<ul class="categories">
-{#					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Ilay</a></li>#}
-{#					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Family</a></li>#}
-{#					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Friends</a></li>#}
-{#                    <li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Surf</a></li>#}
-{#					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Party</a></li>#}
-				</ul>
+                </ul>
 			</div>
             <div class="periods-box">
 				<h2>Life Periods</h2>
 				<ul class="periods">
-{#					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Baby</a></li>#}
-{#					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Boy</a></li>#}
-{#					<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Teen</a></li>#}
-{#                    <li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>Adult</a></li>#}
-				</ul>
+
+                </ul>
 			</div>
 
-             {% if session %}
-                        <div class="post-box">
-                            <a class="btn" id="newpostmodalbtn">
-                                + Upload post
-                            </a>
-                        </div>
-            {% endif %}
+
 
 			<div class="social-box">
 				<ul class="social-icons">
@@ -125,13 +106,14 @@
   </div>
  </div>
 
+{% if session %}
 <!-- new post modal -->
 <div id="newpostmodal" class="modal">
   <!-- New Post Modal content -->
   <div class="modal-content">
     <span class="closemodal">&times;</span>
       <h1>Stage 1: Post Info</h1>
-     <form id="new-post-form" action="/home/newpost" method="post">
+     <form id="new-post-form" method="POST" enctype="multipart/form-data">
           <div class="imgcontainer">
             <img src="{{ url_for('static', filename='media/img/logos/tattoo_fish_600x600.webp') }}" alt="Avatar" class="avatar">
           </div>
@@ -163,9 +145,20 @@
 
               </div>
           </div>
-     </form>
+
       <h1>Stage 2: Image Upload</h1>
-        {{ dropzone.create(id='new_post_dropzone', action='/homepage/uploadpostphotos') }}
-<button id="upload-btn" type="button">Post</button>
+         <div id="newPostDropzone">
+             <div class="dz-default dz-message dropzone">
+                 <button class="dz-button" type="button">Drop files here to upload</button>
+                 <div class="dropzone-previews"></div>
+             </div>
+
+         </div>
+
+         {#        {{ dropzone.create(id='new_post_dropzone', action='/homepage/uploadpostphotos') }}#}
+         <button id="upload-btn" type="submit">Post</button>
+     </form>
   </div>
  </div>
+
+{% endif %}

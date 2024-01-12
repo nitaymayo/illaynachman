@@ -27,7 +27,7 @@ Base page blocks:
 <head>
     {% block page_head %}
         {# Title #}
-        <title>{{ page_head_title|default('IllayNachman', true) }}</title>
+        <title>{{ page_head_title|default('IllayNachman', true)|capitalize }}</title>
 
         {# Meta tags #}
         {% block page_head_meta %}
@@ -40,7 +40,7 @@ Base page blocks:
         {% endblock %}
 
         {# favicon #}
-        <link rel="icon" href="{{ url_for('static', filename='') }}"/>
+        <link rel="icon" href="{{ url_for('static', filename='media/img/logos/fish_logo.png') }}"/>
 
         {# Base #}
         <base href="/"/>
