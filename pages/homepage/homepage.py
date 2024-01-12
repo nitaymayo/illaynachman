@@ -178,23 +178,18 @@ def load_more_posts():
 
     return pd.DataFrame(separate_posts).to_json(), 201
 
-
-    return redirect('/')
-
-@homepage.route('/home/newpost', methods=['POST'])
+@homepage.route('/home/newpost', methods=['GET', 'POST'])
 def new_post():
     if not session:
         flash('Login is required to upload a post')
         return redirect(url_for('login.index'))
 
-    from_dir = post.config.destination + '/temp_post_u' + str(session['user_id']) # The path to the directory where the content from upload_post_photos_to_temp() is wating
     data = json.loads(request.form['data'])
     post_name = data['post_name']
     post_year = data['post_year']
     post_description = data['post_description']
     access_type = data['post_access']
     post_tags = data['post_tags']
-    with_images = data['with_images']
 
     # Insert post to db
     query = (f"INSERT INTO post (name, user_id, year, description, access) "
@@ -203,7 +198,6 @@ def new_post():
     res = dbManager.commit(query)
 
     if res == -1:
-        shutil.rmtree(from_dir)
         return 'Something went wrong, your post did not uploaded'
 
     # Get post ID
@@ -211,7 +205,7 @@ def new_post():
     res = dbManager.fetch(query)
     post_id = res[0].current_post
 
-    to_dir = post.config.destination + '/post_id' + str(post_id) # Directory to save the content to
+
 
     ### Insert Tags
     try:
@@ -224,82 +218,99 @@ def new_post():
             if res == -1:
                 raise Exception('Something went wrong with tags insert query')
     except Exception as e:
-        if os.path.exists(from_dir):
-            shutil.rmtree(from_dir)
         query = f"DELETE FROM post WHERE post_id = {post_id}"
         dbManager.commit(query)
         return e.args[0], 301
 
-    # check if post doesnt have photos
-    if (not with_images):
-        return 'Post uploaded!', 201
+    flash('Post uploaded!')
 
-    os.makedirs(to_dir) #Create post dir
+    # check if post doesnt have photos
+    files = request.files
+    if files.get('file[0]').filename == 'blob':
+        return 'uploaded', 201
+
+    post_dir = 'post_id' + str(post_id)  # Directory to save the content to
+    os.makedirs(post.config.destination + '/' + post_dir) #Create post dir
 
     # Insert Content to dir and to DB
     query = "INSERT INTO image (location, post_id) VALUES "
-    try:
-        for file in os.listdir(from_dir):
-            shutil.move(os.path.join(from_dir, file), to_dir)
-            query += f"('/post_id{post_id}/{file}', {post_id}),"
-        shutil.rmtree(from_dir)
-        query = query[:-1]
-
-        res = dbManager.commit(query)
-        if res == -1:
-            raise Exception('Something went wrong with the db upload, if error repeats please let us know')
-
-        # choose randomly 3 photos as cover photos
-        query = (f"UPDATE image "
-                 f"SET cover = b'1' "
-                 f"WHERE post_id = {post_id} "
-                 f"ORDER BY post_id LIMIT 3")
-        res = dbManager.commit(query)
-    except Exception as e:
-        query = f"DELETE FROM post WHERE post_id = {post_id}"
-        dbManager.commit(query)
-        shutil.rmtree(to_dir)
-        return e.args[0], 301
-
-
-    return 'Post uploaded!', 201
-
-
-@homepage.route('/homepage/uploadpostphotos', methods=['POST'])
-def upload_post_photos_to_temp():
-    if not session:
-        return "You need to login", 301
-    if request.method == 'POST':
-        temp_dir = f"temp_post_u{session['user_id']}"
-        to_dir = post.config.destination + '/' + temp_dir
-        # Delete temp dir if exists
-        if os.path.exists(to_dir):
-            shutil.rmtree(to_dir)
-
-        os.makedirs(to_dir, exist_ok=True)
-        file_obj = request.files
-        bad_files = []
-        for f in file_obj:
-            file = request.files.get(f)
-
-            # save the file to our photos folder
-            try:
+    bad_files = []
+    good_files = []
+    for f in files:
+        file = request.files.get(f)
+        new_file_name = file.filename.replace(" ", "+")
+        # save the file to our photos folder
+        try:
+            res = dbManager.commit(query + f"('/{post_dir + '/' + new_file_name}', {post_id})")
+            if res == 1:
                 file_name = post.save(
                     file,
-                    name=os.path.join(temp_dir, file.filename.replace(" ", "+"))
+                    name=(post_dir + '/' + new_file_name)
                 )
-            except Exception as e:
-                bad_files.append(file.filename)
+                good_files.append(file_name)
+            else:
+                raise Exception()
+        except Exception as e:
+            bad_files.append(file.filename)
 
-        if bad_files:
-            bad_file_string = "some images could not be uploaded:\n"
-            for i, file in enumerate(bad_files):
-                bad_file_string = bad_file_string + f"{i+1}) {file}\n"
-            flash(bad_file_string + "Please try changing their name and make sure they are valid content\n You can upload them by editing your post")
-        return "uploading...", 200
+    # choose randomly 3 photos as cover photos
+    query = (f"UPDATE image "
+             f"SET cover = b'1' "
+             f"WHERE post_id = {post_id} "
+             f"ORDER BY post_id LIMIT 3")
+    res = dbManager.commit(query)
 
-    else:
-        return "Method not allowed", 401
+
+    if bad_files:
+        bad_file_string = "some images could not be uploaded:\n"
+        for i, file in enumerate(bad_files):
+            bad_file_string = bad_file_string + f"{i + 1}) {file}\n"
+        flash(bad_file_string + "Please try changing their name and make sure they are valid content\n You can upload them by editing your post")
+    
+    return "uploaded", 201
+
+
+# @homepage.route('/homepage/uploadpostphotos', methods=['POST'])
+# def upload_post_photos_to_temp():
+#     if not session:
+#         return "You need to login", 301
+#     if request.method == 'POST':
+#         temp_dir = f"temp_post_u{session['user_id']}"
+#         to_dir = post.config.destination + '/' + temp_dir
+#         # Delete temp dir if exists
+#         if os.path.exists(to_dir):
+#             shutil.rmtree(to_dir)
+#
+#         os.makedirs(to_dir, exist_ok=True)
+#         file_obj = request.files
+#         bad_files = []
+#         good_files = []
+#         for f in file_obj:
+#             file = request.files.get(f)
+#
+#             # save the file to our photos folder
+#             try:
+#                 file_name = post.save(
+#                     file,
+#                     name=os.path.join(temp_dir, file.filename.replace(" ", "+"))
+#                 )
+#                 good_files.append(file_name)
+#             except Exception as e:
+#                 bad_files.append(file.filename)
+#
+#         if bad_files:
+#             bad_file_string = "some images could not be uploaded:\n"
+#             for i, file in enumerate(bad_files):
+#                 bad_file_string = bad_file_string + f"{i+1}) {file}\n"
+#             flash(bad_file_string + "Please try changing their name and make sure they are valid content\n You can upload them by editing your post")
+#
+#         # if good_files:
+#         #     while len(os.listdir(to_dir)) < len(good_files):
+#         #         pass
+#         return "uploading...", 200
+#
+#     else:
+#         return "Method not allowed", 401
 
 
 @homepage.route('/homepage/gettags')

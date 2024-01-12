@@ -6,9 +6,15 @@ Object.defineProperty(String.prototype, 'capitalize', {
   value: function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
   },
-
   enumerable: false
 });
+
+// check mobile function
+window.mobileCheck = function() {
+  let check = false;
+  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+  return check;
+};
 
 var $ = jQuery.noConflict();
 
@@ -252,6 +258,22 @@ $(document).ready(function($) {
 
 	});
 
+	if (winDow.width() < 500){
+		const upload_btn = $('.post-box')
+		const social_box = $('.social-box')
+		const contact_box = $('.contact-box')
+
+		const menu_box = $('.menu-box')
+
+		upload_btn.appendTo(menu_box)
+		social_box.appendTo(menu_box)
+		contact_box.appendTo(menu_box)
+	}
+
+	/* ---------------------------------------------------------------------- */
+	/*	post page main div height
+	/* ---------------------------------------------------------------------- */
+
 	function set_postpage_images_div() {
 		// Enter this if only on postpage.html (where main_images_div exists)
 		const main_images_div = document.querySelector('.post-images.main-images');
@@ -277,8 +299,24 @@ $(document).ready(function($) {
 			main_images_div.style.height = (final_div_height).toString() + "px";
 		}
 	}
-	set_postpage_images_div()
-	winDow.bind('resize',set_postpage_images_div)
+
+	// Check if all images are loaded to calculate post page image div height
+	if (location.href.includes('postpage')) {
+		// When we begin, assume no images are loaded.
+		var imagesLoaded = 0;
+		// Count the total number of images on the page when the page has loaded.
+		var totalImages = $(".img-card img").length;
+
+		// After an image is loaded, add to the count, and if that count equals the
+		// total number of images, fire the allImagesLoaded() function.
+		$(".img-card img").on("load", function (event) {
+			imagesLoaded++;
+			if (imagesLoaded == totalImages) {
+				set_postpage_images_div();
+			}
+		});
+		winDow.bind('resize',set_postpage_images_div)
+	}
 	/* ---------------------------------------------------------------------- */
 	/*	Load more post btn
 	/* ---------------------------------------------------------------------- */
@@ -432,7 +470,140 @@ $(document).ready(function($) {
 	load_posts_for_search()
 
 
+	Dropzone.autoDiscover = false;
 
+	$(function (){
+		// configure new post dropzone
+		var postUploadDz = new Dropzone('div#newPostDropzone', {
+			paramName: "file",
+			url: "/home/newpost",
+			previewsContainer: "div.dropzone-previews",
+			addRemoveLinks: true,
+			autoProcessQueue: false,
+			uploadMultiple: true,
+			parallelUploads: 50,
+			maxFiles: 50,
+			init: function (){
+				let myDropzone = this;
+
+				// First change the button to actually tell Dropzone to process the queue.
+				document.querySelector("#upload-btn").addEventListener("click", function(e) {
+				  // Make sure that the form isn't actually being sent.
+				  e.preventDefault();
+				  e.stopPropagation();
+				  if (new_post_validation()) {
+					  if (myDropzone.getQueuedFiles().length === 0){
+						  if(confirm('Please confirm you want to upload post without images')) {
+							  var blob = new Blob();
+							  blob.upload = {'chunked': myDropzone.options.chunking};
+							  myDropzone.uploadFile(blob);
+						  }
+					  } else {
+						  myDropzone.processQueue();
+					  }
+				  } else {
+					  $(".modal-content").animate({ scrollTop: 0 }, "smooth");
+				  }
+				});
+
+				this.on("sendingmultiple", function(file, xhr, form) {
+					const post_name = document.getElementById('post_name').value
+					const post_year = document.getElementById('post_year').value
+					const post_description = document.getElementById('free_text').value
+					const post_access = document.getElementById('access_type').value
+					let post_tags = []
+					// get tags
+					const tag_checkboxes = document.querySelectorAll('#new-post-form input[type=checkbox]')
+
+					for (let i = 0; i<tag_checkboxes.length; i++){
+						if (tag_checkboxes[i].checked){
+							post_tags.push(tag_checkboxes[i].id.toLowerCase())
+						}
+					}
+
+					const body = JSON.stringify({
+						"post_name": post_name,
+						"post_description": post_description,
+						"post_year": post_year,
+						"post_access": post_access,
+						"post_tags": post_tags
+					});
+					form.append("data", body);
+				});
+
+				this.on("successmultiple", function(files, response) {
+			      document.location = '/'
+			    });
+			}
+		})
+
+		// configure add imgs to post dropzone
+		var updatePostDz = new Dropzone('div#uploadNewPhotos', {
+			paramName: "file",
+			url: "/postpage/updatepost",
+			previewsContainer: "div.dropzone-previews.added_images",
+			addRemoveLinks: true,
+			autoProcessQueue: false,
+			uploadMultiple: true,
+			parallelUploads: 50,
+			maxFiles: 50,
+			init: function (){
+				let myDropzone = this;
+
+				// First change the button to actually tell Dropzone to process the queue.
+				document.querySelector("#update_post_btn").addEventListener("click", function(e) {
+				  // Make sure that the form isn't actually being sent.
+				  e.preventDefault();
+				  e.stopPropagation();
+				  if (myDropzone.getQueuedFiles().length === 0){
+					  var blob = new Blob();
+					  blob.upload = {'chunked': myDropzone.options.chunking};
+					  myDropzone.uploadFile(blob);
+				  } else {
+					  myDropzone.processQueue();
+				  }
+				});
+
+				this.on("sendingmultiple",process_new_post_data);
+
+				this.on("successmultiple", function(files, response) {
+			      location.reload()
+			    });
+			}
+		})
+	})
+	function process_new_post_data(file, xhr, form) {
+					const post_id = document.querySelector('.project-post-content').getAttribute('post')
+					const new_name = document.querySelector('.single-box-content input.post_name_input').value
+					const new_description = document.querySelector('.single-box-content textarea.post_description_input').value
+					const new_access = document.querySelector('#new_access_type').value
+					const new_year = document.querySelector('.single-box input.post_year_input').value
+					let new_tags = []
+					for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
+						new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
+					}
+					let delete_images = []
+					for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
+						delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('src'))
+					}
+					let cover_images_src = []
+					let cover_imgs = document.querySelectorAll('div.img-card.cover-img')
+					for (let i = 0; i < cover_imgs.length; i++){
+						cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('src'))
+					}
+					const body = JSON.stringify({
+						'name': new_name,
+						'description': new_description,
+						'year': new_year,
+						'access': new_access,
+						'images': delete_images,
+						'cover_images': cover_images_src,
+						'tags': new_tags,
+						'post_id': post_id
+					})
+
+					form.append("data", body);
+				}
 
 });
 
@@ -458,10 +629,29 @@ if (new_post_btn) {
 		$('html').getNiceScroll().hide();
 		$('#newpostmodal>div.modal-content').niceScroll()
 	})
+
+	// When the user clicks on <span> (x), close the modal
+	new_post_close_span.addEventListener('click', () => {close_modal(new_post_modal)})
+
+	// When user clicks upload post buttton
+// 	document.getElementById('upload-btn').addEventListener('click', function () {
+// 	if (new_post_validation()) {
+// 		if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
+// 			Dropzone.forElement('#new_post_dropzone').on('completemultiple', () => {submit_new_post(true)})
+// 			Dropzone.forElement('#new_post_dropzone').processQueue()
+// 		} else {
+// 			if (confirm("Do you want to upload a post with out images?")) {
+// 				submit_new_post(false);
+// 			}
+// 		}
+// 	} else {
+// 		$(".modal-content").animate({ scrollTop: 0 }, "smooth");
+// 	}
+// })
+
 }
 
-// When the user clicks on <span> (x), close the modal
-new_post_close_span.addEventListener('click', () => {close_modal(new_post_modal)})
+
 
 /* ---------------------------------------------------------------------- */
 /*	search modal
@@ -563,11 +753,6 @@ if (search_input){
 
 }
 
-
-
-
-
-
 // function to execute when user wants to exit modal
 function close_modal(modal){
 	modal.style.display = "none";
@@ -583,21 +768,6 @@ window.onclick = function(event) {
   }
 }
 
-// When user clicks upload post buttton
-document.getElementById('upload-btn').addEventListener('click', function () {
-	if (new_post_validation()) {
-		if (Dropzone.forElement('#new_post_dropzone').getQueuedFiles().length > 0) {
-			Dropzone.forElement('#new_post_dropzone').on('queuecomplete', submit_new_post(true))
-			Dropzone.forElement('#new_post_dropzone').processQueue()
-		} else {
-			if (confirm("Do you want to upload a post with out images?")) {
-				submit_new_post(false);
-			}
-		}
-	} else {
-		$(".modal-content").animate({ scrollTop: 0 }, "smooth");
-	}
-})
 
 // submit new post form
 function  submit_new_post(with_images){
@@ -625,8 +795,7 @@ function  submit_new_post(with_images){
 		"post_description": post_description,
 		"post_year": post_year,
 		"post_access": post_access,
-		"post_tags": post_tags,
-		"with_images": with_images //variable to tell the server if the post is imageless
+		"post_tags": post_tags //variable to tell the server if the post is imageless
 	});
 	xhr.onload = () => {
 	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
@@ -857,64 +1026,65 @@ function edit_post(post_id){
 	document.querySelector('.select-tags-info').classList.remove('hidden')
 	set_postpage_tags()
 
+	// show update post button
+	document.querySelector('.update_post_div').classList.remove('hidden')
 
 	// show new images upload dropzone
-	document.querySelector('.add_new_images').classList.remove('hidden')
-	$('#upload_new_photos').niceScroll()
+	$('#uploadNewPhotos').niceScroll()
 
 
 	// set click listener to the update post btn
-	document.querySelector('#update_post_btn').addEventListener('click', function (){
-		// update post name and description + delete selected photos
-		const new_name = document.querySelector('.single-box-content input.post_name_input').value
-		const new_description = post_description_input.value
-		const new_access = document.querySelector('#new_access_type').value
-		const new_year = post_year_input.value
-		let new_tags = []
-		for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
-			new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
-		}
-		let delete_images = []
-		for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
-			delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('src'))
-		}
-		let cover_images_src = []
-		for (let i = 0; i < cover_imgs.length; i++){
-			cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('src'))
-		}
-		const data = JSON.stringify({
-			'name': new_name,
-			'description': new_description,
-			'year': new_year,
-			'access': new_access,
-			'images': delete_images,
-			'cover_images': cover_images_src,
-			'tags': new_tags
-		})
-		// send xhr post request to do the update
-		const xhr = new XMLHttpRequest();
-		xhr.open("POST", "/postpage/updatepost/" + post_id.toString());
-		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		const body = "data=" + data
-		xhr.onload = () => {
-			if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
-				// if queue is empty reload page
-				if (Dropzone.forElement('#upload_new_photos').getQueuedFiles().length == 0){
-					location.reload()
-				} else {
-					// If the update returned good status, upload new photos
-					Dropzone.forElement('#upload_new_photos').on('queuecomplete', function (file){
-					location.reload()
-				})
-				}
-				Dropzone.forElement('#upload_new_photos').processQueue()
-			} else {
-				console.log("request status: " + xhr.status)
-				alert(xhr.responseText)
-			}
-		};
-		xhr.send(body)
-	})
+	// document.querySelector('#update_post_btn').addEventListener('click', function (){
+	// 	// update post name and description + delete selected photos
+	// 	const new_name = document.querySelector('.single-box-content input.post_name_input').value
+	// 	const new_description = post_description_input.value
+	// 	const new_access = document.querySelector('#new_access_type').value
+	// 	const new_year = post_year_input.value
+	// 	let new_tags = []
+	// 	for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
+	// 		new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
+	// 	}
+	// 	let delete_images = []
+	// 	for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
+	// 		delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('src'))
+	// 	}
+	// 	let cover_images_src = []
+	// 	for (let i = 0; i < cover_imgs.length; i++){
+	// 		cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('src'))
+	// 	}
+	// 	const data = JSON.stringify({
+	// 		'name': new_name,
+	// 		'description': new_description,
+	// 		'year': new_year,
+	// 		'access': new_access,
+	// 		'images': delete_images,
+	// 		'cover_images': cover_images_src,
+	// 		'tags': new_tags
+	// 	})
+	// 	// send xhr post request to do the update
+	// 	const xhr = new XMLHttpRequest();
+	// 	xhr.open("POST", "/postpage/updatepost/" + post_id.toString());
+	// 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	// 	const body = "data=" + data
+	// 	xhr.onload = () => {
+	// 		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status <= 299) {
+	// 			// if queue is empty reload page
+	// 			if (Dropzone.forElement('#upload_new_photos').getQueuedFiles().length === 0){
+	// 				location.reload()
+	// 			} else {
+	// 				// If the update returned good status, upload new photos
+	// 				Dropzone.forElement('#upload_new_photos').on('queuecomplete', function (file){
+	// 				location.reload()
+	// 			})
+	// 			}
+	// 			Dropzone.forElement('#upload_new_photos').processQueue()
+	// 		} else {
+	// 			console.log("request status: " + xhr.status)
+	// 			alert(xhr.responseText)
+	// 		}
+	// 	};
+	// 	xhr.send(body)
+	// })
 }
 
 // load all tags to the post page when user clicks edit mode
