@@ -234,6 +234,7 @@ def new_post():
 
     # Insert Content to dir and to DB
     query = "INSERT INTO image (location, post_id) VALUES "
+    delete_query = f"DELETE FROM image WHERE location = "
     bad_files = []
     good_files = []
     for f in files:
@@ -252,6 +253,7 @@ def new_post():
                 raise Exception()
         except Exception as e:
             bad_files.append(file.filename)
+            dbManager.commit(delete_query + f"'/{post_dir + '/' + new_file_name}'")
 
     # choose randomly 3 photos as cover photos
     query = (f"UPDATE image "
@@ -263,6 +265,7 @@ def new_post():
 
     if bad_files:
         bad_file_string = "some images could not be uploaded:\n"
+
         for i, file in enumerate(bad_files):
             bad_file_string = bad_file_string + f"{i + 1}) {file}\n"
         flash(bad_file_string + "Please try changing their name and make sure they are valid content\n You can upload them by editing your post")

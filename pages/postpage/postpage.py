@@ -209,17 +209,11 @@ def update_post():
         res = dbManager.commit(query[:-1])
 
     # Set new cover photos
-    new_cover_images = []
-    for img in cover_images:
-        img_name = img.split(f"post_id{post_id}/")[-1]
-        img_location = f"/post_id{post_id}/{img_name}"
-        new_cover_images.append(img_location)
-
     query = (f"UPDATE image SET "
-             f"cover = b'0' "
-             f"WHERE post_id = {post_id}")
+         f"cover = b'0' "
+         f"WHERE post_id = {post_id}")
     res = dbManager.commit(query)
-    location_string = ','.join([f"'{str(img).replace(' ', '+')}'" for img in new_cover_images])
+    location_string = ','.join([f"'{str(img).replace(' ', '+')}'" for img in cover_images])
     query = (f"UPDATE image SET "
              f"cover = b'1' "
              f"WHERE location in ({location_string})")
@@ -232,8 +226,7 @@ def update_post():
     images_not_deleted = []
     if images:
         delete_to_location = post_app.config.destination.removesuffix("/posts") + f"/deleted_posts/images_deleted_from_posts/deleted_from{post_id}/"
-        for img in images:
-            img_name = img.split(f"/posts")[-1].replace(" ", "+")
+        for img_name in images:
             img_location = post_app.config.destination + img_name
             res = dbManager.commit(query_delete + f"'{img_name}'")
             if res:

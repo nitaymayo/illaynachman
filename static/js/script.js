@@ -573,12 +573,12 @@ $(document).ready(function($) {
 					}
 					let delete_images = []
 					for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
-						delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('src'))
+						delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('alt'))
 					}
 					let cover_images_src = []
 					let cover_imgs = document.querySelectorAll('div.img-card.cover-img')
 					for (let i = 0; i < cover_imgs.length; i++){
-						cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('src'))
+						cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('alt'))
 					}
 					const body = JSON.stringify({
 						'name': new_name,
@@ -1021,60 +1021,6 @@ function edit_post(post_id){
 
 	// show new images upload dropzone
 	$('#uploadNewPhotos').niceScroll()
-
-
-	// set click listener to the update post btn
-	// document.querySelector('#update_post_btn').addEventListener('click', function (){
-	// 	// update post name and description + delete selected photos
-	// 	const new_name = document.querySelector('.single-box-content input.post_name_input').value
-	// 	const new_description = post_description_input.value
-	// 	const new_access = document.querySelector('#new_access_type').value
-	// 	const new_year = post_year_input.value
-	// 	let new_tags = []
-	// 	for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
-	// 		new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
-	// 	}
-	// 	let delete_images = []
-	// 	for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
-	// 		delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('src'))
-	// 	}
-	// 	let cover_images_src = []
-	// 	for (let i = 0; i < cover_imgs.length; i++){
-	// 		cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('src'))
-	// 	}
-	// 	const data = JSON.stringify({
-	// 		'name': new_name,
-	// 		'description': new_description,
-	// 		'year': new_year,
-	// 		'access': new_access,
-	// 		'images': delete_images,
-	// 		'cover_images': cover_images_src,
-	// 		'tags': new_tags
-	// 	})
-	// 	// send xhr post request to do the update
-	// 	const xhr = new XMLHttpRequest();
-	// 	xhr.open("POST", "/postpage/updatepost/" + post_id.toString());
-	// 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	// 	const body = "data=" + data
-	// 	xhr.onload = () => {
-	// 		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status <= 299) {
-	// 			// if queue is empty reload page
-	// 			if (Dropzone.forElement('#upload_new_photos').getQueuedFiles().length === 0){
-	// 				location.reload()
-	// 			} else {
-	// 				// If the update returned good status, upload new photos
-	// 				Dropzone.forElement('#upload_new_photos').on('queuecomplete', function (file){
-	// 				location.reload()
-	// 			})
-	// 			}
-	// 			Dropzone.forElement('#upload_new_photos').processQueue()
-	// 		} else {
-	// 			console.log("request status: " + xhr.status)
-	// 			alert(xhr.responseText)
-	// 		}
-	// 	};
-	// 	xhr.send(body)
-	// })
 }
 
 // load all tags to the post page when user clicks edit mode
