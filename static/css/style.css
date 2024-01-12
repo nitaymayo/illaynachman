@@ -1272,26 +1272,17 @@ ul.tab-links li a.active {
     line-height: 32px;
 }
 
-/*.project-feature ul li:before {*/
-/*    content: '\f00c';*/
-/*    font-family: 'FontAwesome';*/
-/*    margin-right: 8px;*/
-/*}*/
-
 /*-------------------------------------------------*/
 /* =  single post
 /*-------------------------------------------------*/
 
 .post-images {
-    display: flex;
-    flex-flow: column wrap;
-    width: 28%;
-    gap: 6px;
+    width: 100%;
 }
 
 .post-images .img-card{
-        width: 100%;
-    position: relative;
+    width: 28%;
+    margin: 0 5px 5px 0;
 }
 
 .post-images .img-card img {

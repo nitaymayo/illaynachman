@@ -271,52 +271,41 @@ $(document).ready(function($) {
 	}
 
 	/* ---------------------------------------------------------------------- */
-	/*	post page main div height
+	/*	post page main div image arrange
 	/* ---------------------------------------------------------------------- */
-
-	function set_postpage_images_div() {
-		// Enter this if only on postpage.html (where main_images_div exists)
-		const main_images_div = document.querySelector('.post-images.main-images');
-		if (main_images_div) {
-			let final_div_height = 0;
-			const all_images = main_images_div.querySelectorAll('.img-card img')
-			// if 1 or 2 images are present set hight to the hight of the largest
-			if (all_images.length <= 3){
-				// find max
-				for (let i = 0; i < all_images.length; i++){
-					if (all_images[i].clientHeight > final_div_height){
-						final_div_height = all_images[i].clientHeight + 30;
-					}
-				}
-
-
-			} else {
-				for (let i = 0; i < all_images.length; i++) {
-					final_div_height += all_images[i].clientHeight*1.2; // 30px for the gap between the images
-				}
-				final_div_height = final_div_height / 3;
-			}
-			main_images_div.style.height = (final_div_height).toString() + "px";
-		}
-	}
-
-	// Check if all images are loaded to calculate post page image div height
 	if (location.href.includes('postpage')) {
-		// When we begin, assume no images are loaded.
-		var imagesLoaded = 0;
-		// Count the total number of images on the page when the page has loaded.
-		var totalImages = $(".img-card img").length;
+		var image_container = $('div.main-images.post-images')
 
-		// After an image is loaded, add to the count, and if that count equals the
-		// total number of images, fire the allImagesLoaded() function.
-		$(".img-card img").on("load", function (event) {
-			imagesLoaded++;
-			if (imagesLoaded == totalImages) {
-				set_postpage_images_div();
+		try{
+			image_container.imagesLoaded( function(){
+				image_container.show();
+				image_container.isotope({
+					layoutMode:'masonry',
+					animationOptions:{
+						duration:750,
+						easing:'linear'
+					}
+				});
+			});
+		} catch(err) {
+		}
+		winDow.bind('resize', function(){
+
+			try {
+				image_container.isotope({
+					animationOptions: {
+						duration: 750,
+						easing	: 'linear',
+						queue	: false,
+					}
+				});
+			} catch(err) {
 			}
+			return false;
 		});
-		winDow.bind('resize',set_postpage_images_div)
 	}
+
+
 	/* ---------------------------------------------------------------------- */
 	/*	Load more post btn
 	/* ---------------------------------------------------------------------- */
