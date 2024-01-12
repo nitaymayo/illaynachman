@@ -1641,9 +1641,8 @@ ul.depth li:before {
 
 .team-post h3 {
     color: white;
-    font-size: 16px;
+    font-size: 20px;
     font-family: 'Roboto', sans-serif;
-    line-height: 16px;
     text-transform: uppercase;
     margin: 0;
 }
