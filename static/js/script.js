@@ -749,7 +749,8 @@ function close_modal(modal){
 }
 
 // When the user clicks anywhere outside the modal, close it
-window.onclick = function(event) {
+window.onmouseup = function(event) {
+
   if (event.target === new_post_modal) {
 	  close_modal(new_post_modal)
   } else if (event.target === search_modal){
@@ -1196,7 +1197,7 @@ function validate_signup_Form() {
 
   if (!approximation_input.classList.contains('hidden')) {
 	  // Other input validation
-	  if (/|[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
+	  if (/[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
 		  showError(approximation_input, `This field cannot have the following characters: ${/|[,;\/.\\\]\[{}()\-=+#*`]/}.`);
 		  valid = false;
 	  } else {
