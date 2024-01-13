@@ -86,8 +86,13 @@
 									<li>
 										<span><i class="fa fa-user"></i></span><a dir="auto">{{ post['user'].name }}</a>
 									</li>
-									<li>
-										<span class="postlikebtn" onclick="toggle_like({{ post['data'].post_id }}, this)"><i class="fa fa-heart"></i></span><a><a class="like_number">{{ post['likes'] }}</a> Likes</a>
+									<li onclick="toggle_like({{ post['data'].post_id }}, this)">
+										<span class="postlikebtn like_icon">
+                                            <i class="fa fa-heart"></i>
+                                        </span>
+                                        <a>
+                                            <a class="like_number">{{ post['likes'] }}</a> Likes
+                                        </a>
 									</li>
 									<li class="post_year">
                                         <label class="change-year-info hidden">Change post year here</label><br>

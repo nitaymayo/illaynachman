@@ -271,52 +271,41 @@ $(document).ready(function($) {
 	}
 
 	/* ---------------------------------------------------------------------- */
-	/*	post page main div height
+	/*	post page main div image arrange
 	/* ---------------------------------------------------------------------- */
-
-	function set_postpage_images_div() {
-		// Enter this if only on postpage.html (where main_images_div exists)
-		const main_images_div = document.querySelector('.post-images.main-images');
-		if (main_images_div) {
-			let final_div_height = 0;
-			const all_images = main_images_div.querySelectorAll('.img-card img')
-			// if 1 or 2 images are present set hight to the hight of the largest
-			if (all_images.length <= 3){
-				// find max
-				for (let i = 0; i < all_images.length; i++){
-					if (all_images[i].clientHeight > final_div_height){
-						final_div_height = all_images[i].clientHeight + 30;
-					}
-				}
-
-
-			} else {
-				for (let i = 0; i < all_images.length; i++) {
-					final_div_height += all_images[i].clientHeight*1.2; // 30px for the gap between the images
-				}
-				final_div_height = final_div_height / 3;
-			}
-			main_images_div.style.height = (final_div_height).toString() + "px";
-		}
-	}
-
-	// Check if all images are loaded to calculate post page image div height
 	if (location.href.includes('postpage')) {
-		// When we begin, assume no images are loaded.
-		var imagesLoaded = 0;
-		// Count the total number of images on the page when the page has loaded.
-		var totalImages = $(".img-card img").length;
+		var image_container = $('div.main-images.post-images')
 
-		// After an image is loaded, add to the count, and if that count equals the
-		// total number of images, fire the allImagesLoaded() function.
-		$(".img-card img").on("load", function (event) {
-			imagesLoaded++;
-			if (imagesLoaded == totalImages) {
-				set_postpage_images_div();
+		try{
+			image_container.imagesLoaded( function(){
+				image_container.show();
+				image_container.isotope({
+					layoutMode:'masonry',
+					animationOptions:{
+						duration:750,
+						easing:'linear'
+					}
+				});
+			});
+		} catch(err) {
+		}
+		winDow.bind('resize', function(){
+
+			try {
+				image_container.isotope({
+					animationOptions: {
+						duration: 750,
+						easing	: 'linear',
+						queue	: false,
+					}
+				});
+			} catch(err) {
 			}
+			return false;
 		});
-		winDow.bind('resize',set_postpage_images_div)
 	}
+
+
 	/* ---------------------------------------------------------------------- */
 	/*	Load more post btn
 	/* ---------------------------------------------------------------------- */
@@ -584,12 +573,12 @@ $(document).ready(function($) {
 					}
 					let delete_images = []
 					for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
-						delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('src'))
+						delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('alt'))
 					}
 					let cover_images_src = []
 					let cover_imgs = document.querySelectorAll('div.img-card.cover-img')
 					for (let i = 0; i < cover_imgs.length; i++){
-						cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('src'))
+						cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('alt'))
 					}
 					const body = JSON.stringify({
 						'name': new_name,
@@ -760,7 +749,8 @@ function close_modal(modal){
 }
 
 // When the user clicks anywhere outside the modal, close it
-window.onclick = function(event) {
+window.onmouseup = function(event) {
+
   if (event.target === new_post_modal) {
 	  close_modal(new_post_modal)
   } else if (event.target === search_modal){
@@ -900,11 +890,14 @@ function toggle_like(current_post_id, element){
 	xhr.onload = () => {
 	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
 		  if (xhr.status == 201){
-			  document.querySelector('.like_number').innerText = parseInt(document.querySelector('.like_number').innerText) + 1
+			  element.querySelector('.like_number').innerText = parseInt(element.querySelector('.like_number').innerText) + 1
+			  element.querySelector('i').style.color = "red"
 		  } else{
-			  document.querySelector('.like_number').innerText = parseInt(document.querySelector('.like_number').innerText) - 1
+			  element.querySelector('.like_number').innerText = parseInt(element.querySelector('.like_number').innerText) - 1
+			  element.querySelector('i').style.color = "inherit"
 		  }
-		toggle_like_fa(element);
+		  // element.querySelector('i').style= "color=red"
+		// toggle_like_fa(element.querySelector('.like_icon'));
 	  } else {
 		console.log(`Error: ${xhr.status}`);
 		alert(xhr.responseText + ` (response code = ${xhr.status})`)
@@ -1031,60 +1024,6 @@ function edit_post(post_id){
 
 	// show new images upload dropzone
 	$('#uploadNewPhotos').niceScroll()
-
-
-	// set click listener to the update post btn
-	// document.querySelector('#update_post_btn').addEventListener('click', function (){
-	// 	// update post name and description + delete selected photos
-	// 	const new_name = document.querySelector('.single-box-content input.post_name_input').value
-	// 	const new_description = post_description_input.value
-	// 	const new_access = document.querySelector('#new_access_type').value
-	// 	const new_year = post_year_input.value
-	// 	let new_tags = []
-	// 	for (let i = 0; i < document.querySelectorAll('div.tags-box ul li:not(.not_selected) a').length; i++){
-	// 		new_tags.push(document.querySelectorAll('div.tags-box ul li:not(.not_selected) a')[i].innerText.toLowerCase())
-	// 	}
-	// 	let delete_images = []
-	// 	for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
-	// 		delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('src'))
-	// 	}
-	// 	let cover_images_src = []
-	// 	for (let i = 0; i < cover_imgs.length; i++){
-	// 		cover_images_src.push(cover_imgs[i].querySelector('img').getAttribute('src'))
-	// 	}
-	// 	const data = JSON.stringify({
-	// 		'name': new_name,
-	// 		'description': new_description,
-	// 		'year': new_year,
-	// 		'access': new_access,
-	// 		'images': delete_images,
-	// 		'cover_images': cover_images_src,
-	// 		'tags': new_tags
-	// 	})
-	// 	// send xhr post request to do the update
-	// 	const xhr = new XMLHttpRequest();
-	// 	xhr.open("POST", "/postpage/updatepost/" + post_id.toString());
-	// 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	// 	const body = "data=" + data
-	// 	xhr.onload = () => {
-	// 		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status <= 299) {
-	// 			// if queue is empty reload page
-	// 			if (Dropzone.forElement('#upload_new_photos').getQueuedFiles().length === 0){
-	// 				location.reload()
-	// 			} else {
-	// 				// If the update returned good status, upload new photos
-	// 				Dropzone.forElement('#upload_new_photos').on('queuecomplete', function (file){
-	// 				location.reload()
-	// 			})
-	// 			}
-	// 			Dropzone.forElement('#upload_new_photos').processQueue()
-	// 		} else {
-	// 			console.log("request status: " + xhr.status)
-	// 			alert(xhr.responseText)
-	// 		}
-	// 	};
-	// 	xhr.send(body)
-	// })
 }
 
 // load all tags to the post page when user clicks edit mode
@@ -1207,7 +1146,7 @@ function validate_signup_Form() {
 
   if (!approximation_input.classList.contains('hidden')) {
 	  // Other input validation
-	  if (/|[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
+	  if (/[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
 		  showError(approximation_input, `This field cannot have the following characters: ${/|[,;\/.\\\]\[{}()\-=+#*`]/}.`);
 		  valid = false;
 	  } else {

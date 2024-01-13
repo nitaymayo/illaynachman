@@ -95,6 +95,7 @@ p.username{
 @media only screen and (min-width: 600px) {
     .menu-box {
         padding: 30px 30px 15px;
+        margin-bottom: 0;
     }
 }
 
@@ -627,6 +628,19 @@ ul li {
 
 .blog-post img {
     width: 100%;
+    cursor: pointer;
+}
+.blog-post .images_count{
+        position: absolute;
+    right: 10px
+;
+    top: 10px;
+    height: 60px;
+    aspect-ratio: 1;
+    color: #e1e1e1;
+    background-color: rgba(169, 169, 169, 0.76);
+    font-size: 20px;
+    box-shadow: -1px 1px 9px 9px rgba(169, 169, 169, 0.76);
 }
 
 .post-content {
@@ -689,6 +703,10 @@ ul li {
     color: #818181;
     font-size: 14px;
     margin-right: 8px;
+}
+
+.post_likes{
+    cursor: pointer;
 }
 
 .link-post .post-content {
@@ -1272,26 +1290,17 @@ ul.tab-links li a.active {
     line-height: 32px;
 }
 
-/*.project-feature ul li:before {*/
-/*    content: '\f00c';*/
-/*    font-family: 'FontAwesome';*/
-/*    margin-right: 8px;*/
-/*}*/
-
 /*-------------------------------------------------*/
 /* =  single post
 /*-------------------------------------------------*/
 
 .post-images {
-    display: flex;
-    flex-flow: column wrap;
-    width: 28%;
-    gap: 6px;
+    width: 100%;
 }
 
 .post-images .img-card{
-        width: 100%;
-    position: relative;
+    width: 31%;
+    margin: 0 5px 5px 0;
 }
 
 .post-images .img-card img {
@@ -1650,9 +1659,8 @@ ul.depth li:before {
 
 .team-post h3 {
     color: white;
-    font-size: 16px;
+    font-size: 20px;
     font-family: 'Roboto', sans-serif;
-    line-height: 16px;
     text-transform: uppercase;
     margin: 0;
 }

@@ -31,7 +31,9 @@ def index():
 
     # Pull all relavant data from 'post' table (the relevant access_type)
     posts_query = (f"SELECT post.*, ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, user.name as username, "
-                   f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period "
+                   f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period, "
+                   f"(SELECT count(image.location) FROM image WHERE image.post_id = post.post_id GROUP BY image.post_id) as images_count,"
+                   f"(SELECT true FROM post_likes WHERE post_likes.user_id = {user_id} AND post_likes.post_id = post.post_id) as user_liked "
                    f"FROM post "
                    f"INNER JOIN user ON post.user_id = user.user_id "
                    f"WHERE post.access <= {access_type} OR post.user_id = {user_id} "
@@ -234,6 +236,7 @@ def new_post():
 
     # Insert Content to dir and to DB
     query = "INSERT INTO image (location, post_id) VALUES "
+    delete_query = f"DELETE FROM image WHERE location = "
     bad_files = []
     good_files = []
     for f in files:
@@ -252,6 +255,7 @@ def new_post():
                 raise Exception()
         except Exception as e:
             bad_files.append(file.filename)
+            dbManager.commit(delete_query + f"'/{post_dir + '/' + new_file_name}'")
 
     # choose randomly 3 photos as cover photos
     query = (f"UPDATE image "
@@ -263,6 +267,7 @@ def new_post():
 
     if bad_files:
         bad_file_string = "some images could not be uploaded:\n"
+
         for i, file in enumerate(bad_files):
             bad_file_string = bad_file_string + f"{i + 1}) {file}\n"
         flash(bad_file_string + "Please try changing their name and make sure they are valid content\n You can upload them by editing your post")
