@@ -485,9 +485,11 @@ $(document).ready(function($) {
 						  if(confirm('Please confirm you want to upload post without images')) {
 							  var blob = new Blob();
 							  blob.upload = {'chunked': myDropzone.options.chunking};
+							  start_preloader('Uploading your post...')
 							  myDropzone.uploadFile(blob);
 						  }
 					  } else {
+						  start_preloader('Uploading your post...')
 						  myDropzone.processQueue();
 					  }
 				  } else {
@@ -547,8 +549,10 @@ $(document).ready(function($) {
 				  if (myDropzone.getQueuedFiles().length === 0){
 					  var blob = new Blob();
 					  blob.upload = {'chunked': myDropzone.options.chunking};
+					  start_preloader('Updating your post...')
 					  myDropzone.uploadFile(blob);
 				  } else {
+					  start_preloader('Updating your post...')
 					  myDropzone.processQueue();
 				  }
 				});
@@ -1071,6 +1075,7 @@ let login_button = document.getElementById('login-btn')
 	if (login_button) {
 		login_button.addEventListener('click', function () {
 			if (validate_login_Form()) {
+				start_preloader('')
 				document.getElementById('login-form').submit()
 			}
 		})
@@ -1153,7 +1158,7 @@ function validate_signup_Form() {
 		  showSuccess(approximation_input)
 	  }
   }
-
+  if (valid) start_preloader('')
   return valid
 }
 
@@ -1342,3 +1347,18 @@ function period_press(period){
 	let winDow = $(window)
 	winDow.resize()
 }
+
+
+function start_preloader(message){
+	const preloader = document.querySelector('.preloader')
+	preloader.style.display = 'flex'
+	if (message){
+		preloader.querySelector('.preloader_massage').innerText = message
+	} else {
+		preloader.querySelector('.preloader_massage').innerText = "Life is a PARTY"
+	}
+}
+
+	window.addEventListener('beforeunload', function (e) {
+		start_preloader('')
+	})
