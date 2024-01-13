@@ -11,8 +11,8 @@
 						<!-- blog-post -->
                         {% for post in posts %}
                             <div class="blog-post post gallery-post" lifeperiod="{{ post['data'].period.values[0] }}">
-							<div class="inner-post" onclick=" location.href='/postpage/{{ post['data'].post_id.values[0] }}'">
-								<div class="flexslider">
+							<div class="inner-post">
+								<div class="flexslider" onclick=" location.href='/postpage/{{ post['data'].post_id.values[0] }}'">
 									<ul class="slides">
 {#                                        {% for img in post['images'].location %}#}
 {#										<li>#}
@@ -36,8 +36,12 @@
                                         {% endfor %}
                                         <li class="post_owner"><a><i class="fa fa-clock-o"></i><span>{{ post['data'].period.values[0]|capitalize }}</span></a></li>
                                         <li class="post_owner"><a><i class="fa fa-user"></i><span>{{ post['data'].username.values[0] }}</span></a></li>
-                                        <li class="post_likes"><a><i class="fa fa-heart"></i><span>{{ post['likes'] }} likes</span></a></li>
-{#										<li><a href="#"><i class="fa fa-comment"></i>3 comments</a></li>#}
+                                    <li class="post_likes" onclick="toggle_like({{ post['data'].post_id.values[0] }}, this)">
+                                        <a class="like_icon">
+                                            <i style="{% if post['data'].user_liked.values[0] == 1 %}color:red;{% endif %}" class="fa fa-heart"></i>
+                                        </a>
+                                        <a class="like_number">{{ post['likes'] }}</a> <a>Likes</a>
+                                    </li>
                                         <li class="post_days_ago">
                                             <a>
                                             <i class="fa fa-calendar"></i>

@@ -890,11 +890,14 @@ function toggle_like(current_post_id, element){
 	xhr.onload = () => {
 	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
 		  if (xhr.status == 201){
-			  document.querySelector('.like_number').innerText = parseInt(document.querySelector('.like_number').innerText) + 1
+			  element.querySelector('.like_number').innerText = parseInt(document.querySelector('.like_number').innerText) + 1
+			  element.querySelector('i').style.color = "red"
 		  } else{
-			  document.querySelector('.like_number').innerText = parseInt(document.querySelector('.like_number').innerText) - 1
+			  element.querySelector('.like_number').innerText = parseInt(document.querySelector('.like_number').innerText) - 1
+			  element.querySelector('i').style.color = "inherit"
 		  }
-		toggle_like_fa(element);
+		  // element.querySelector('i').style= "color=red"
+		// toggle_like_fa(element.querySelector('.like_icon'));
 	  } else {
 		console.log(`Error: ${xhr.status}`);
 		alert(xhr.responseText + ` (response code = ${xhr.status})`)
