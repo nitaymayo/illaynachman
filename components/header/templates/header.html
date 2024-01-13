@@ -22,13 +22,19 @@
                     {% endif %}
 				</ul>
 			</div>
+<div class="post-box">
             {% if session %}
-            <div class="post-box">
                 <a class="btn" id="newpostmodalbtn">
-                    + Upload post
+                    <i class="fa fa-plus" aria-hidden="false"></i>
+                    Upload post
                 </a>
-            </div>
+            {% else %}
+                <a class="btn" href="/login">
+                <i class="fa fa-user" aria-hidden="false"></i>
+                    Login to upload
+                </a>
             {% endif %}
+</div>
 			<div class="categories-box">
 				<h2>Categories</h2>
 				<ul class="categories">
