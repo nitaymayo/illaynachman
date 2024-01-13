@@ -629,6 +629,18 @@ ul li {
 .blog-post img {
     width: 100%;
 }
+.blog-post .images_count{
+        position: absolute;
+    right: 10px
+;
+    top: 10px;
+    height: 60px;
+    aspect-ratio: 1;
+    color: #e1e1e1;
+    background-color: rgba(169, 169, 169, 0.76);
+    font-size: 20px;
+    box-shadow: -1px 1px 9px 9px rgba(169, 169, 169, 0.76);
+}
 
 .post-content {
     background: #fff;

@@ -31,7 +31,8 @@ def index():
 
     # Pull all relavant data from 'post' table (the relevant access_type)
     posts_query = (f"SELECT post.*, ABS(DATEDIFF(post.upload_timestamp, CURRENT_TIMESTAMP)) as uploaded, user.name as username, "
-                   f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period "
+                   f"(SELECT name FROM period_lookup as pl WHERE post.year <= pl.end_year AND post.year >= pl.start_year) as period, "
+                   f"(SELECT count(image.location) FROM image WHERE image.post_id = post.post_id GROUP BY image.post_id) as images_count "
                    f"FROM post "
                    f"INNER JOIN user ON post.user_id = user.user_id "
                    f"WHERE post.access <= {access_type} OR post.user_id = {user_id} "

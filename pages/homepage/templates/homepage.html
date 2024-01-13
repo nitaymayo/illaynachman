@@ -11,7 +11,7 @@
 						<!-- blog-post -->
                         {% for post in posts %}
                             <div class="blog-post post gallery-post" lifeperiod="{{ post['data'].period.values[0] }}">
-							<div class="inner-post">
+							<div class="inner-post" onclick=" location.href='/postpage/{{ post['data'].post_id.values[0] }}'">
 								<div class="flexslider">
 									<ul class="slides">
 {#                                        {% for img in post['images'].location %}#}
@@ -22,12 +22,13 @@
                                         {% if post['images'].location.values.any() %}
                                         <li>
                                             <img alt="" src="{{ url_for('static', filename=('media/posts' + post['images'].location.values[0])) }}" />
+                                            <div class="images_count"><i class="fa fa-plus-square-o" aria-hidden="true"></i> {{ ((post['data'].images_count|int) - 1)  }}<br>Images</div>
 										</li>
                                         {% endif %}
 									</ul>
 								</div>
 								<div class="post-content">
-									<h2 dir="auto"><a href="/postpage/{{ post['data'].post_id.values[0] }}">{{ post['data'].name.values[0] }}</a></h2>
+									<h2 dir="auto"><a>{{ post['data'].name.values[0] }}</a></h2>
 									<p dir="auto">{{ post['data'].description.values[0] }}</p>
 									<ul class="post-tags">
                                         {% for tag in post['tags'].name %}
