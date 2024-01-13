@@ -628,6 +628,7 @@ ul li {
 
 .blog-post img {
     width: 100%;
+    cursor: pointer;
 }
 .blog-post .images_count{
         position: absolute;
@@ -702,6 +703,10 @@ ul li {
     color: #818181;
     font-size: 14px;
     margin-right: 8px;
+}
+
+.post_likes{
+    cursor: pointer;
 }
 
 .link-post .post-content {

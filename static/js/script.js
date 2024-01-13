@@ -890,10 +890,10 @@ function toggle_like(current_post_id, element){
 	xhr.onload = () => {
 	  if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
 		  if (xhr.status == 201){
-			  element.querySelector('.like_number').innerText = parseInt(document.querySelector('.like_number').innerText) + 1
+			  element.querySelector('.like_number').innerText = parseInt(element.querySelector('.like_number').innerText) + 1
 			  element.querySelector('i').style.color = "red"
 		  } else{
-			  element.querySelector('.like_number').innerText = parseInt(document.querySelector('.like_number').innerText) - 1
+			  element.querySelector('.like_number').innerText = parseInt(element.querySelector('.like_number').innerText) - 1
 			  element.querySelector('i').style.color = "inherit"
 		  }
 		  // element.querySelector('i').style= "color=red"

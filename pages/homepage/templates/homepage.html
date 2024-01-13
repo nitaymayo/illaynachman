@@ -28,7 +28,7 @@
 									</ul>
 								</div>
 								<div class="post-content">
-									<h2 dir="auto"><a>{{ post['data'].name.values[0] }}</a></h2>
+									<h2 dir="auto"><a href="/postpage/{{ post['data'].post_id.values[0] }}">{{ post['data'].name.values[0] }}</a></h2>
 									<p dir="auto">{{ post['data'].description.values[0] }}</p>
 									<ul class="post-tags">
                                         {% for tag in post['tags'].name %}
