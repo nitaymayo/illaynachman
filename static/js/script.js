@@ -598,6 +598,15 @@ $(document).ready(function($) {
 					form.append("data", body);
 				}
 
+	// page intro lunching
+	if (location.href.includes('postpage')){
+		if (!checkSession('postpage')) intro_postpage()
+	} else if(location.href.split(location.host)[1] === "/"){
+	if (!checkSession('homepage')) intro_homepage()
+	}
+
+
+
 });
 
 
@@ -948,6 +957,7 @@ function edit_post(post_id){
 	if (!confirm('Enter edit mode?')){
 		return
 	}
+	if (!checkSession('editpost')) intro_editpost()
 
 	document.querySelector('.single-box-content').style = 'border: 7px solid blue'
 	document.querySelector('.edit_post').innerText = "exit edit mode"
@@ -1023,8 +1033,11 @@ function edit_post(post_id){
 	document.querySelector('.select-tags-info').classList.remove('hidden')
 	set_postpage_tags()
 
-	// show update post button
+	// show upload images div
 	document.querySelector('.update_post_div').classList.remove('hidden')
+
+	// show update post button
+	document.querySelector('#update_post_btn').classList.remove('hidden')
 
 	// show new images upload dropzone
 	$('#uploadNewPhotos').niceScroll()
@@ -1355,10 +1368,120 @@ function start_preloader(message){
 	if (message){
 		preloader.querySelector('.preloader_massage').innerText = message
 	} else {
-		preloader.querySelector('.preloader_massage').innerText = "Life is a PARTY"
+		preloader.querySelector('.preloader_massage').innerHTML = "Life is a PARTY"
 	}
 }
 
-	window.addEventListener('beforeunload', function (e) {
-		start_preloader('')
-	})
+window.addEventListener('beforeunload', function (e) {
+	start_preloader('')
+})
+
+function setCookie(c_name,value,exdays){var exdate=new Date();exdate.setDate(exdate.getDate() + exdays);var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());document.cookie=c_name + "=" + c_value;}
+
+function getCookie(c_name){var c_value = document.cookie;var c_start = c_value.indexOf(" " + c_name + "=");if (c_start == -1){c_start = c_value.indexOf(c_name + "=");}if (c_start == -1){c_value = null;}else{c_start = c_value.indexOf("=", c_start) + 1;var c_end = c_value.indexOf(";", c_start);if (c_end == -1){c_end = c_value.length;}c_value = unescape(c_value.substring(c_start,c_end));}return c_value;}
+
+
+
+function checkSession(page_name, value='yes'){
+	let c = getCookie(`visited_${page_name}`);
+	c = (c === "yes");
+   setCookie(`visited_${page_name}`, value, 30); // expire in 1 year; or use null to never expire
+	return c;
+}
+
+
+// Into to homepage
+function intro_homepage(){
+	introJs().setOptions({
+		disableInteraction: true,
+	  steps: [{
+		  title: "Welcome Friends and Family!",
+		intro: "This is Ilay's memories website. Lets go through some important functions here"
+	  },{
+		element: document.querySelector('.post'),
+		intro: "This is a post, later you will click on it to see the whole content of it"
+	  }, {
+		element: document.querySelector('.post-content'),
+		intro: "All the relevant data on the post is down here"
+	  }, {
+		element: document.querySelector('.images_count'),
+		intro: "This squere tells you there are more images to see inside the post"
+	  }, {
+		element: document.querySelector('.post-box'),
+		intro: "To upload content and like posts you need to signup, Lets do it!"
+	  }]
+	}).start();
+	}
+
+function intro_postpage(){
+	introJs().setOptions({
+		disableInteraction: true,
+	  steps: [{
+		  title: "Post page",
+		intro: "This is a post page, here you can see the story of the post"
+	  },{
+		element: document.querySelector('.project-text'),
+		intro: "The name and story of the post can be found here"
+	  }, {
+		element: document.querySelector('.main-images'),
+		intro: "All the images that are related to this post"
+	  }, {
+		element: document.querySelector('.img-card'),
+		intro: "Later you can click to see it up close!"
+	  }, {
+		element: document.querySelector('.sidebar'),
+		intro: "At last the post information is found here"
+	  }, {
+		  element: document.querySelector('.postlikebtn'),
+		  intro: "Click here to like the post, login in order to like a post"
+	  },
+		  {
+			  intro: "Thats it, feel free to wonder around some posts :)"
+		  }]
+	}).start();
+	}
+
+// intro to post edit
+function intro_editpost(){
+	introJs().setOptions({
+		disableInteraction: true,
+	  steps: [{
+		  title: "Edit Post",
+		intro: "Lets go through some edit features"
+	  },{
+		element: document.querySelector('.project-text'),
+		intro: "Change the values of the post name and description here"
+	  }, {
+		element: document.querySelector('.access_type'),
+		intro: "The group set here will be the only users that can see this post"
+	  }, {
+		element: document.querySelector('.img-card'),
+		  title: "Pay Attention",
+		intro: "here you choose which images will be in the post cover and which will be deleted"
+	  }, {
+		element: document.querySelector('.img-card'),
+		intro: "To make cover: click the green section and make sure the whole image is green<br>Note: only 3 cover Images allowed"
+	  }, {
+		element: document.querySelector('.img-card'),
+		intro: "To delete: click the red section and make sure the whole image is red"
+	  }, {
+		element: document.querySelector('.img-card'),
+		intro: "The changes will be saved only AFTER you press the update post button"
+	  }, {
+		  element: document.querySelector('#uploadNewPhotos'),
+		  intro: "Press here to add images to your post"
+	  }, {
+		  element: document.querySelector('.post_year'),
+		  intro: "Set the post year here"
+	  },  {
+		  element: document.querySelector('.tags-box'),
+		  intro: "Update post tags here, highlight the desired ones."
+	  }, {
+		  element: document.querySelector('#update_post_btn'),
+		  intro: "Finally click here to commit all your updates"
+	  },
+		  {
+			  intro: `Have fun :)`
+		  }]
+	}).start();
+	}

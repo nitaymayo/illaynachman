@@ -29,6 +29,7 @@
                                 <div class="post_edit">
                                     <button onclick="edit_post({{ post['data'].post_id }})" class="btn edit_post">Edit</button>
                                     <button onclick="delete_post({{ post['data'].post_id }})" class="btn delete_post">Delete</button>
+                                    <button id="update_post_btn" class="btn hidden">Update post</button>
                                 </div>
                             {% endif %}
 							<div class="project-post-content" post="{{ post['data'].post_id }}">
@@ -75,7 +76,7 @@
                                      <div class="dropzone-previews added_images"></div>
                                     </div>
 							    </div>
-                                <button id="update_post_btn" class="btn">Update post</button>
+
                                 </div>
                             </div>
                         </div>
