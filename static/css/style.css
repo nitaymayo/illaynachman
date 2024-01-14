@@ -1181,7 +1181,7 @@ ul.tab-links li a.active {
 
 .project-post-content p,
 .about-section p {
-    color: #a3a3a3;
+    color: #5b5b5b;
     font-size: 18px;
     font-family: 'Roboto', sans-serif;
     font-weight: 300;
@@ -1393,8 +1393,12 @@ ul.tab-links li a.active {
 /* style for PC for post editing */
 @media only screen and (min-width: 600px){
     .post_edit{
-        width: 350px !important;
-        left: 15px;
+        left: 0;
+        margin: 0 2%;
+    }
+    .post_edit #update_post_btn{
+            margin-left: auto;
+        order: 4 !important;
     }
 }
 .post_edit{
@@ -1402,21 +1406,32 @@ ul.tab-links li a.active {
     top: 15px;
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-evenly;
+    justify-content: start;
     align-items: center;
-    width: 100%;
+    width: 96%;
+    height: 60px;
     z-index: 10;
 }
 .post_edit button{
-    width: 40%;
+    width: 150px;
+    height: 35px;
+    margin-right: 20px;
     transition-duration: 40ms;
+    position: sticky;
+    top: 15px;
 }
 
 .post_edit button.delete_post{
     background-color: #ec3939 !important;
+    order: 3;
 }
 .post_edit button.edit_post{
     background-color: var(--lead-brown) !important;
+    order: 1;
+}
+.post_edit button#update_post_btn{
+    background-color: var(--lead-brown) !important;
+    order: 2;
 }
 
 .post_edit button:hover{
