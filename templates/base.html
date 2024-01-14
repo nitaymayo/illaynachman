@@ -55,8 +55,9 @@ Base page blocks:
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/flexslider.css') }}" media="screen">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" media="screen">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/responsive.css') }}" media="screen">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/intro.css') }}" media="screen">
         <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic' rel='stylesheet' type='text/css'>
-        <link href='https://unpkg.com/intro.js/introjs.css' rel='stylesheet' type='text/css'>
+
         <link rel="stylesheet" type="text/css" href="{{ url_for('login.static', filename='css/login.css') }}" media="screen">
 
         {% block page_head_css %}{% endblock %}
@@ -101,9 +102,10 @@ Base page blocks:
 {% endblock %}
 
 {# JS #}
-<script type="text/javascript" src="https://unpkg.com/intro.js/intro.js"></script>
+
 <script type="text/javascript" src="{{ url_for('static', filename='js/dropzone.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/intro.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.migrate.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.imagesloaded.min.js') }}"></script>
