@@ -832,7 +832,7 @@ function showSuccess(input) {
     const error = document.querySelector(`.container small.${input.getAttribute('name')}_err`);
 	error.classList.add('hidden')
     error.textContent = '';
-};
+}
 
 function new_post_validation() {
   // Get form elements
@@ -1089,10 +1089,63 @@ let login_button = document.getElementById('login-btn')
 		login_button.addEventListener('click', function () {
 			if (validate_login_Form()) {
 				start_preloader('')
-				document.getElementById('login-form').submit()
+				let login_promise = fetch("/login/checkuser", {
+					  method: "POST",
+					  body: JSON.stringify({
+						uname: document.querySelector('#username').value,
+					    password: document.querySelector('#login_password').value
+					  }),
+					  headers: {
+						"Content-type": "application/json; charset=UTF-8"
+					  }
+					});
+					  login_promise.then((response) => response.json()).then((response_data) => {
+						  if (response_data){
+							  location.href = '/'
+						  } else {
+							  hide_preloader();
+							  document.querySelector('.login_error_msg').innerHTML = 'One of the credentials is wrong :('
+						  }
+					  });
 			}
 		})
 	}
+
+let signup_button = document.getElementById('signup-btn')
+	if (signup_button) {
+		signup_button.addEventListener('click', function () {
+			if (validate_signup_Form()) {
+				start_preloader('')
+				let signup_promise = fetch("/login/register", {
+					method: "POST",
+					body: JSON.stringify({
+						uname: document.querySelector('#uname').value,
+					    psw: document.querySelector('#signup_password').value,
+						email: document.querySelector('#email').value,
+						approximation: document.querySelector('#approximation').value,
+						approximation_more_info: document.querySelector('#approximation_more_info').value
+					  }),
+					  headers: {
+						"Content-type": "application/json; charset=UTF-8"
+					  }
+					});
+					  signup_promise.then((response) => response.json()).then((response_status) => {
+						  if (response_status === 201){
+							  location.href = "/"
+						  } else if (response_status === 204){
+							  location.href = "/login"
+						  } else {
+							  hide_preloader();
+							  document.querySelector('.signup_error_msg').innerHTML = "Can't add user, please try again"
+						  }
+					  });
+
+
+				//document.getElementById('signup-form').submit()
+			}
+		})
+	}
+
 function validate_login_Form() {
 	const name_input = document.getElementById('username')
 	const password_input = document.getElementById('login_password')
@@ -1128,7 +1181,7 @@ function validate_login_Form() {
 // sign up form validation
 function validate_signup_Form() {
 	const name_input = document.getElementById('uname')
-	const password_input = document.getElementById('psw')
+	const password_input = document.getElementById('signup_password')
 	const email_input = document.getElementById('email')
 	const approximation_input = document.getElementById('approximation_more_info')
 	const regExp = /\s|[,;\/.\\\]\[{}()\-=+#*`]/;
@@ -1370,6 +1423,11 @@ function start_preloader(message){
 	} else {
 		preloader.querySelector('.preloader_massage').innerHTML = "Life is a PARTY"
 	}
+}
+
+function hide_preloader(){
+		const preloader = document.querySelector('.preloader')
+		preloader.style.display = 'none'
 }
 
 window.addEventListener('beforeunload', function (e) {

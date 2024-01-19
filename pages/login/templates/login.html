@@ -26,14 +26,12 @@
                                     <label for="login_password"><b>Password</b></label>
                                     <input type="password" placeholder="Enter Password" name="password" id="login_password" required>
                                   <small class="hidden login_password_err">error here</small><br>
-
+                                    <span class="login_error_msg" style="color: rgba(255,0,0,0.58)"></span>
                                     <button type="button" id="login-btn">Login</button>
 
                                       <span>First time here? <a onclick="document.getElementById('login-form').classList.add('hidden'); document.getElementById('signup-form').classList.remove('hidden')">Sign up</a></span>
-                                      {% if msg %}
                                           <br>
-                                      <span style="color: rgba(255,0,0,0.58)">{{ msg }}</span>
-                                      {% endif %}
+
                                   </div>
 
                                   <div class="container" style="background-color:#f1f1f1">
@@ -41,7 +39,7 @@
                                   </div>
                                 </form>
 
-                                <form id="signup-form" onsubmit="return validate_signup_Form()" class="hidden" action="/login/register" method="post">
+                                <form id="signup-form" class="hidden" action="/login/register" method="post">
                                   <div class="imgcontainer">
                                     <img src="{{ url_for('static', filename='media/img/logos/fish_logo_nobg.png') }}" alt="Avatar" class="avatar">
                                   </div>
@@ -52,7 +50,7 @@
                                     <small class="hidden uname_err">error here</small><br>
 
                                     <label for="psw"><b>Password</b></label>
-                                    <input type="password" placeholder="Enter your password" name="psw" id="psw" required>
+                                    <input type="password" placeholder="Enter your password" name="psw" id="signup_password" required>
                                       <small class="hidden psw_err">error here</small><br>
 
                                      <label for="email"><b>Email</b></label>
@@ -76,8 +74,8 @@
                                     <input class="hidden" type="text" placeholder="" name="approximation_more_info" id="approximation_more_info">
                                       <small class="hidden approximation_more_info_err">error here</small><br>
 
-
-                                    <button type="submit">Signup</button>
+                                    <span class="signup_error_msg" style="color: rgba(255,0,0,0.58)"></span>
+                                    <button type="button" id="signup-btn">Signup</button>
 
                                       <span>Already have an account? <a onclick="document.getElementById('signup-form').classList.add('hidden'); document.getElementById('login-form').classList.remove('hidden')">Log in</a></span>
                                   </div>
