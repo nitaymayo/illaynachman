@@ -605,7 +605,33 @@ $(document).ready(function($) {
 	if (!checkSession('homepage')) intro_homepage()
 	}
 
+	winDow.imagesLoaded(() => {
+		let tag_cookie = getCookie('tag_press')
+		if (tag_cookie){
+			deleteCookie("tag_press")
 
+			// set tag attribute on .categories-box for later arrow mark
+			document.querySelector('.categories-box').setAttribute('current_tag', tag_cookie)
+
+			let all_posts = document.querySelectorAll('.blog-box > .post')
+
+
+			// show only relevant posts
+			for (let i = 0; i < all_posts.length; ++i) {
+				if (!get_tags(all_posts[i]).includes(tag_cookie)) {
+					all_posts[i].classList.add('hidden')
+				} else {
+					all_posts[i].classList.remove('hidden')
+				}
+			}
+			let i_fa = document.querySelector(`.categories-box .${tag_cookie} i`)
+			if (i_fa){
+				i_fa.classList.add('fa-arrow-circle-right')
+			}
+			let winDow = $(window)
+			winDow.resize()
+		}
+	})
 
 });
 
@@ -1291,30 +1317,34 @@ async function fetch_tags() {
 // Function used when clicking a tag, shows only the post with that specific tag
 // pressing again on an activated tag disables it and shows all posts
 function tag_press(tag){
+		if (location.href.split(location.host)[1] !== "/"){
+			setCookie('tag_press', tag.toLowerCase(), 1)
+			location.href = "/"
+		}
 	const all_posts = document.querySelectorAll('.blog-box > .post');
-	const tag_name = tag.innerText.toLowerCase();
-
-	// Show all posts
-	for (i = 0; i < all_posts.length; ++i) {
-			all_posts[i].classList.remove('hidden')
-	}
+	const tag_name = tag.toLowerCase();
 
 	// If an active tag filter has been pressed -> remove filter
+	tag = document.querySelector(`.categories-box .${tag_name}`)
 	if (tag.querySelector('i').classList.contains('fa-arrow-circle-right')){
 		tag.querySelector('i').classList.remove('fa-arrow-circle-right')
-
+		for (let i = 0; i < all_posts.length; i++){
+			all_posts[i].classList.remove('hidden')
+		}
 	// Otherwise -> change filter to the pressed one
 	} else {
 		// Remove active marker from the previous filter btn
 		const tags_btn = document.querySelectorAll('ul.categories i.fa')
-		for (i = 0; i < tags_btn.length; i++){
+		for (let i = 0; i < tags_btn.length; i++){
 		tags_btn[i].classList.remove('fa-arrow-circle-right')
 		}
 
-		// Hide irelevant posts
-		for (i = 0; i < all_posts.length; ++i) {
+		// show only relevant posts
+		for (let i = 0; i < all_posts.length; ++i) {
 			if (!get_tags(all_posts[i]).includes(tag_name)) {
 				all_posts[i].classList.add('hidden')
+			} else {
+				all_posts[i].classList.remove('hidden')
 			}
 		}
 		tag.querySelector('i').classList.add('fa-arrow-circle-right')
@@ -1338,10 +1368,14 @@ function get_tags(post){
 function load_tags_in_header(){
 	const tagsPromise = fetch_tags()
 	const tag_box = document.querySelector('.categories-box ul.categories')
-	let tag_tamplate = ""
+	let tag_template = ""
 	tagsPromise.then((tags) => {
 		for (let i = 0; i < tags.length ; i++){
-			tag_box.innerHTML += `<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>${tags[i][0].capitalize()}</a></li>`
+			tag_box.innerHTML += `<li><a onclick="tag_press(this.innerText)" class="${tags[i][0]}"><i class="fa" aria-hidden="true"></i>${tags[i][0].capitalize()}</a></li>`
+		}
+		let current_tag = document.querySelector('.categories-box').getAttribute('current_tag')
+		if (current_tag !== ''){
+			document.querySelector(`.categories-box .${current_tag} i`).classList.add('fa-arrow-circle-right')
 		}
 	})
 }
@@ -1351,10 +1385,14 @@ function load_tags_in_header(){
 function load_periods_in_header(){
 	const periodsPromise = fetch_periods()
 	const period_box = document.querySelector('.periods-box ul.periods')
-	let period_tamplate = ""
+	let period_template = ""
 	periodsPromise.then((periods) => {
 		for (let i = 0; i < periods.length ; i++){
-			period_box.innerHTML += `<li><a onclick="period_press(this)"><i class="fa" aria-hidden="true"></i>${periods[i][0].capitalize()}</a></li>`
+			period_box.innerHTML += `<li><a onclick="period_press(this.innerText)" class="${periods[i][0]}"><i class="fa" aria-hidden="true"></i>${periods[i][0].capitalize()}</a></li>`
+		}
+		let current_period = document.querySelector('.categories-box').getAttribute('current_tag')
+		if (current_period){
+			document.querySelector(`.categories-box .${current_period} i`).classList.add('fa-arrow-circle-right')
 		}
 	})
 }
@@ -1382,29 +1420,35 @@ async function fetch_periods() {
 // Function used when clicking a period, shows only the post with that specific period
 // pressing again on an activated period disables it and shows all posts
 function period_press(period){
+	if (location.href.split(location.host)[1] !== "/"){
+			setCookie('period_press', period.toLowerCase(), 1)
+			location.href = "/"
+		}
 	const all_posts = document.querySelectorAll('.blog-box > .post');
-	const period_name = period.innerText.toLowerCase();
+	const period_name = period.toLowerCase();
 
-	// Show all posts
-	for (i = 0; i < all_posts.length; ++i) {
-			all_posts[i].classList.remove('hidden')
-	}
 
 	// If an active period filter has been pressed -> remove filter
+	period = document.querySelector(`.periods-box .${period_name}`)
 	if (period.querySelector('i').classList.contains('fa-arrow-circle-right')){
 		period.querySelector('i').classList.remove('fa-arrow-circle-right')
-
+		// Show all posts
+		for (let i = 0; i < all_posts.length; ++i) {
+				all_posts[i].classList.remove('hidden')
+		}
 	// Otherwise -> change filter to the pressed one
 	} else {
 		// Remove active marker from the previous filter btn
 		const periods_btn = document.querySelectorAll('ul.periods i.fa')
-		for (i = 0; i < periods_btn.length; i++){
+		for (let i = 0; i < periods_btn.length; i++){
 		periods_btn[i].classList.remove('fa-arrow-circle-right')
 		}
 
-		// Hide irelevant posts
-		for (i = 0; i < all_posts.length; ++i) {
-			if (all_posts[i].getAttribute('lifeperiod') !== period_name) {
+		// show only relevant posts
+		for (let i = 0; i < all_posts.length; ++i) {
+			if (all_posts[i].querySelector('.post_period span').innerHTML.toLocaleLowerCase() === period_name) {
+				all_posts[i].classList.remove('hidden')
+			} else {
 				all_posts[i].classList.add('hidden')
 			}
 		}
@@ -1438,7 +1482,9 @@ function setCookie(c_name,value,exdays){var exdate=new Date();exdate.setDate(exd
 
 function getCookie(c_name){var c_value = document.cookie;var c_start = c_value.indexOf(" " + c_name + "=");if (c_start == -1){c_start = c_value.indexOf(c_name + "=");}if (c_start == -1){c_value = null;}else{c_start = c_value.indexOf("=", c_start) + 1;var c_end = c_value.indexOf(";", c_start);if (c_end == -1){c_end = c_value.length;}c_value = unescape(c_value.substring(c_start,c_end));}return c_value;}
 
-
+function deleteCookie(name) {
+    document.cookie = name+'=; Max-Age=-99999999;';
+}
 
 function checkSession(page_name, value='yes'){
 	let c = getCookie(`visited_${page_name}`);
