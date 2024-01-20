@@ -664,6 +664,11 @@ if (new_post_btn) {
 		document.body.style.overflow = 'hidden';
 		$('html').getNiceScroll().hide();
 		$('#newpostmodal>div.modal-content').niceScroll()
+		const visited_newpost = getCookie('visited_newpost')
+		if (visited_newpost !== "yes"){
+			intro_newpost()
+			//setCookie("visited_newpost", "yes", 30)
+		}
 	})
 
 	// When the user clicks on <span> (x), close the modal
@@ -992,6 +997,7 @@ function edit_post(post_id){
 		return
 	}
 	if (!checkSession('editpost')) intro_editpost()
+	document.querySelector('.show_postpage_intro').setAttribute('onclick', "intro_editpost()")
 
 	document.querySelector('.single-box-content').style = 'border: 7px solid blue'
 	document.querySelector('.edit_post').innerText = "exit edit mode"
@@ -1547,6 +1553,9 @@ function intro_postpage(){
 	  }, {
 		  element: document.querySelector('.postlikebtn'),
 		  intro: "Click here to like the post, login in order to like a post"
+	  }, {
+		  element: document.querySelector('.show_postpage_intro'),
+		  intro: "Click here to see this guide again"
 	  },
 		  {
 			  intro: "Thats it, feel free to wonder around some posts :)"
@@ -1596,5 +1605,36 @@ function intro_editpost(){
 		  {
 			  intro: `Have fun :)`
 		  }]
+	}).start();
+	}
+
+function intro_newpost(){
+	introJs("#newpostmodal").setOptions({
+		disableInteraction: true,
+	  steps: [{
+		  title: "Post upload guide",
+		intro: "This is were you can upload posts"
+	  },{
+		element: document.querySelector('#post_name'),
+		intro: "Enter here the name of the post, make it meaningful and clear"
+	  }, {
+		element: document.querySelector('#post_year'),
+		intro: "Enter here the year of the event/memory, this will help us organize the posts in the future"
+	  }, {
+		element: document.querySelector('#free_text'),
+		intro: "If you want to share something you wrote please enter it here, Otherwise describe the event"
+	  }, {
+		element: document.querySelector('#access_type'),
+		intro: "Important part here, set who can see your post"
+	  }, {
+		element: document.querySelector('.new_post_tags'),
+		intro: "Categorize your post with this tags, notice that the 'Ilay' tag is ment for posts that contain images of Ilay alone"
+	  }, {
+		element: document.querySelector('.dz-clickable'),
+		intro: "Click and select or drag your images to here"
+	  }, {
+		element: document.querySelector('#upload-btn'),
+		intro: "After you finished click here and wait for your post to upload"
+	  }]
 	}).start();
 	}

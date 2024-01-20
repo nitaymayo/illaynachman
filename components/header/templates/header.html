@@ -6,6 +6,7 @@
                     <br>
                 <p class="username">Hello, {{ session['name'] }} {% if session['is_admin'] %}(admin){% endif %}</p>
                 {% endif %}
+
 			</div>
 
 			<a class="elemadded responsive-link" href="#">Menu</a>
@@ -78,7 +79,9 @@
 <div id="searchmodal" class="modal">
   <!-- Modal content -->
   <div class="modal-content">
-    <span class="closemodal">&times;</span>
+    <div>
+        <span class="closemodal">&times;</span>
+    </div>
       <div class="search_container">
     <input type="search" id="search_input" placeholder="Start searching here" />
           </div>
@@ -117,7 +120,10 @@
 <div id="newpostmodal" class="modal">
   <!-- New Post Modal content -->
   <div class="modal-content">
-    <span class="closemodal">&times;</span>
+      <div>
+          <span class="closemodal">&times;</span>
+          <span class="show_intro hidden" onclick="intro_newpost()">?</span>
+      </div>
       <h1>Stage 1: Post Info</h1>
      <form id="new-post-form" method="POST" enctype="multipart/form-data">
           <div class="imgcontainer">
