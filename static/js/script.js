@@ -606,27 +606,35 @@ $(document).ready(function($) {
 	}
 
 	winDow.imagesLoaded(() => {
-		let tag_cookie = getCookie('tag_press')
-		if (tag_cookie){
-			deleteCookie("tag_press")
+		let filter_cookie = getCookie('filter_press')
+		if (filter_cookie){
+			filter_cookie = JSON.parse(filter_cookie)
+			deleteCookie("filter_press")
+			const current_filter = filter_cookie.filter
+			var is_relevant;
+			if (filter_cookie.type === "tag"){
+				// set filter attribute on .categories-box for later arrow mark
+				document.querySelector('.categories-box').setAttribute('current_filter', current_filter)
 
-			// set tag attribute on .categories-box for later arrow mark
-			document.querySelector('.categories-box').setAttribute('current_tag', tag_cookie)
+				is_relevant = (post) => { return get_tags(post).includes(current_filter)}
+			} else {
+				// set filter attribute on .categories-box for later arrow mark
+				document.querySelector('.periods-box').setAttribute('current_filter', current_filter)
+
+				is_relevant = (post) => { return post.querySelector('.post_period span').innerHTML.toLocaleLowerCase() === current_filter}
+			}
+
 
 			let all_posts = document.querySelectorAll('.blog-box > .post')
 
 
 			// show only relevant posts
 			for (let i = 0; i < all_posts.length; ++i) {
-				if (!get_tags(all_posts[i]).includes(tag_cookie)) {
-					all_posts[i].classList.add('hidden')
-				} else {
+				if (is_relevant(all_posts[i])) {
 					all_posts[i].classList.remove('hidden')
+				} else {
+					all_posts[i].classList.add('hidden')
 				}
-			}
-			let i_fa = document.querySelector(`.categories-box .${tag_cookie} i`)
-			if (i_fa){
-				i_fa.classList.add('fa-arrow-circle-right')
 			}
 			let winDow = $(window)
 			winDow.resize()
@@ -1318,7 +1326,7 @@ async function fetch_tags() {
 // pressing again on an activated tag disables it and shows all posts
 function tag_press(tag){
 		if (location.href.split(location.host)[1] !== "/"){
-			setCookie('tag_press', tag.toLowerCase(), 1)
+			setCookie('filter_press', JSON.stringify({"type": "tag", "filter": tag.toLowerCase()}), 1)
 			location.href = "/"
 		}
 	const all_posts = document.querySelectorAll('.blog-box > .post');
@@ -1328,6 +1336,7 @@ function tag_press(tag){
 	tag = document.querySelector(`.categories-box .${tag_name}`)
 	if (tag.querySelector('i').classList.contains('fa-arrow-circle-right')){
 		tag.querySelector('i').classList.remove('fa-arrow-circle-right')
+		// Show all posts
 		for (let i = 0; i < all_posts.length; i++){
 			all_posts[i].classList.remove('hidden')
 		}
@@ -1373,8 +1382,8 @@ function load_tags_in_header(){
 		for (let i = 0; i < tags.length ; i++){
 			tag_box.innerHTML += `<li><a onclick="tag_press(this.innerText)" class="${tags[i][0]}"><i class="fa" aria-hidden="true"></i>${tags[i][0].capitalize()}</a></li>`
 		}
-		let current_tag = document.querySelector('.categories-box').getAttribute('current_tag')
-		if (current_tag !== ''){
+		let current_tag = document.querySelector('.categories-box').getAttribute('current_filter')
+		if (current_tag){
 			document.querySelector(`.categories-box .${current_tag} i`).classList.add('fa-arrow-circle-right')
 		}
 	})
@@ -1390,9 +1399,9 @@ function load_periods_in_header(){
 		for (let i = 0; i < periods.length ; i++){
 			period_box.innerHTML += `<li><a onclick="period_press(this.innerText)" class="${periods[i][0]}"><i class="fa" aria-hidden="true"></i>${periods[i][0].capitalize()}</a></li>`
 		}
-		let current_period = document.querySelector('.categories-box').getAttribute('current_tag')
+		let current_period = document.querySelector('.periods-box').getAttribute('current_filter')
 		if (current_period){
-			document.querySelector(`.categories-box .${current_period} i`).classList.add('fa-arrow-circle-right')
+			document.querySelector(`.periods-box .${current_period} i`).classList.add('fa-arrow-circle-right')
 		}
 	})
 }
@@ -1421,7 +1430,7 @@ async function fetch_periods() {
 // pressing again on an activated period disables it and shows all posts
 function period_press(period){
 	if (location.href.split(location.host)[1] !== "/"){
-			setCookie('period_press', period.toLowerCase(), 1)
+			setCookie('filter_press', JSON.stringify({"type": "period", "filter": period.toLowerCase()}), 1)
 			location.href = "/"
 		}
 	const all_posts = document.querySelectorAll('.blog-box > .post');
