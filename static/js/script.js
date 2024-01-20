@@ -1477,6 +1477,8 @@ function period_press(period){
 function start_preloader(message){
 	const preloader = document.querySelector('.preloader')
 	preloader.style.display = 'flex'
+	preloader.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
+	$('html').getNiceScroll().hide()
 	if (message){
 		preloader.querySelector('.preloader_massage').innerText = message
 	} else {
