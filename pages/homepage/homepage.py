@@ -11,8 +11,6 @@ import pandas as pd
 homepage = Blueprint('homepage', __name__, static_folder='static', static_url_path='/homepage',
                      template_folder='templates')
 
-post_uploaded = 0
-images_uploaded = ""
 
 
 # Routes

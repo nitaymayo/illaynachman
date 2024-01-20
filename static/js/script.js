@@ -667,7 +667,7 @@ if (new_post_btn) {
 		const visited_newpost = getCookie('visited_newpost')
 		if (visited_newpost !== "yes"){
 			intro_newpost()
-			//setCookie("visited_newpost", "yes", 30)
+			setCookie("visited_newpost", "yes", 30)
 		}
 	})
 

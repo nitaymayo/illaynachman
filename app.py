@@ -10,16 +10,17 @@ app = Flask(__name__)
 app.config.from_pyfile('settings.py')
 
 dropzone = Dropzone(app)
+VIDEOS = tuple('MP4 mp4 MOV mov AVI avi WMV wmv AVCHD avchd WebM webm FLV flv'.split())
 
 # Dropzone settings
 app.config['DROPZONE_UPLOAD_MULTIPLE'] = True
 app.config['DROPZONE_ALLOWED_FILE_CUSTOM'] = True
-app.config['DROPZONE_ALLOWED_FILE_TYPE'] = 'image/*'
+app.config['DROPZONE_ALLOWED_FILE_TYPE'] = 'image/*, video/*'
 app.config['DROPZONE_MAX_FILE_SIZE'] = 10
 
 # New post uploads settings
 app.config['UPLOADED_POST_DEST'] = os.getcwd() + "/static/media/posts"
-post = UploadSet('post', IMAGES)
+post = UploadSet('post', IMAGES + VIDEOS)
 configure_uploads(app, post)
 patch_request_class(app)  # set maximum file size, default is 16MB
 
