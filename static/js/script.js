@@ -708,6 +708,8 @@ var admin_modal_close_span = document.querySelector("#adminmodal .closemodal");
 // Get search bar input
 var admin_modal_search_input = document.querySelector('input#admin_search_input')
 
+
+
 // When the user clicks on the button, open the new post modal
 if (admin_modal_btn) {
 	admin_modal_btn.onclick = function () {
@@ -718,6 +720,37 @@ if (admin_modal_btn) {
 		$('html').getNiceScroll().hide();
 		$('#adminmodal>div.modal-content').niceScroll()
 	}
+}
+
+// Search users in admin modal
+if (admin_modal_search_input){
+
+	admin_modal_search_input.addEventListener('keyup', (event) => {
+		const all_cards = [...document.querySelectorAll('.admin_search_results .user_card')]
+		const search_value = event.target.value
+
+		const relevent_users = all_cards.filter((user_card) => {
+			let user_card_name = user_card.querySelector('.user_name')
+			user_card_name.innerHTML = user_card_name.innerHTML.replace(`<span class="highlight">`, "").replace(`</span>`, "")
+
+			if (search_value === ""){
+			all_cards.map((user) => {user.classList.remove('hidden')})
+				return
+			}
+			all_cards.map((user) => {user.classList.add('hidden')})
+			if (user_card_name.textContent.includes(search_value)){
+				user_card_name.innerHTML = user_card_name.innerHTML.replace(search_value, `<span class="highlight">${search_value}</span>`)
+				return true
+			} else {
+				return false
+			}
+		})
+		relevent_users.map((user) => {user.classList.remove('hidden')})
+	})
+
+	// When the user clicks on <span> (x), close the modal
+	admin_modal_close_span.addEventListener('click', () => {close_modal(admin_modal)})
+
 }
 
 
@@ -741,7 +774,7 @@ async function load_users_for_admin_modal(){
 																						  <option value="2">Family</option>
                                                                                       </select></div>
                   <div class="user_info"><label class="info_title is_admin">Is admin: <input type="checkbox" ID="admin_${user.user_ID}" class="info_data" value="admin"/></label></div>
-                  <div class="user_info"><button class="btn" onclick="update_user(${user.user_ID})">Update user data</button></div>
+                  <div class="user_info"><button class="btn" onclick="update_user(${user.user_ID})">Update</button></div>
               </div>
           </div>`
 		container.append(result_card)
@@ -817,7 +850,7 @@ async function update_user(user_ID){
 	const user_password = document.getElementById(`password_${user_ID}`).value
 	const user_email = document.getElementById(`email_${user_ID}`).value
 	const user_approximation = document.getElementById(`approximation_${user_ID}`).value
-	const user_is_admin = document.getElementById(`admin_${user_ID}`).value
+	const user_is_admin = document.getElementById(`admin_${user_ID}`).checked
 	const user_accesstype = document.getElementById(`accesstype_${user_ID}`).value
 
 	const upadteUserPromise = await fetch('/homepage/updateuserdata', {
@@ -833,9 +866,17 @@ async function update_user(user_ID){
   headers: {
     "Content-type": "application/json; charset=UTF-8"
   }
+}).then((response) => response.json()).then((user_data) => {
+
+		if (user_data['success']) {
+			document.querySelector(`#user_${user_data['user_ID']}`).classList.remove('failed')
+			document.querySelector(`#user_${user_data['user_ID']}`).classList.add('success')
+		} else {
+			document.querySelector(`#user_${user_data['user_ID']}`).classList.remove('success')
+			document.querySelector(`#user_${user_data['user_ID']}`).classList.add('failed')
+		}
+		alert(user_data['text'])
 });
-	const result = await upadteUserPromise.json();
-	alert(result)
 }
 
 
@@ -945,6 +986,9 @@ if (search_input){
 // function to execute when user wants to exit modal
 function close_modal(modal){
 	modal.style.display = "none";
+	if (modal === admin_modal){
+		admin_modal.querySelector('.admin_search_results').innerHTML = ""
+	}
 	$('html').getNiceScroll().show();
 }
 
@@ -955,6 +999,8 @@ window.onmouseup = function(event) {
 	  close_modal(new_post_modal)
   } else if (event.target === search_modal){
 	  close_modal(search_modal)
+  } else if (event.target === admin_modal){
+	  close_modal(admin_modal)
   }
 }
 

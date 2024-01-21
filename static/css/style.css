@@ -169,7 +169,7 @@ ul.menu li a:hover {
 }
 .post-box a.btn {
         width: 100%;
-        margin: auto;
+        margin: 10px auto;
         display: block;
         background-color: var(--lead-brown);
         color: black;
@@ -397,6 +397,13 @@ p.copyright {
     flex-flow: column wrap;
     justify-content: start;
     align-items: start;
+}
+
+.user_card.success{
+    background-color: rgba(0, 255, 0, 0.4);
+}
+.user_card.failed{
+    background-color: rgba(250, 0, 0, 0.4);
 }
 
 .user_card h1{

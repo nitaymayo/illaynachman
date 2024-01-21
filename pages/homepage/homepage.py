@@ -384,7 +384,8 @@ def fetchadmindata():
 
     return json.dumps(pd.DataFrame(users).T.to_dict()), 200
 
-@homepage.route('/homepage/updateuserdata')
+
+@homepage.route('/homepage/updateuserdata', methods=['POST'])
 def updateuserdata():
     if not session and not session['is_admin']:
         return "You are not authorized to do that", 303
@@ -393,16 +394,19 @@ def updateuserdata():
     if (not data):
         return "Server problem", 301
 
-    query = (f"UPDATE user SET "
-             f"email = '{data.email}', "
-             f"password = '{data.password}', "
-             f"access_type = '{data.access_type}', "
-             f"approximation = '{data.approximation}', "
-             f"is_admin = '{data.is_admin}' "
-             f"WHERE user_ID = {data.user_ID}")
-    res = dbManager.update(query)
 
-    if res:
-        return "user data updated", 201
+    query = (f"UPDATE user SET "
+             f"email = '{data['email']}', "
+             f"password = '{data['password']}', "
+             f"access_type = '{data['access_type']}', "
+             f"approximation = '{data['approximation']}', "
+             f"is_admin = b'{1 if data['is_admin'] else 0}' "
+             f"WHERE user_ID = {data['user_ID']}")
+    res = dbManager.commit(query)
+
+    if res == 1:
+        return json.dumps({'text': "user data updated", 'user_ID': data['user_ID'], 'success': True}), 201
+    elif res == 0:
+        return json.dumps({'text': "No new data introduced", 'user_ID': data['user_ID'], 'success': True}), 201
     else:
-        return "problem with data, user data not updated", 301
+        return json.dumps({'text': "problem with data, user data not updated", 'user_ID': data['user_ID'], 'success': False}), 301
