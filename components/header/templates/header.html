@@ -29,6 +29,12 @@
                     <i class="fa fa-plus" aria-hidden="true"></i>
                     Upload post
                 </a>
+                {% if session['is_admin'] %}
+                    <a class="btn" id="adminmodalbtn">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                    Admin zone
+                </a>
+                {% endif %}
             {% else %}
                 <a class="btn" href="/login">
                 <i class="fa fa-user" aria-hidden="true"></i>
@@ -170,6 +176,32 @@
          {#        {{ dropzone.create(id='new_post_dropzone', action='/homepage/uploadpostphotos') }}#}
          <button id="upload-btn" type="submit">Post</button>
      </form>
+  </div>
+ </div>
+
+<div id="adminmodal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div>
+        <span class="closemodal">&times;</span>
+    </div>
+      <div class="search_container">
+    <input type="search" id="admin_search_input" placeholder="Search users here" />
+          </div>
+      <div class="admin_search_results">
+{#          <div class="user_card" user_id="1">#}
+{#              <h1 class="user_name">nitay</h1>#}
+{#              <div class="user_info_div">#}
+{#                  <div class="user_info"><label class="info_title">Email:</label><input type="email" id="1_email" class="info_data" value="nitay@mgail.com"/></div>#}
+{#                  <div class="user_info"><span class="info_title">Password:</span><input type="text" id="1_password" class="info_data" value="123"/></div>#}
+{#                  <div class="user_info"><span class="info_title">Approximation:</span><input type="text" id="1_approximation" class="info_data" value="Friend: from school"/></div>#}
+{#                  <div class="user_info"><span class="info_title">Access type:</span><select id="1_accesstype" class="info_data">#}
+{##}
+{#                                                                                      </select></div>#}
+{#                  <div class="user_info"><span class="info_title">Is admin:</span><input type="checkbox" id="1_admin" class="info_data" value="admin"/></div>#}
+{#              </div>#}
+{#          </div>#}
+      </div>
   </div>
  </div>
 

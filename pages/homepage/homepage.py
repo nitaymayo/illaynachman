@@ -370,3 +370,39 @@ def getpostsforsearch():
 
     data = pd.DataFrame(data).T.to_json()
     return data, 201
+
+@homepage.route('/homepage/fetchadmindata')
+def fetchadmindata():
+    if not session and not session['is_admin']:
+        flash('You are not authorized to do that')
+        return "You are not authorized to do that", 303
+
+    query = f"SELECT * FROM user"
+    users = DBManager().fetch(query)
+    if not users:
+        return "Server problem or no users in DB", 301
+
+    return json.dumps(pd.DataFrame(users).T.to_dict()), 200
+
+@homepage.route('/homepage/updateuserdata')
+def updateuserdata():
+    if not session and not session['is_admin']:
+        return "You are not authorized to do that", 303
+
+    data = json.loads(request.data)
+    if (not data):
+        return "Server problem", 301
+
+    query = (f"UPDATE user SET "
+             f"email = '{data.email}', "
+             f"password = '{data.password}', "
+             f"access_type = '{data.access_type}', "
+             f"approximation = '{data.approximation}', "
+             f"is_admin = '{data.is_admin}' "
+             f"WHERE user_ID = {data.user_ID}")
+    res = dbManager.update(query)
+
+    if res:
+        return "user data updated", 201
+    else:
+        return "problem with data, user data not updated", 301

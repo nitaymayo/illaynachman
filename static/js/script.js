@@ -455,8 +455,7 @@ $(document).ready(function($) {
 	}
 	load_header_filters()
 
-	// loads posts to the search modal
-	load_posts_for_search()
+
 
 
 	Dropzone.autoDiscover = false;
@@ -693,6 +692,153 @@ if (new_post_btn) {
 }
 
 
+/* ---------------------------------------------------------------------- */
+/*	admin modal
+/* ---------------------------------------------------------------------- */
+
+// Get the modal
+var admin_modal = document.getElementById("adminmodal");
+
+// Get the button that opens the modal
+var admin_modal_btn = document.getElementById("adminmodalbtn");
+
+// Get the <span> element that closes the modal
+var admin_modal_close_span = document.querySelector("#adminmodal .closemodal");
+
+// Get search bar input
+var admin_modal_search_input = document.querySelector('input#admin_search_input')
+
+// When the user clicks on the button, open the new post modal
+if (admin_modal_btn) {
+	admin_modal_btn.onclick = function () {
+		// loads posts to the search modal
+		load_users_for_admin_modal()
+		admin_modal.style.display = "block";
+		document.body.style.overflow = 'hidden';
+		$('html').getNiceScroll().hide();
+		$('#adminmodal>div.modal-content').niceScroll()
+	}
+}
+
+
+// Load users data in admin modal
+async function load_users_for_admin_modal(){
+	const container = $('div#adminmodal div.admin_search_results')
+	const searchPostsPromise = await fetch('/homepage/fetchadmindata');
+	const users = await searchPostsPromise.json();
+	let result_card = ""
+	for (var index in users){
+		const user = users[index]
+		result_card = `<div class="user_card" id="user_${user.user_ID}">
+              <h1 class="user_name">${user.name}</h1>
+              <div class="user_info_div">
+                  <div class="user_info"><label class="info_title">Email:</label><input type="email" ID="email_${user.user_ID}" class="info_data" value="${user.email}"/></div>
+                  <div class="user_info"><label class="info_title">Password:</label><input type="text" ID="password_${user.user_ID}" class="info_data" value="${user.password}"/></div>
+                  <div class="user_info"><label class="info_title">Approximation:</label><input type="text" ID="approximation_${user.user_ID}" class="info_data" value="${user.approximation}"/></div>
+                  <div class="user_info"><label class="info_title">Access type:</label><select ID="accesstype_${user.user_ID}" class="info_data">
+																						<option value="0">Public</option>
+																						  <option value="1">Friend</option>
+																						  <option value="2">Family</option>
+                                                                                      </select></div>
+                  <div class="user_info"><label class="info_title is_admin">Is admin: <input type="checkbox" ID="admin_${user.user_ID}" class="info_data" value="admin"/></label></div>
+                  <div class="user_info"><button class="btn" onclick="update_user(${user.user_ID})">Update user data</button></div>
+              </div>
+          </div>`
+		container.append(result_card)
+		// set access type select value
+		document.getElementById(`accesstype_${user.user_ID}`).value = user.access_type;
+		// set is admin checked if user is admin
+		if (user.is_admin){
+			document.getElementById(`admin_${user.user_ID}`).checked = true;
+		}
+
+	}
+}
+
+function validate_user_data_admin_modal(user_card){
+	const user_ID = user_card.getAttribute('id').replace('user_', "")
+	// short validation for new user data
+	//const name_input = user_card.getElementById('uname')
+	const password_input = document.getElementById(`password_${user_ID}`)
+	const email_input = document.getElementById(`email_${user_ID}`)
+	const approximation_input = document.getElementById(`approximation_${user_ID}`)
+	const regExp = /\s|[,;\/.\\\]\[{}()\-=+#*`]/;
+	var valid = true;
+
+  // // Username validation
+  // if (regExp.test(name_input.value)) {
+  //     name_input.setCustomValidity("user name cant have whitespace or special characters")
+  //   valid = false
+  // } else {
+	//   name_input.setCustomValidity("")
+  // }
+
+  // Password validation
+  if (password_input.value.length < 8) {
+    password_input.setCustomValidity("Password must be at least 8 characters long.");
+    valid = false;
+  } else if (regExp.test(password_input.value)) {
+   password_input.setCustomValidity(`Password cannot have whitespace or the following characters: ${regExp}.`);
+   valid = false;
+  } else {
+	password_input.setCustomValidity("")
+  }
+  password_input.reportValidity()
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	if (!emailRegex.test(email_input.value)) {
+    email_input.setCustomValidity( "Invalid email format.");
+    valid = false;
+  } else {
+	  email_input.setCustomValidity("")
+  }
+	email_input.reportValidity()
+
+  // Other input validation
+  if (/[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
+	  approximation_input.setCustomValidity(`This field cannot have the following characters: ${/|[,;\/.\\\]\[{}()\-=+#*`]/}.`);
+	  valid = false;
+  } else {
+	  approximation_input.setCustomValidity("")
+  }
+  approximation_input.reportValidity()
+
+  return valid
+}
+
+async function update_user(user_ID){
+	const user_card = document.querySelector(`#user_${user_ID}`)
+	if (!validate_user_data_admin_modal(user_card)){
+		return false
+	}
+
+	//const name_input = user_card.getElementById('uname').value
+	const user_password = document.getElementById(`password_${user_ID}`).value
+	const user_email = document.getElementById(`email_${user_ID}`).value
+	const user_approximation = document.getElementById(`approximation_${user_ID}`).value
+	const user_is_admin = document.getElementById(`admin_${user_ID}`).value
+	const user_accesstype = document.getElementById(`accesstype_${user_ID}`).value
+
+	const upadteUserPromise = await fetch('/homepage/updateuserdata', {
+  method: "POST",
+  body: JSON.stringify({
+    user_ID: user_ID,
+    email: user_email,
+	  password: user_password,
+	  approximation: user_approximation,
+	  access_type: user_accesstype,
+	  is_admin: user_is_admin
+  }),
+  headers: {
+    "Content-type": "application/json; charset=UTF-8"
+  }
+});
+	const result = await upadteUserPromise.json();
+	alert(result)
+}
+
+
 
 /* ---------------------------------------------------------------------- */
 /*	search modal
@@ -713,6 +859,8 @@ var search_input = document.querySelector('input#search_input')
 // When the user clicks on the button, open the new post modal
 if (search_btn) {
 	search_btn.onclick = function () {
+		// loads posts to the search modal
+		load_posts_for_search()
 		search_modal.style.display = "block";
 		document.body.style.overflow = 'hidden';
 		$('html').getNiceScroll().hide();

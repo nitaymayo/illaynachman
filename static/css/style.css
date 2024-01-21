@@ -358,6 +358,66 @@ p.copyright {
     user-select: none;
 }
 
+/*-------------------------------------------------*/
+/* =  admin modal
+/*-------------------------------------------------*/
+
+.admin_search_results{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: start;
+    align-items: center;
+    gap: 5px;
+}
+
+.user_card{
+    border-bottom: 1px solid grey;
+    padding: 10px;
+}
+
+#adminmodal .user_card input, #adminmodal .user_card select{
+    width: 100%;
+    padding: 3px 0;
+    margin: 0;
+
+}
+
+.user_info_div{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.user_info{
+    max-width: 30%;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: start;
+    align-items: start;
+}
+
+.user_card h1{
+    font-size: 25px;
+}
+.user_card label{
+    margin-bottom: 0;
+}
+
+.user_card .user_info.is_admin{
+    width: 150px;
+}
+#adminmodal .user_card .info_title.is_admin input{
+    display: inline;
+    width: fit-content;
+}
+
+
+
+
+
 
 /*-------------------------------------------------*/
 /* =  New post modal
