@@ -694,16 +694,17 @@ ul li {
     height: 100%;
 }
 
-#content .show_homepage_intro{
+.logo-box .show_homepage_intro{
        position: absolute;
     top: 15px;
     right: 15px;
     cursor: pointer;
+    color: white;
     font-size: 25px;
     transition-duration: 40ms;
     z-index: 1000;
 }
-#content .show_homepage_intro:hover{
+.logo-box .show_homepage_intro:hover{
     transform: scale(1.3);
 }
 

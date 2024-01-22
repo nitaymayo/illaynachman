@@ -6,7 +6,9 @@
                     <br>
                 <p class="username">Hello, {{ session['name'] }} {% if session['is_admin'] %}(admin){% endif %}</p>
                 {% endif %}
-
+                {% if page_head_title == 'Homepage' %}
+                <span class="show_homepage_intro" onclick="intro_homepage()">?</span>
+                {% endif %}
 			</div>
 
 			<a class="elemadded responsive-link" href="#">Menu</a>
