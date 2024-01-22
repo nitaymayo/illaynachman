@@ -1405,6 +1405,14 @@ ul.tab-links li a.active {
 .post-images .img-card img:hover {
     transform: scale(1.1);
 }
+.post-images .img-card video {
+    width: 100%;
+    height: auto;
+    transition-duration: 60ms;
+}
+.post-images .img-card video:hover {
+    transform: scale(1.1);
+}
 .post-images .edit_image{
     position: absolute;
     top: 0;
@@ -1435,6 +1443,8 @@ ul.tab-links li a.active {
     height: 70%;
 }
 .post-images .img-card .delete_img{
+    bottom: 0;
+    position: absolute;
     background-color: rgba(255, 0, 0, 0.4);
     height: 30%;
 }

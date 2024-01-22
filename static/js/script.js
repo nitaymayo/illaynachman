@@ -275,6 +275,7 @@ $(document).ready(function($) {
 	/* ---------------------------------------------------------------------- */
 	if (location.href.includes('postpage')) {
 		var image_container = $('div.main-images.post-images')
+		var videos_tags = document.querySelectorAll('.post-images video')
 
 		try{
 			image_container.imagesLoaded( function(){
@@ -287,6 +288,17 @@ $(document).ready(function($) {
 					}
 				});
 			});
+			for (let i = 0; i < videos_tags.length; i++) {
+				videos_tags.onloadeddata = function () {
+					image_container.isotope({
+						layoutMode: 'masonry',
+						animationOptions: {
+							duration: 750,
+							easing: 'linear'
+						}
+					});
+				}
+			}
 		} catch(err) {
 		}
 		winDow.bind('resize', function(){
@@ -576,7 +588,7 @@ $(document).ready(function($) {
 					}
 					let delete_images = []
 					for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
-						delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('alt'))
+						delete_images.push(document.querySelectorAll('div.img-card.delete-img img, div.img-card.delete-img source')[i].getAttribute('alt'))
 					}
 					let cover_images_src = []
 					let cover_imgs = document.querySelectorAll('div.img-card.cover-img')
@@ -639,6 +651,8 @@ $(document).ready(function($) {
 			winDow.resize()
 		}
 	})
+
+
 
 });
 
@@ -1121,7 +1135,11 @@ function new_post_validation() {
 function showinbig(img){
 	let showinbig = document.querySelector('.showinbig-div')
 	showinbig.classList.remove('hidden')
-	showinbig.querySelector('img').setAttribute('src', img.getAttribute('src'))
+
+	if (img.tagName === 'IMG'){
+		showinbig.innerHTML = `<img class="sha" src="${img.getAttribute('src')}">`
+		showinbig.onclick = () => {showinbig.classList.add('hidden')}
+	}
 }
 
 // like/dislike function - add or remove like from a post
@@ -1205,33 +1223,36 @@ function edit_post(post_id){
 	const post_imgs = document.querySelectorAll('div.main-images div.img-card')
 	let cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
 	for (let i = 0; i < post_imgs.length; i++){
+		post_imgs[i].querySelector('.edit_image').classList.remove('hidden')
 		let make_cover_btn = post_imgs[i].querySelector('.make_cover')
 		let delete_image_btn = post_imgs[i].querySelector('.delete_img')
 
-		make_cover_btn.parentElement.classList.remove('hidden')
+		if (make_cover_btn) {
+			make_cover_btn.addEventListener('click', function (event) {
+				const img_card = event.target.closest('.img-card')
+				if (img_card.classList.contains('cover-img')) {
+					img_card.classList.remove('cover-img')
 
-		make_cover_btn.addEventListener('click', function (event){
-			const img_card = event.target.closest('.img-card')
-			if (img_card.classList.contains('cover-img')){
-				img_card.classList.remove('cover-img')
-
-			} else {
-				img_card.classList.add('cover-img')
-				if (cover_imgs.length === 3) {
-					let removed_from_cover = cover_imgs.pop()
-					removed_from_cover.classList.remove('cover-img')
+				} else {
+					img_card.classList.add('cover-img')
+					if (cover_imgs.length === 3) {
+						let removed_from_cover = cover_imgs.pop()
+						removed_from_cover.classList.remove('cover-img')
+					}
 				}
-			}
-			cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
-		})
-		delete_image_btn.addEventListener('click', function (event){
-			const img_card = event.target.closest('.img-card')
-			if (img_card.classList.contains('delete-img')){
-				img_card.classList.remove('delete-img')
-			} else {
-				img_card.classList.add('delete-img')
-			}
-		})
+				cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
+			})
+		}
+		if (delete_image_btn){
+			delete_image_btn.addEventListener('click', function (event) {
+				const img_card = event.target.closest('.img-card')
+				if (img_card.classList.contains('delete-img')) {
+					img_card.classList.remove('delete-img')
+				} else {
+					img_card.classList.add('delete-img')
+				}
+			})
+		}
 	}
 	document.querySelector('.select-images-info').classList.remove('hidden')
 
@@ -1672,7 +1693,9 @@ function start_preloader(message){
 	const preloader = document.querySelector('.preloader')
 	preloader.style.display = 'flex'
 	preloader.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
-	$('html').getNiceScroll().hide()
+	try {
+		$('html').getNiceScroll().hide()
+	} catch {}
 	if (message){
 		preloader.querySelector('.preloader_massage').innerText = message
 	} else {

@@ -233,7 +233,7 @@ def new_post():
     os.makedirs(post.config.destination + '/' + post_dir) #Create post dir
 
     # Insert Content to dir and to DB
-    query = "INSERT INTO image (location, post_id) VALUES "
+    query = "INSERT INTO image (location, post_id, type) VALUES "
     delete_query = f"DELETE FROM image WHERE location = "
     bad_files = []
     good_files = []
@@ -241,8 +241,13 @@ def new_post():
         file = request.files.get(f)
         new_file_name = file.filename.replace(" ", "+")
         # save the file to our photos folder
+        content_type = ""
+        if ("video" in file.content_type):
+            content_type = "video"
+        elif ("image" in file.content_type):
+            content_type = "image"
         try:
-            res = dbManager.commit(query + f"('/{post_dir + '/' + new_file_name}', {post_id})")
+            res = dbManager.commit(query + f"('/{post_dir + '/' + new_file_name}', {post_id}, '{content_type}')")
             if res == 1:
                 file_name = post.save(
                     file,
@@ -258,7 +263,7 @@ def new_post():
     # choose randomly 3 photos as cover photos
     query = (f"UPDATE image "
              f"SET cover = b'1' "
-             f"WHERE post_id = {post_id} "
+             f"WHERE post_id = {post_id} AND type = 'image'"
              f"ORDER BY post_id LIMIT 3")
     res = dbManager.commit(query)
 
