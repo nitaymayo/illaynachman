@@ -11,8 +11,6 @@ import pandas as pd
 homepage = Blueprint('homepage', __name__, static_folder='static', static_url_path='/homepage',
                      template_folder='templates')
 
-post_uploaded = 0
-images_uploaded = ""
 
 
 # Routes
@@ -185,8 +183,10 @@ def new_post():
     if not session:
         flash('Login is required to upload a post')
         return redirect(url_for('login.index'))
-
-    data = json.loads(request.form['data'])
+    try:
+        data = json.loads(request.form['data'])
+    except Exception as e:
+        return e.description, e.code
     post_name = data['post_name']
     post_year = data['post_year']
     post_description = data['post_description']
@@ -235,7 +235,7 @@ def new_post():
     os.makedirs(post.config.destination + '/' + post_dir) #Create post dir
 
     # Insert Content to dir and to DB
-    query = "INSERT INTO image (location, post_id) VALUES "
+    query = "INSERT INTO image (location, post_id, type) VALUES "
     delete_query = f"DELETE FROM image WHERE location = "
     bad_files = []
     good_files = []
@@ -243,8 +243,13 @@ def new_post():
         file = request.files.get(f)
         new_file_name = file.filename.replace(" ", "+")
         # save the file to our photos folder
+        content_type = ""
+        if ("video" in file.content_type):
+            content_type = "video"
+        elif ("image" in file.content_type):
+            content_type = "image"
         try:
-            res = dbManager.commit(query + f"('/{post_dir + '/' + new_file_name}', {post_id})")
+            res = dbManager.commit(query + f"('/{post_dir + '/' + new_file_name}', {post_id}, '{content_type}')")
             if res == 1:
                 file_name = post.save(
                     file,
@@ -260,7 +265,7 @@ def new_post():
     # choose randomly 3 photos as cover photos
     query = (f"UPDATE image "
              f"SET cover = b'1' "
-             f"WHERE post_id = {post_id} "
+             f"WHERE post_id = {post_id} AND type = 'image'"
              f"ORDER BY post_id LIMIT 3")
     res = dbManager.commit(query)
 
@@ -372,3 +377,43 @@ def getpostsforsearch():
 
     data = pd.DataFrame(data).T.to_json()
     return data, 201
+
+@homepage.route('/homepage/fetchadmindata')
+def fetchadmindata():
+    if not session and not session['is_admin']:
+        flash('You are not authorized to do that')
+        return "You are not authorized to do that", 303
+
+    query = f"SELECT * FROM user"
+    users = DBManager().fetch(query)
+    if not users:
+        return "Server problem or no users in DB", 301
+
+    return json.dumps(pd.DataFrame(users).T.to_dict()), 200
+
+
+@homepage.route('/homepage/updateuserdata', methods=['POST'])
+def updateuserdata():
+    if not session and not session['is_admin']:
+        return "You are not authorized to do that", 303
+
+    data = json.loads(request.data)
+    if (not data):
+        return "Server problem", 301
+
+
+    query = (f"UPDATE user SET "
+             f"email = '{data['email']}', "
+             f"password = '{data['password']}', "
+             f"access_type = '{data['access_type']}', "
+             f"approximation = '{data['approximation']}', "
+             f"is_admin = b'{1 if data['is_admin'] else 0}' "
+             f"WHERE user_ID = {data['user_ID']}")
+    res = dbManager.commit(query)
+
+    if res == 1:
+        return json.dumps({'text': "user data updated", 'user_ID': data['user_ID'], 'success': True}), 201
+    elif res == 0:
+        return json.dumps({'text': "No new data introduced", 'user_ID': data['user_ID'], 'success': True}), 201
+    else:
+        return json.dumps({'text': "problem with data, user data not updated", 'user_ID': data['user_ID'], 'success': False}), 301

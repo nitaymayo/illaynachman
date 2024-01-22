@@ -21,8 +21,9 @@ def index(post_id):
                  f"FROM post "
                  f"WHERE post_id = {post_id}")
         res = dbManager.fetch(query)
-        if res == False:
-            raise Exception("Problem with the DB", 303)
+        if not res:
+            return redirect('/pagenotfound')
+            # raise Exception("Problem with the DB", 303)
         else:
             post_data = res[0]
 
@@ -160,8 +161,10 @@ def deletepost():
 def update_post():
     if not session:
         return "Please signin", 401
-
-    data = json.loads(request.form.to_dict()['data'])
+    try:
+        data = json.loads(request.form.to_dict()['data'])
+    except Exception as e:
+        return e.description, e.code
     post_id = data["post_id"]
 
     # Pull post data
@@ -233,7 +236,7 @@ def update_post():
                 if not os.path.exists(delete_to_location):
                     os.makedirs(delete_to_location)
                 if os.path.exists(img_location):
-                    shutil.move(img_location, delete_to_location)
+                    shutil.move(img_location, delete_to_location + img_location.split('/')[-1])
             else:
                 images_not_deleted.append(img_name)
 
@@ -257,8 +260,14 @@ def update_post():
 
             file = request.files.get(f)
             new_file_name = file.filename.replace(" ", "+")
+            content_type =''
+            if "video" in file.content_type:
+                content_type = "video"
+            elif "image" in file.content_type:
+                content_type = "image"
+
             # try to insert img to db
-            query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '/{post_dir + new_file_name}')"
+            query = f"INSERT INTO image (post_id, location, type) VALUES ({post_id}, '/{post_dir + new_file_name}', '{content_type}')"
             res = dbManager.commit(query)
             try:
                 # if successful save it to folder, else raise exception

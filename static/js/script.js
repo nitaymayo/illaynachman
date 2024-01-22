@@ -275,6 +275,7 @@ $(document).ready(function($) {
 	/* ---------------------------------------------------------------------- */
 	if (location.href.includes('postpage')) {
 		var image_container = $('div.main-images.post-images')
+		var videos_tags = document.querySelectorAll('.post-images video')
 
 		try{
 			image_container.imagesLoaded( function(){
@@ -287,6 +288,17 @@ $(document).ready(function($) {
 					}
 				});
 			});
+			for (let i = 0; i < videos_tags.length; i++) {
+				videos_tags[i].onloadeddata = function () {
+					image_container.isotope({
+						layoutMode: 'masonry',
+						animationOptions: {
+							duration: 750,
+							easing: 'linear'
+						}
+					});
+				}
+			}
 		} catch(err) {
 		}
 		winDow.bind('resize', function(){
@@ -455,8 +467,7 @@ $(document).ready(function($) {
 	}
 	load_header_filters()
 
-	// loads posts to the search modal
-	load_posts_for_search()
+
 
 
 	Dropzone.autoDiscover = false;
@@ -470,8 +481,8 @@ $(document).ready(function($) {
 			addRemoveLinks: true,
 			autoProcessQueue: false,
 			uploadMultiple: true,
-			parallelUploads: 50,
-			maxFiles: 50,
+			maxFilesize: 16000,
+			parallelUploads: 30,
 			init: function (){
 				let myDropzone = this;
 
@@ -488,10 +499,12 @@ $(document).ready(function($) {
 							  start_preloader('Uploading your post...')
 							  myDropzone.uploadFile(blob);
 						  }
+					  } else if (myDropzone.getQueuedFiles().length > 30){
+							  alert("To many files, please select 30 or less")
 					  } else {
-						  start_preloader('Uploading your post...')
-						  myDropzone.processQueue();
-					  }
+							  start_preloader('Uploading your post...')
+							  myDropzone.processQueue();
+						  }
 				  } else {
 					  $(".modal-content").animate({ scrollTop: 0 }, "smooth");
 				  }
@@ -525,6 +538,36 @@ $(document).ready(function($) {
 				this.on("successmultiple", function(files, response) {
 			      document.location = '/'
 			    });
+				this.on("errormultiple", (files, response) => {
+					hide_preloader()
+					const all_previews = document.querySelectorAll('#newPostDropzone .dz-preview')
+					for (let i = 0; i < files.length ; i++){
+						files[i].status = "queued"
+						all_previews[i].classList.remove('dz-error')
+						all_previews[i].classList.remove('dz-complete')
+					}
+					alert("Something went wrong, please refresh the page and try to upload the post again\n Error: " + response)
+					try{
+						$('html').getNiceScroll().show()
+					} catch {}
+				})
+
+				this.on("addedfile", function (file){
+				  if (file.size > 16*1e6){
+					  alert(`File ${file.name} is to big, max size is 16mb`)
+					  this.removeFile(file)
+				  } else if (myDropzone.getQueuedFiles().length === 30){
+					  alert(`Too many files, max allowed with each upload is 30`)
+					  this.removeFile(file)
+					  this.stopPropagation()
+				  } else {
+					  document.querySelector('#newpostmodal .images_number').innerHTML = `(${myDropzone.getQueuedFiles().length + 1} images selected)`
+				  }
+
+				});
+				this.on("removedfile", function (){
+					document.querySelector('#newpostmodal .images_number').innerHTML = `(${myDropzone.getQueuedFiles().length} images selected)`
+				})
 			}
 		})
 
@@ -536,8 +579,8 @@ $(document).ready(function($) {
 			addRemoveLinks: true,
 			autoProcessQueue: false,
 			uploadMultiple: true,
-			parallelUploads: 50,
-			maxFiles: 50,
+			maxFilesize: 16000,
+			parallelUploads: 30,
 			init: function (){
 				let myDropzone = this;
 
@@ -551,6 +594,8 @@ $(document).ready(function($) {
 					  blob.upload = {'chunked': myDropzone.options.chunking};
 					  start_preloader('Updating your post...')
 					  myDropzone.uploadFile(blob);
+				  } else if ((myDropzone.getQueuedFiles().length + document.querySelectorAll('.post-images .img-card:not(.delete-img)').length) > 30){
+					  alert("To many files, please select 30 or less")
 				  } else {
 					  start_preloader('Updating your post...')
 					  myDropzone.processQueue();
@@ -562,6 +607,39 @@ $(document).ready(function($) {
 				this.on("successmultiple", function(files, response) {
 			      location.reload()
 			    });
+
+				this.on("addedfile", function (file){
+					const files_length = (myDropzone.getQueuedFiles().length + document.querySelectorAll('.post-images .img-card:not(.delete-img)').length)
+				   if (file.size > 16*1e6){
+					  alert(`File ${file.name} is to big, max size is 16mb`)
+					  this.removeFile(file)
+				  } else if (files_length === 30){
+					  alert(`Too many files, max allowed with each upload is 30`)
+					  this.removeFile(file)
+					  this.stopPropagation()
+				  } else {
+					  document.querySelector('#uploadNewPhotos .images_number').innerHTML = `(${files_length} images selected)`
+				  }
+
+				});
+
+				this.on("removedfile", function (){
+					document.querySelector('#uploadNewPhotos .images_number').innerHTML = `(${(myDropzone.getQueuedFiles().length + document.querySelectorAll('.post-images .img-card:not(.delete-img)').length)} images selected)`
+				})
+
+				this.on("errormultiple", (files, response) => {
+					hide_preloader()
+					const all_previews = document.querySelectorAll('#newPostDropzone .dz-preview')
+					for (let i = 0; i < files.length ; i++){
+						files[i].status = "queued"
+						all_previews[i].classList.remove('dz-error')
+						all_previews[i].classList.remove('dz-complete')
+					}
+					alert("Something went wrong, please refresh the page and try to upload the post again\n Error: " + response)
+					try{
+						$('html').getNiceScroll().show()
+					} catch {}
+				})
 			}
 		})
 	})
@@ -577,7 +655,7 @@ $(document).ready(function($) {
 					}
 					let delete_images = []
 					for (let i = 0; i < document.querySelectorAll('div.img-card.delete-img').length; i++){
-						delete_images.push(document.querySelectorAll('div.img-card.delete-img img')[i].getAttribute('alt'))
+						delete_images.push(document.querySelectorAll('div.img-card.delete-img img, div.img-card.delete-img source')[i].getAttribute('alt'))
 					}
 					let cover_images_src = []
 					let cover_imgs = document.querySelectorAll('div.img-card.cover-img')
@@ -605,6 +683,42 @@ $(document).ready(function($) {
 	if (!checkSession('homepage')) intro_homepage()
 	}
 
+	winDow.imagesLoaded(() => {
+		let filter_cookie = getCookie('filter_press')
+		if (filter_cookie){
+			filter_cookie = JSON.parse(filter_cookie)
+			deleteCookie("filter_press")
+			const current_filter = filter_cookie.filter
+			var is_relevant;
+			if (filter_cookie.type === "tag"){
+				// set filter attribute on .categories-box for later arrow mark
+				document.querySelector('.categories-box').setAttribute('current_filter', current_filter)
+
+				is_relevant = (post) => { return get_tags(post).includes(current_filter)}
+			} else {
+				// set filter attribute on .categories-box for later arrow mark
+				document.querySelector('.periods-box').setAttribute('current_filter', current_filter)
+
+				is_relevant = (post) => { return post.querySelector('.post_period span').innerHTML.toLocaleLowerCase() === current_filter}
+			}
+
+
+			let all_posts = document.querySelectorAll('.blog-box > .post')
+
+
+			// show only relevant posts
+			for (let i = 0; i < all_posts.length; ++i) {
+				if (is_relevant(all_posts[i])) {
+					all_posts[i].classList.remove('hidden')
+				} else {
+					all_posts[i].classList.add('hidden')
+				}
+			}
+			let winDow = $(window)
+			winDow.resize()
+		}
+	})
+
 
 
 });
@@ -630,6 +744,11 @@ if (new_post_btn) {
 		document.body.style.overflow = 'hidden';
 		$('html').getNiceScroll().hide();
 		$('#newpostmodal>div.modal-content').niceScroll()
+		// const visited_newpost = getCookie('visited_newpost')
+		// if (visited_newpost !== "yes"){
+		// 	intro_newpost()
+		// 	setCookie("visited_newpost", "yes", 30)
+		// }
 	})
 
 	// When the user clicks on <span> (x), close the modal
@@ -654,6 +773,194 @@ if (new_post_btn) {
 }
 
 
+/* ---------------------------------------------------------------------- */
+/*	admin modal
+/* ---------------------------------------------------------------------- */
+
+// Get the modal
+var admin_modal = document.getElementById("adminmodal");
+
+// Get the button that opens the modal
+var admin_modal_btn = document.getElementById("adminmodalbtn");
+
+// Get the <span> element that closes the modal
+var admin_modal_close_span = document.querySelector("#adminmodal .closemodal");
+
+// Get search bar input
+var admin_modal_search_input = document.querySelector('input#admin_search_input')
+
+
+
+// When the user clicks on the button, open the new post modal
+if (admin_modal_btn) {
+	admin_modal_btn.onclick = function () {
+		// loads posts to the search modal
+		load_users_for_admin_modal()
+		admin_modal.style.display = "block";
+		document.body.style.overflow = 'hidden';
+		$('html').getNiceScroll().hide();
+		$('#adminmodal>div.modal-content').niceScroll()
+	}
+}
+
+// Search users in admin modal
+if (admin_modal_search_input){
+
+	admin_modal_search_input.addEventListener('keyup', (event) => {
+		const all_cards = [...document.querySelectorAll('.admin_search_results .user_card')]
+		const search_value = event.target.value
+
+		const relevent_users = all_cards.filter((user_card) => {
+			let user_card_name = user_card.querySelector('.user_name')
+			user_card_name.innerHTML = user_card_name.innerHTML.replace(`<span class="highlight">`, "").replace(`</span>`, "")
+
+			if (search_value === ""){
+			all_cards.map((user) => {user.classList.remove('hidden')})
+				return
+			}
+			all_cards.map((user) => {user.classList.add('hidden')})
+			if (user_card_name.textContent.includes(search_value)){
+				user_card_name.innerHTML = user_card_name.innerHTML.replace(search_value, `<span class="highlight">${search_value}</span>`)
+				return true
+			} else {
+				return false
+			}
+		})
+		relevent_users.map((user) => {user.classList.remove('hidden')})
+	})
+
+	// When the user clicks on <span> (x), close the modal
+	admin_modal_close_span.addEventListener('click', () => {close_modal(admin_modal)})
+
+}
+
+
+// Load users data in admin modal
+async function load_users_for_admin_modal(){
+	const container = $('div#adminmodal div.admin_search_results')
+	const searchPostsPromise = await fetch('/homepage/fetchadmindata');
+	const users = await searchPostsPromise.json();
+	let result_card = ""
+	for (var index in users){
+		const user = users[index]
+		result_card = `<div class="user_card" id="user_${user.user_ID}">
+              <h1 class="user_name">${user.name}</h1>
+              <div class="user_info_div">
+                  <div class="user_info"><label class="info_title">Email:</label><input type="email" ID="email_${user.user_ID}" class="info_data" value="${user.email}"/></div>
+                  <div class="user_info"><label class="info_title">Password:</label><input type="text" ID="password_${user.user_ID}" class="info_data" value="${user.password}"/></div>
+                  <div class="user_info"><label class="info_title">Approximation:</label><input type="text" ID="approximation_${user.user_ID}" class="info_data" value="${user.approximation}"/></div>
+                  <div class="user_info"><label class="info_title">Access type:</label><select ID="accesstype_${user.user_ID}" class="info_data">
+																						<option value="0">Public</option>
+																						  <option value="1">Friend</option>
+																						  <option value="2">Family</option>
+                                                                                      </select></div>
+                  <div class="user_info"><label class="info_title is_admin">Is admin: <input type="checkbox" ID="admin_${user.user_ID}" class="info_data" value="admin"/></label></div>
+                  <div class="user_info"><button class="btn" onclick="update_user(${user.user_ID})">Update</button></div>
+              </div>
+          </div>`
+		container.append(result_card)
+		// set access type select value
+		document.getElementById(`accesstype_${user.user_ID}`).value = user.access_type;
+		// set is admin checked if user is admin
+		if (user.is_admin){
+			document.getElementById(`admin_${user.user_ID}`).checked = true;
+		}
+
+	}
+}
+
+function validate_user_data_admin_modal(user_card){
+	const user_ID = user_card.getAttribute('id').replace('user_', "")
+	// short validation for new user data
+	//const name_input = user_card.getElementById('uname')
+	const password_input = document.getElementById(`password_${user_ID}`)
+	const email_input = document.getElementById(`email_${user_ID}`)
+	const approximation_input = document.getElementById(`approximation_${user_ID}`)
+	const regExp = /\s|[,;\/.\\\]\[{}()\-=+#*`]/;
+	var valid = true;
+
+  // // Username validation
+  // if (regExp.test(name_input.value)) {
+  //     name_input.setCustomValidity("user name cant have whitespace or special characters")
+  //   valid = false
+  // } else {
+	//   name_input.setCustomValidity("")
+  // }
+
+  // Password validation
+  if (password_input.value.length < 8) {
+    password_input.setCustomValidity("Password must be at least 8 characters long.");
+    valid = false;
+  } else if (regExp.test(password_input.value)) {
+   password_input.setCustomValidity(`Password cannot have whitespace or the following characters: ${regExp}.`);
+   valid = false;
+  } else {
+	password_input.setCustomValidity("")
+  }
+  password_input.reportValidity()
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	if (!emailRegex.test(email_input.value)) {
+    email_input.setCustomValidity( "Invalid email format.");
+    valid = false;
+  } else {
+	  email_input.setCustomValidity("")
+  }
+	email_input.reportValidity()
+
+  // Other input validation
+  if (/[,;\/.\\\]\[{}()\-=+#*`]/.test(approximation_input.value)) {
+	  approximation_input.setCustomValidity(`This field cannot have the following characters: ${/|[,;\/.\\\]\[{}()\-=+#*`]/}.`);
+	  valid = false;
+  } else {
+	  approximation_input.setCustomValidity("")
+  }
+  approximation_input.reportValidity()
+
+  return valid
+}
+
+async function update_user(user_ID){
+	const user_card = document.querySelector(`#user_${user_ID}`)
+	if (!validate_user_data_admin_modal(user_card)){
+		return false
+	}
+
+	//const name_input = user_card.getElementById('uname').value
+	const user_password = document.getElementById(`password_${user_ID}`).value
+	const user_email = document.getElementById(`email_${user_ID}`).value
+	const user_approximation = document.getElementById(`approximation_${user_ID}`).value
+	const user_is_admin = document.getElementById(`admin_${user_ID}`).checked
+	const user_accesstype = document.getElementById(`accesstype_${user_ID}`).value
+
+	const upadteUserPromise = await fetch('/homepage/updateuserdata', {
+  method: "POST",
+  body: JSON.stringify({
+    user_ID: user_ID,
+    email: user_email,
+	  password: user_password,
+	  approximation: user_approximation,
+	  access_type: user_accesstype,
+	  is_admin: user_is_admin
+  }),
+  headers: {
+    "Content-type": "application/json; charset=UTF-8"
+  }
+}).then((response) => response.json()).then((user_data) => {
+
+		if (user_data['success']) {
+			document.querySelector(`#user_${user_data['user_ID']}`).classList.remove('failed')
+			document.querySelector(`#user_${user_data['user_ID']}`).classList.add('success')
+		} else {
+			document.querySelector(`#user_${user_data['user_ID']}`).classList.remove('success')
+			document.querySelector(`#user_${user_data['user_ID']}`).classList.add('failed')
+		}
+		alert(user_data['text'])
+});
+}
+
+
 
 /* ---------------------------------------------------------------------- */
 /*	search modal
@@ -674,6 +981,8 @@ var search_input = document.querySelector('input#search_input')
 // When the user clicks on the button, open the new post modal
 if (search_btn) {
 	search_btn.onclick = function () {
+		// loads posts to the search modal
+		load_posts_for_search()
 		search_modal.style.display = "block";
 		document.body.style.overflow = 'hidden';
 		$('html').getNiceScroll().hide();
@@ -758,6 +1067,9 @@ if (search_input){
 // function to execute when user wants to exit modal
 function close_modal(modal){
 	modal.style.display = "none";
+	if (modal === admin_modal){
+		admin_modal.querySelector('.admin_search_results').innerHTML = ""
+	}
 	$('html').getNiceScroll().show();
 }
 
@@ -768,6 +1080,8 @@ window.onmouseup = function(event) {
 	  close_modal(new_post_modal)
   } else if (event.target === search_modal){
 	  close_modal(search_modal)
+  } else if (event.target === admin_modal){
+	  close_modal(admin_modal)
   }
 }
 
@@ -832,7 +1146,7 @@ function showSuccess(input) {
     const error = document.querySelector(`.container small.${input.getAttribute('name')}_err`);
 	error.classList.add('hidden')
     error.textContent = '';
-};
+}
 
 function new_post_validation() {
   // Get form elements
@@ -888,7 +1202,11 @@ function new_post_validation() {
 function showinbig(img){
 	let showinbig = document.querySelector('.showinbig-div')
 	showinbig.classList.remove('hidden')
-	showinbig.querySelector('img').setAttribute('src', img.getAttribute('src'))
+
+	if (img.tagName === 'IMG'){
+		showinbig.innerHTML = `<img class="sha" src="${img.getAttribute('src')}">`
+		showinbig.onclick = () => {showinbig.classList.add('hidden')}
+	}
 }
 
 // like/dislike function - add or remove like from a post
@@ -958,6 +1276,7 @@ function edit_post(post_id){
 		return
 	}
 	if (!checkSession('editpost')) intro_editpost()
+	document.querySelector('.show_postpage_intro').setAttribute('onclick', "intro_editpost()")
 
 	document.querySelector('.single-box-content').style = 'border: 7px solid blue'
 	document.querySelector('.edit_post').innerText = "exit edit mode"
@@ -970,36 +1289,42 @@ function edit_post(post_id){
 	// set cover image change and delete image feature
 	const post_imgs = document.querySelectorAll('div.main-images div.img-card')
 	let cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
-	for (let i = 0; i < post_imgs.length; i++){
-		let make_cover_btn = post_imgs[i].querySelector('.make_cover')
-		let delete_image_btn = post_imgs[i].querySelector('.delete_img')
+	if (post_imgs.length > 0) {
+		for (let i = 0; i < post_imgs.length; i++) {
+			post_imgs[i].querySelector('.edit_image').classList.remove('hidden')
+			let make_cover_btn = post_imgs[i].querySelector('.make_cover')
+			let delete_image_btn = post_imgs[i].querySelector('.delete_img')
 
-		make_cover_btn.parentElement.classList.remove('hidden')
+			if (make_cover_btn) {
+				make_cover_btn.addEventListener('click', function (event) {
+					const img_card = event.target.closest('.img-card')
+					if (img_card.classList.contains('cover-img')) {
+						img_card.classList.remove('cover-img')
 
-		make_cover_btn.addEventListener('click', function (event){
-			const img_card = event.target.closest('.img-card')
-			if (img_card.classList.contains('cover-img')){
-				img_card.classList.remove('cover-img')
-
-			} else {
-				img_card.classList.add('cover-img')
-				if (cover_imgs.length === 3) {
-					let removed_from_cover = cover_imgs.pop()
-					removed_from_cover.classList.remove('cover-img')
-				}
+					} else {
+						img_card.classList.add('cover-img')
+						if (cover_imgs.length === 3) {
+							let removed_from_cover = cover_imgs.pop()
+							removed_from_cover.classList.remove('cover-img')
+						}
+					}
+					cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
+				})
 			}
-			cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
-		})
-		delete_image_btn.addEventListener('click', function (event){
-			const img_card = event.target.closest('.img-card')
-			if (img_card.classList.contains('delete-img')){
-				img_card.classList.remove('delete-img')
-			} else {
-				img_card.classList.add('delete-img')
+			if (delete_image_btn) {
+				delete_image_btn.addEventListener('click', function (event) {
+					const img_card = event.target.closest('.img-card')
+					if (img_card.classList.contains('delete-img')) {
+						img_card.classList.remove('delete-img')
+					} else {
+						img_card.classList.add('delete-img')
+					}
+				})
 			}
-		})
+		}
+
+		document.querySelector('.select-images-info').classList.remove('hidden')
 	}
-	document.querySelector('.select-images-info').classList.remove('hidden')
 
 
 	// make post name an input to allow user to change it
@@ -1089,10 +1414,63 @@ let login_button = document.getElementById('login-btn')
 		login_button.addEventListener('click', function () {
 			if (validate_login_Form()) {
 				start_preloader('')
-				document.getElementById('login-form').submit()
+				let login_promise = fetch("/login/checkuser", {
+					  method: "POST",
+					  body: JSON.stringify({
+						uname: document.querySelector('#username').value,
+					    password: document.querySelector('#login_password').value
+					  }),
+					  headers: {
+						"Content-type": "application/json; charset=UTF-8"
+					  }
+					});
+					  login_promise.then((response) => response.json()).then((response_data) => {
+						  if (response_data){
+							  location.href = '/'
+						  } else {
+							  hide_preloader();
+							  document.querySelector('.login_error_msg').innerHTML = 'One of the credentials is wrong :('
+						  }
+					  });
 			}
 		})
 	}
+
+let signup_button = document.getElementById('signup-btn')
+	if (signup_button) {
+		signup_button.addEventListener('click', function () {
+			if (validate_signup_Form()) {
+				start_preloader('')
+				let signup_promise = fetch("/login/register", {
+					method: "POST",
+					body: JSON.stringify({
+						uname: document.querySelector('#uname').value,
+					    psw: document.querySelector('#signup_password').value,
+						email: document.querySelector('#email').value,
+						approximation: document.querySelector('#approximation').value,
+						approximation_more_info: document.querySelector('#approximation_more_info').value
+					  }),
+					  headers: {
+						"Content-type": "application/json; charset=UTF-8"
+					  }
+					});
+					  signup_promise.then((response) => response.json()).then((response_status) => {
+						  if (response_status === 201){
+							  location.href = "/"
+						  } else if (response_status === 204){
+							  location.href = "/login"
+						  } else {
+							  hide_preloader();
+							  document.querySelector('.signup_error_msg').innerHTML = "Can't add user, please try again"
+						  }
+					  });
+
+
+				//document.getElementById('signup-form').submit()
+			}
+		})
+	}
+
 function validate_login_Form() {
 	const name_input = document.getElementById('username')
 	const password_input = document.getElementById('login_password')
@@ -1128,7 +1506,7 @@ function validate_login_Form() {
 // sign up form validation
 function validate_signup_Form() {
 	const name_input = document.getElementById('uname')
-	const password_input = document.getElementById('psw')
+	const password_input = document.getElementById('signup_password')
 	const email_input = document.getElementById('email')
 	const approximation_input = document.getElementById('approximation_more_info')
 	const regExp = /\s|[,;\/.\\\]\[{}()\-=+#*`]/;
@@ -1238,30 +1616,35 @@ async function fetch_tags() {
 // Function used when clicking a tag, shows only the post with that specific tag
 // pressing again on an activated tag disables it and shows all posts
 function tag_press(tag){
+		if (location.href.split(location.host)[1] !== "/"){
+			setCookie('filter_press', JSON.stringify({"type": "tag", "filter": tag.toLowerCase()}), 1)
+			location.href = "/"
+		}
 	const all_posts = document.querySelectorAll('.blog-box > .post');
-	const tag_name = tag.innerText.toLowerCase();
-
-	// Show all posts
-	for (i = 0; i < all_posts.length; ++i) {
-			all_posts[i].classList.remove('hidden')
-	}
+	const tag_name = tag.toLowerCase();
 
 	// If an active tag filter has been pressed -> remove filter
+	tag = document.querySelector(`.categories-box .${tag_name}`)
 	if (tag.querySelector('i').classList.contains('fa-arrow-circle-right')){
 		tag.querySelector('i').classList.remove('fa-arrow-circle-right')
-
+		// Show all posts
+		for (let i = 0; i < all_posts.length; i++){
+			all_posts[i].classList.remove('hidden')
+		}
 	// Otherwise -> change filter to the pressed one
 	} else {
 		// Remove active marker from the previous filter btn
 		const tags_btn = document.querySelectorAll('ul.categories i.fa')
-		for (i = 0; i < tags_btn.length; i++){
+		for (let i = 0; i < tags_btn.length; i++){
 		tags_btn[i].classList.remove('fa-arrow-circle-right')
 		}
 
-		// Hide irelevant posts
-		for (i = 0; i < all_posts.length; ++i) {
+		// show only relevant posts
+		for (let i = 0; i < all_posts.length; ++i) {
 			if (!get_tags(all_posts[i]).includes(tag_name)) {
 				all_posts[i].classList.add('hidden')
+			} else {
+				all_posts[i].classList.remove('hidden')
 			}
 		}
 		tag.querySelector('i').classList.add('fa-arrow-circle-right')
@@ -1285,10 +1668,14 @@ function get_tags(post){
 function load_tags_in_header(){
 	const tagsPromise = fetch_tags()
 	const tag_box = document.querySelector('.categories-box ul.categories')
-	let tag_tamplate = ""
+	let tag_template = ""
 	tagsPromise.then((tags) => {
 		for (let i = 0; i < tags.length ; i++){
-			tag_box.innerHTML += `<li><a onclick="tag_press(this)"><i class="fa" aria-hidden="true"></i>${tags[i][0].capitalize()}</a></li>`
+			tag_box.innerHTML += `<li><a onclick="tag_press(this.innerText)" class="${tags[i][0]}"><i class="fa" aria-hidden="true"></i>${tags[i][0].capitalize()}</a></li>`
+		}
+		let current_tag = document.querySelector('.categories-box').getAttribute('current_filter')
+		if (current_tag){
+			document.querySelector(`.categories-box .${current_tag} i`).classList.add('fa-arrow-circle-right')
 		}
 	})
 }
@@ -1298,10 +1685,14 @@ function load_tags_in_header(){
 function load_periods_in_header(){
 	const periodsPromise = fetch_periods()
 	const period_box = document.querySelector('.periods-box ul.periods')
-	let period_tamplate = ""
+	let period_template = ""
 	periodsPromise.then((periods) => {
 		for (let i = 0; i < periods.length ; i++){
-			period_box.innerHTML += `<li><a onclick="period_press(this)"><i class="fa" aria-hidden="true"></i>${periods[i][0].capitalize()}</a></li>`
+			period_box.innerHTML += `<li><a onclick="period_press(this.innerText)" class="${periods[i][0]}"><i class="fa" aria-hidden="true"></i>${periods[i][0].capitalize()}</a></li>`
+		}
+		let current_period = document.querySelector('.periods-box').getAttribute('current_filter')
+		if (current_period){
+			document.querySelector(`.periods-box .${current_period} i`).classList.add('fa-arrow-circle-right')
 		}
 	})
 }
@@ -1329,29 +1720,35 @@ async function fetch_periods() {
 // Function used when clicking a period, shows only the post with that specific period
 // pressing again on an activated period disables it and shows all posts
 function period_press(period){
+	if (location.href.split(location.host)[1] !== "/"){
+			setCookie('filter_press', JSON.stringify({"type": "period", "filter": period.toLowerCase()}), 1)
+			location.href = "/"
+		}
 	const all_posts = document.querySelectorAll('.blog-box > .post');
-	const period_name = period.innerText.toLowerCase();
+	const period_name = period.toLowerCase();
 
-	// Show all posts
-	for (i = 0; i < all_posts.length; ++i) {
-			all_posts[i].classList.remove('hidden')
-	}
 
 	// If an active period filter has been pressed -> remove filter
+	period = document.querySelector(`.periods-box .${period_name}`)
 	if (period.querySelector('i').classList.contains('fa-arrow-circle-right')){
 		period.querySelector('i').classList.remove('fa-arrow-circle-right')
-
+		// Show all posts
+		for (let i = 0; i < all_posts.length; ++i) {
+				all_posts[i].classList.remove('hidden')
+		}
 	// Otherwise -> change filter to the pressed one
 	} else {
 		// Remove active marker from the previous filter btn
 		const periods_btn = document.querySelectorAll('ul.periods i.fa')
-		for (i = 0; i < periods_btn.length; i++){
+		for (let i = 0; i < periods_btn.length; i++){
 		periods_btn[i].classList.remove('fa-arrow-circle-right')
 		}
 
-		// Hide irelevant posts
-		for (i = 0; i < all_posts.length; ++i) {
-			if (all_posts[i].getAttribute('lifeperiod') !== period_name) {
+		// show only relevant posts
+		for (let i = 0; i < all_posts.length; ++i) {
+			if (all_posts[i].querySelector('.post_period span').innerHTML.toLocaleLowerCase() === period_name) {
+				all_posts[i].classList.remove('hidden')
+			} else {
 				all_posts[i].classList.add('hidden')
 			}
 		}
@@ -1365,11 +1762,20 @@ function period_press(period){
 function start_preloader(message){
 	const preloader = document.querySelector('.preloader')
 	preloader.style.display = 'flex'
+	preloader.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
+	try {
+		$('html').getNiceScroll().hide()
+	} catch {}
 	if (message){
 		preloader.querySelector('.preloader_massage').innerText = message
 	} else {
 		preloader.querySelector('.preloader_massage').innerHTML = "Life is a PARTY"
 	}
+}
+
+function hide_preloader(){
+		const preloader = document.querySelector('.preloader')
+		preloader.style.display = 'none'
 }
 
 window.addEventListener('beforeunload', function (e) {
@@ -1380,7 +1786,9 @@ function setCookie(c_name,value,exdays){var exdate=new Date();exdate.setDate(exd
 
 function getCookie(c_name){var c_value = document.cookie;var c_start = c_value.indexOf(" " + c_name + "=");if (c_start == -1){c_start = c_value.indexOf(c_name + "=");}if (c_start == -1){c_value = null;}else{c_start = c_value.indexOf("=", c_start) + 1;var c_end = c_value.indexOf(";", c_start);if (c_end == -1){c_end = c_value.length;}c_value = unescape(c_value.substring(c_start,c_end));}return c_value;}
 
-
+function deleteCookie(name) {
+    document.cookie = name+'=; Max-Age=-99999999;';
+}
 
 function checkSession(page_name, value='yes'){
 	let c = getCookie(`visited_${page_name}`);
@@ -1434,6 +1842,9 @@ function intro_postpage(){
 	  }, {
 		  element: document.querySelector('.postlikebtn'),
 		  intro: "Click here to like the post, login in order to like a post"
+	  }, {
+		  element: document.querySelector('.show_postpage_intro'),
+		  intro: "Click here to see this guide again"
 	  },
 		  {
 			  intro: "Thats it, feel free to wonder around some posts :)"
@@ -1483,5 +1894,36 @@ function intro_editpost(){
 		  {
 			  intro: `Have fun :)`
 		  }]
+	}).start();
+	}
+
+function intro_newpost(){
+	introJs("#newpostmodal").setOptions({
+		disableInteraction: true,
+	  steps: [{
+		  title: "Post upload guide",
+		intro: "This is were you can upload posts"
+	  },{
+		element: document.querySelector('#post_name'),
+		intro: "Enter here the name of the post, make it meaningful and clear"
+	  }, {
+		element: document.querySelector('#post_year'),
+		intro: "Enter here the year of the event/memory, this will help us organize the posts in the future"
+	  }, {
+		element: document.querySelector('#free_text'),
+		intro: "If you want to share something you wrote please enter it here, Otherwise describe the event"
+	  }, {
+		element: document.querySelector('#access_type'),
+		intro: "Important part here, set who can see your post"
+	  }, {
+		element: document.querySelector('.new_post_tags'),
+		intro: "Categorize your post with this tags, notice that the 'Ilay' tag is ment for posts that contain images of Ilay alone"
+	  }, {
+		element: document.querySelector('.dz-clickable'),
+		intro: "Click and select or drag your images to here"
+	  }, {
+		element: document.querySelector('#upload-btn'),
+		intro: "After you finished click here and wait for your post to upload"
+	  }]
 	}).start();
 	}
