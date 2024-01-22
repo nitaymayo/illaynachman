@@ -21,8 +21,9 @@ def index(post_id):
                  f"FROM post "
                  f"WHERE post_id = {post_id}")
         res = dbManager.fetch(query)
-        if res == False:
-            raise Exception("Problem with the DB", 303)
+        if not res:
+            return redirect('/pagenotfound')
+            # raise Exception("Problem with the DB", 303)
         else:
             post_data = res[0]
 
