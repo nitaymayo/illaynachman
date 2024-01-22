@@ -183,8 +183,10 @@ def new_post():
     if not session:
         flash('Login is required to upload a post')
         return redirect(url_for('login.index'))
-
-    data = json.loads(request.form['data'])
+    try:
+        data = json.loads(request.form['data'])
+    except Exception as e:
+        return e.description, e.code
     post_name = data['post_name']
     post_year = data['post_year']
     post_description = data['post_description']

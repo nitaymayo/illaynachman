@@ -160,8 +160,10 @@ def deletepost():
 def update_post():
     if not session:
         return "Please signin", 401
-
-    data = json.loads(request.form.to_dict()['data'])
+    try:
+        data = json.loads(request.form.to_dict()['data'])
+    except Exception as e:
+        return e.description, e.code
     post_id = data["post_id"]
 
     # Pull post data

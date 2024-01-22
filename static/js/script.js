@@ -289,7 +289,7 @@ $(document).ready(function($) {
 				});
 			});
 			for (let i = 0; i < videos_tags.length; i++) {
-				videos_tags.onloadeddata = function () {
+				videos_tags[i].onloadeddata = function () {
 					image_container.isotope({
 						layoutMode: 'masonry',
 						animationOptions: {
@@ -481,8 +481,8 @@ $(document).ready(function($) {
 			addRemoveLinks: true,
 			autoProcessQueue: false,
 			uploadMultiple: true,
-			parallelUploads: 50,
-			maxFiles: 50,
+			maxFilesize: 16000,
+			parallelUploads: 30,
 			init: function (){
 				let myDropzone = this;
 
@@ -499,10 +499,12 @@ $(document).ready(function($) {
 							  start_preloader('Uploading your post...')
 							  myDropzone.uploadFile(blob);
 						  }
+					  } else if (myDropzone.getQueuedFiles().length > 30){
+							  alert("To many files, please select 30 or less")
 					  } else {
-						  start_preloader('Uploading your post...')
-						  myDropzone.processQueue();
-					  }
+							  start_preloader('Uploading your post...')
+							  myDropzone.processQueue();
+						  }
 				  } else {
 					  $(".modal-content").animate({ scrollTop: 0 }, "smooth");
 				  }
@@ -536,6 +538,36 @@ $(document).ready(function($) {
 				this.on("successmultiple", function(files, response) {
 			      document.location = '/'
 			    });
+				this.on("errormultiple", (files, response) => {
+					hide_preloader()
+					const all_previews = document.querySelectorAll('#newPostDropzone .dz-preview')
+					for (let i = 0; i < files.length ; i++){
+						files[i].status = "queued"
+						all_previews[i].classList.remove('dz-error')
+						all_previews[i].classList.remove('dz-complete')
+					}
+					alert("Something went wrong, please refresh the page and try to upload the post again\n Error: " + response)
+					try{
+						$('html').getNiceScroll().show()
+					} catch {}
+				})
+
+				this.on("addedfile", function (file){
+				  if (file.size > 16*1e6){
+					  alert(`File ${file.name} is to big, max size is 16mb`)
+					  this.removeFile(file)
+				  } else if (myDropzone.getQueuedFiles().length === 30){
+					  alert(`Too many files, max allowed with each upload is 30`)
+					  this.removeFile(file)
+					  this.stopPropagation()
+				  } else {
+					  document.querySelector('#newpostmodal .images_number').innerHTML = `(${myDropzone.getQueuedFiles().length + 1} images selected)`
+				  }
+
+				});
+				this.on("removedfile", function (){
+					document.querySelector('#newpostmodal .images_number').innerHTML = `(${myDropzone.getQueuedFiles().length} images selected)`
+				})
 			}
 		})
 
@@ -547,8 +579,8 @@ $(document).ready(function($) {
 			addRemoveLinks: true,
 			autoProcessQueue: false,
 			uploadMultiple: true,
-			parallelUploads: 50,
-			maxFiles: 50,
+			maxFilesize: 16000,
+			parallelUploads: 30,
 			init: function (){
 				let myDropzone = this;
 
@@ -562,6 +594,8 @@ $(document).ready(function($) {
 					  blob.upload = {'chunked': myDropzone.options.chunking};
 					  start_preloader('Updating your post...')
 					  myDropzone.uploadFile(blob);
+				  } else if ((myDropzone.getQueuedFiles().length + document.querySelectorAll('.post-images .img-card:not(.delete-img)').length) > 30){
+					  alert("To many files, please select 30 or less")
 				  } else {
 					  start_preloader('Updating your post...')
 					  myDropzone.processQueue();
@@ -573,6 +607,39 @@ $(document).ready(function($) {
 				this.on("successmultiple", function(files, response) {
 			      location.reload()
 			    });
+
+				this.on("addedfile", function (file){
+					const files_length = (myDropzone.getQueuedFiles().length + document.querySelectorAll('.post-images .img-card:not(.delete-img)').length)
+				   if (file.size > 16*1e6){
+					  alert(`File ${file.name} is to big, max size is 16mb`)
+					  this.removeFile(file)
+				  } else if (files_length === 30){
+					  alert(`Too many files, max allowed with each upload is 30`)
+					  this.removeFile(file)
+					  this.stopPropagation()
+				  } else {
+					  document.querySelector('#uploadNewPhotos .images_number').innerHTML = `(${files_length} images selected)`
+				  }
+
+				});
+
+				this.on("removedfile", function (){
+					document.querySelector('#uploadNewPhotos .images_number').innerHTML = `(${(myDropzone.getQueuedFiles().length + document.querySelectorAll('.post-images .img-card:not(.delete-img)').length)} images selected)`
+				})
+
+				this.on("errormultiple", (files, response) => {
+					hide_preloader()
+					const all_previews = document.querySelectorAll('#newPostDropzone .dz-preview')
+					for (let i = 0; i < files.length ; i++){
+						files[i].status = "queued"
+						all_previews[i].classList.remove('dz-error')
+						all_previews[i].classList.remove('dz-complete')
+					}
+					alert("Something went wrong, please refresh the page and try to upload the post again\n Error: " + response)
+					try{
+						$('html').getNiceScroll().show()
+					} catch {}
+				})
 			}
 		})
 	})
@@ -677,11 +744,11 @@ if (new_post_btn) {
 		document.body.style.overflow = 'hidden';
 		$('html').getNiceScroll().hide();
 		$('#newpostmodal>div.modal-content').niceScroll()
-		const visited_newpost = getCookie('visited_newpost')
-		if (visited_newpost !== "yes"){
-			intro_newpost()
-			setCookie("visited_newpost", "yes", 30)
-		}
+		// const visited_newpost = getCookie('visited_newpost')
+		// if (visited_newpost !== "yes"){
+		// 	intro_newpost()
+		// 	setCookie("visited_newpost", "yes", 30)
+		// }
 	})
 
 	// When the user clicks on <span> (x), close the modal
@@ -1222,39 +1289,42 @@ function edit_post(post_id){
 	// set cover image change and delete image feature
 	const post_imgs = document.querySelectorAll('div.main-images div.img-card')
 	let cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
-	for (let i = 0; i < post_imgs.length; i++){
-		post_imgs[i].querySelector('.edit_image').classList.remove('hidden')
-		let make_cover_btn = post_imgs[i].querySelector('.make_cover')
-		let delete_image_btn = post_imgs[i].querySelector('.delete_img')
+	if (post_imgs.length > 0) {
+		for (let i = 0; i < post_imgs.length; i++) {
+			post_imgs[i].querySelector('.edit_image').classList.remove('hidden')
+			let make_cover_btn = post_imgs[i].querySelector('.make_cover')
+			let delete_image_btn = post_imgs[i].querySelector('.delete_img')
 
-		if (make_cover_btn) {
-			make_cover_btn.addEventListener('click', function (event) {
-				const img_card = event.target.closest('.img-card')
-				if (img_card.classList.contains('cover-img')) {
-					img_card.classList.remove('cover-img')
+			if (make_cover_btn) {
+				make_cover_btn.addEventListener('click', function (event) {
+					const img_card = event.target.closest('.img-card')
+					if (img_card.classList.contains('cover-img')) {
+						img_card.classList.remove('cover-img')
 
-				} else {
-					img_card.classList.add('cover-img')
-					if (cover_imgs.length === 3) {
-						let removed_from_cover = cover_imgs.pop()
-						removed_from_cover.classList.remove('cover-img')
+					} else {
+						img_card.classList.add('cover-img')
+						if (cover_imgs.length === 3) {
+							let removed_from_cover = cover_imgs.pop()
+							removed_from_cover.classList.remove('cover-img')
+						}
 					}
-				}
-				cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
-			})
+					cover_imgs = Array.from(document.querySelectorAll('div.main-images div.cover-img'))
+				})
+			}
+			if (delete_image_btn) {
+				delete_image_btn.addEventListener('click', function (event) {
+					const img_card = event.target.closest('.img-card')
+					if (img_card.classList.contains('delete-img')) {
+						img_card.classList.remove('delete-img')
+					} else {
+						img_card.classList.add('delete-img')
+					}
+				})
+			}
 		}
-		if (delete_image_btn){
-			delete_image_btn.addEventListener('click', function (event) {
-				const img_card = event.target.closest('.img-card')
-				if (img_card.classList.contains('delete-img')) {
-					img_card.classList.remove('delete-img')
-				} else {
-					img_card.classList.add('delete-img')
-				}
-			})
-		}
+
+		document.querySelector('.select-images-info').classList.remove('hidden')
 	}
-	document.querySelector('.select-images-info').classList.remove('hidden')
 
 
 	// make post name an input to allow user to change it

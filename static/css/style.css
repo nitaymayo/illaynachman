@@ -494,6 +494,10 @@ p.copyright {
     }
 }
 
+#newpostmodal .images_number{
+    font-size: 20px;
+}
+
 .dropzone{
     border: 2px dashed var(--lead-brown) !important;
     margin-bottom: 10px;
