@@ -7,7 +7,7 @@
                 <p class="username">Hello, {{ session['name'] }} {% if session['is_admin'] %}(admin){% endif %}</p>
                 {% endif %}
                 {% if page_head_title == 'Homepage' %}
-                <span class="show_homepage_intro" onclick="intro_homepage()">?</span>
+                    <span class="show_homepage_intro" onclick="intro_homepage()"><i class="fa fa-lightbulb-o" aria-hidden="true"></i></span>
                 {% endif %}
 			</div>
 
