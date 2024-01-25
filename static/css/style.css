@@ -1406,6 +1406,10 @@ ul.tab-links li a.active {
     margin: 0 5px 5px 0;
 }
 
+.post-images .img-card.video-card{
+    width: 62%;
+}
+
 .post-images .img-card img {
     width: 100%;
     transition-duration: 60ms;
@@ -1414,8 +1418,8 @@ ul.tab-links li a.active {
     transform: scale(1.1);
 }
 
-.post-images .img-card video {
-    width: 200%;
+.post-images .video-card video {
+    width: 100%;
     height: auto;
     transition-duration: 60ms;
 }
@@ -1604,7 +1608,7 @@ ul.tab-links li a.active {
     }
 }
 
-.flexslider .slides {
+.showinbig-div .flexslider .slides {
     display: inline-flex;
 }
 
