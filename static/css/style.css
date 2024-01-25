@@ -1618,7 +1618,8 @@ ul.tab-links li a.active {
 
 
 .showinbig-div video{
-    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .showinbig-div .showinbig_img_container{
@@ -1644,9 +1645,11 @@ ul.tab-links li a.active {
 .showinbig-div .slideshow_btn.previous_slide{
     left: 5px;
 }
-.showinbig-div img{
-    max-width: 80vw;
+.showinbig-div .slides li img{
+    max-width: 100%;
+    width: initial;
     box-shadow: -9px 10px 96px -31px rgba(0,0,0,0.89);
+    margin: 0 auto;
 }
 
 @media only screen and (min-width: 600px){

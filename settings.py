@@ -13,7 +13,7 @@ APPLICATION_ROOT = '/'
 SECRET_KEY = os.environ.get('SECRET_KEY')
 # Set session lifetime, default value is timedelta(days=31)
 #   see: https://docs.python.org/3/library/datetime.html#datetime.timedelta
-PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
+PERMANENT_SESSION_LIFETIME = timedelta(days=365)
 
 ''' Database '''
 # DB base configuration from .env for modularity and security reasons
