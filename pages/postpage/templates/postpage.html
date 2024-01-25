@@ -7,8 +7,12 @@
 {% endblock %}
 
 {% block page_body_main_content %}
-    <div class="showinbig-div hidden" onclick="this.classList.add('hidden')">
-    <img class="" src="#">
+    <div class="showinbig-div hidden">
+        <div class="flexslider">
+            <ul class="slides">
+
+            </ul>
+        </div>
     </div>
 <div id="content">
 			<div class="inner-content">
@@ -60,15 +64,15 @@
                                    {% for img in images %}
                                         <div class="img-card {% if img.cover %}cover-img{% endif %}" draggable="true">
                                             {% if img.type == 'image' %}
-                                            <img onclick="showinbig(this)" src="{{ url_for('static', filename=('media/posts' + img.location)) }}" alt="{{ img.location }}">
+                                            <img onclick="showinbig(this.parentElement)" src="{{ url_for('static', filename=('media/posts' + img.location)) }}" alt="{{ img.location }}">
                                             <div class="edit_image hidden">
                                                 <div class="make_cover"><i class="fa fa-plus-circle "></i> </div>
                                                 <div class="delete_img"><i class="fa fa-trash-o"></i></div>
                                             </div>
                                             {% elif img.type == 'video' %}
 
-                                            <video controls muted preload="metadata" >
-                                            <source src="{{ url_for('static', filename=('media/posts' + img.location)) }}" type="video/{{ img.location.split('.')[-1] }}" alt="{{ img.location }}" />
+                                            <video muted preload="metadata" controls playsinline="" >
+                                            <source onclick="showinbig(this.parentElement())" src="{{ url_for('static', filename=('media/posts' + img.location)) }}" type="video/{{ img.location.split('.')[-1] }}" alt="{{ img.location }}" />
                                             <p>
                                                 Your browser doesn't support HTML video. Here is a
                                                 <a href="{{ url_for('static', filename=('media/posts' + img.location)) }}">link to the video</a> instead.
