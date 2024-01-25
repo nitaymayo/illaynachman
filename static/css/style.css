@@ -1278,12 +1278,15 @@ ul.tab-links li a.active {
     font-weight: 300;
     margin: 0 0 25px;
     line-height: 30px;
-    white-space: pre-wrap
+    white-space: pre-wrap;
 }
 
 .project-text {
     border-bottom: 1px solid #e5e5e5;
     margin-bottom: 25px;
+}
+.project-text .post_description{
+    overflow-y: scroll;
 }
 /* Post edit description style */
 .project-text textarea{
@@ -1410,8 +1413,9 @@ ul.tab-links li a.active {
 .post-images .img-card img:hover {
     transform: scale(1.1);
 }
+
 .post-images .img-card video {
-    width: 100%;
+    width: 200%;
     height: auto;
     transition-duration: 60ms;
 }
@@ -1580,11 +1584,63 @@ ul.tab-links li a.active {
     top: 0;
     background-color: rgba(128, 128, 128, 0.29);
     display: flex;
+    flex-flow: row nowrap;
     justify-content: center;
-    align-content: center;
+    align-items: center;
+}
+
+.showinbig-div .flexslider{
+    background-color: transparent;
+    width: 80vw;
+}
+
+.showinbig-div .flex-direction-nav a {
+    display: none;
+}
+
+@media only screen and (min-width: 600px){
+    .showinbig-div .flex-direction-nav a {
+        display: block;
+    }
+}
+
+.flexslider .slides {
+    display: inline-flex;
+}
+
+.flexslider .slides > li {
+    height: fit-content;
+}
+
+
+.showinbig-div video{
+    width: 100%;
+}
+
+.showinbig-div .showinbig_img_container{
+    position: relative;
+}
+
+
+.showinbig-div .slideshow_btn{
+    font-size: 80px;
+    margin: 5%;
+    position: absolute;
+    bottom: 35%;
+    transition-duration: 50ms;
+}
+.showinbig-div .slideshow_btn:hover{
+    transform: scale(1.2);
+}
+
+.showinbig-div .slideshow_btn.next_slide{
+    right: 5px;
+}
+
+.showinbig-div .slideshow_btn.previous_slide{
+    left: 5px;
 }
 .showinbig-div img{
-    margin: auto;
     max-width: 80vw;
     box-shadow: -9px 10px 96px -31px rgba(0,0,0,0.89);
 }

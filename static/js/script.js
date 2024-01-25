@@ -9,6 +9,10 @@ Object.defineProperty(String.prototype, 'capitalize', {
   enumerable: false
 });
 
+function getDomIndex (target) {
+	return [].slice.call(target.parentNode.children).indexOf(target)
+}
+
 // check mobile function
 window.mobileCheck = function() {
   let check = false;
@@ -80,7 +84,7 @@ $(document).ready(function($) {
 	/*-------------------------------------------------*/
 	try {
 
-		var SliderPost = $('.flexslider');
+		var SliderPost = $('.flexslider.post-slide, .flexslider.post_slider');
 
 		SliderPost.flexslider({
 			animation: "fade",
@@ -89,6 +93,9 @@ $(document).ready(function($) {
 	} catch(err) {
 
 	}
+
+
+
 
 	/*-------------------------------------------------*/
 	/* =  header height fix
@@ -129,12 +136,12 @@ $(document).ready(function($) {
 
 	}
 
-	try {
-		var post_description = $("p.post_description");
-		post_description.niceScroll();
-	} catch(err) {
-
-	}
+	// try {
+	// 	var post_description = $("p.post_description");
+	// 	post_description.niceScroll();
+	// } catch(err) {
+	//
+	// }
 
 
 	/* ---------------------------------------------------------------------- */
@@ -1199,13 +1206,52 @@ function new_post_validation() {
 }
 
 // Function used in post page, makes the clicked photo appear big in the center of the screen
-function showinbig(img){
-	let showinbig = document.querySelector('.showinbig-div')
-	showinbig.classList.remove('hidden')
+function showinbig(img_card){
+	const showinbig_div = $('.showinbig-div');
+	showinbig_div.removeClass('hidden')
+	showinbig_div.on("click", close_showinbig)
+	const showinbig_slides = $('.showinbig-div .slides')
+	// IF showingib_flexslider not set, load it with the post images
+	if (showinbig_slides.html() !== "") {
+		const post_files = document.querySelectorAll('.img-card img, .img-card source')
+		for (let index in post_files) {
+			let li;
+			if (post_files[index].tagName === 'IMG') {
+				li = $(`<li><img src="${post_files[index].getAttribute('src')}"></li>`)[0]
+			} else if (post_files[index].tagName === 'SOURCE') {
+				li = $(`<li> <video controls muted preload="metadata" >
+                    <source src="${post_files[index].getAttribute('src')}" type="${post_files[index].getAttribute('type')}" />
+                    <p>
+                        Your browser doesn't support HTML video. Here is a
+                        <a href="${post_files[index].getAttribute('src')}">link to the video</a> instead.
+                      </p>
 
-	if (img.tagName === 'IMG'){
-		showinbig.innerHTML = `<img class="sha" src="${img.getAttribute('src')}">`
-		showinbig.onclick = () => {showinbig.classList.add('hidden')}
+                    </video></li>`)[0]
+			}
+			showinbig_slides.append(li)
+		}
+
+		//make the flexslider
+		try {
+			var showinbig_slider = $('.showinbig-div .flexslider');
+			showinbig_slider.flexslider({
+				animation: "slide",
+				video: true,
+				slideshow: false,
+				smoothHeight: true
+			});
+		} catch (err) {
+
+		}
+	}
+
+	// show clicked img
+	showinbig_slider.flexslider(getDomIndex(img_card))
+}
+
+function close_showinbig(event){
+	if (event.target === document.querySelector('.showinbig-div')){
+		document.querySelector('.showinbig-div').classList.add('hidden')
 	}
 }
 
