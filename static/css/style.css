@@ -662,7 +662,7 @@ ul li {
     justify-content: center;
     align-items: center;
     flex-flow: column nowrap;
-    position: absolute;
+    position: fixed;
     z-index: 20000;
     background-color: #77777796;
     top: 0;
@@ -1610,6 +1610,9 @@ ul.tab-links li a.active {
 
 .showinbig-div .flexslider .slides {
     display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    height: 100%;
 }
 
 .flexslider .slides > li {

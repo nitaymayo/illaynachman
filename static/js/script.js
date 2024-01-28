@@ -1071,6 +1071,19 @@ if (search_input){
 
 }
 
+
+function start_nicescroll(){
+	try {
+		$('html').getNiceScroll().show();
+	} catch {}
+}
+function stop_nicescroll(){
+	try {
+		$('html').getNiceScroll().hide();
+	} catch {}
+}
+
+
 // function to execute when user wants to exit modal
 function close_modal(modal){
 	modal.style.display = "none";
@@ -1167,16 +1180,17 @@ function new_post_validation() {
   if (name.trim() === '') {
     showError(nameInput, 'Please enter post name.');
 	valid = false
-  } else {
-	  // Check if name contains restricted characters
-	  var restrictedChars = /[\(\)'\/*;.\[\]{}\\`]/;
-	  if (restrictedChars.test(name)) {
-		showError(nameInput, 'Name cannot contain characters such as (), \', /, ;, ., \\, [], {}, `.');
-		valid = false
-	  } else {
-		  showSuccess(nameInput)
-	  }
   }
+  // else {
+	//   // Check if name contains restricted characters
+	//   var restrictedChars = /[\(\)'\/*;.\[\]{}\\`]/;
+	//   if (restrictedChars.test(name)) {
+	// 	showError(nameInput, 'Name cannot contain characters such as (), \', /, ;, ., \\, [], {}, `.');
+	// 	valid = false
+	//   } else {
+	// 	  showSuccess(nameInput)
+	//   }
+  // }
 
 
 
@@ -1190,15 +1204,15 @@ function new_post_validation() {
   }
 
   // Validation check for post_description length
-  var postDescription = postDescriptionInput.value;
-  if (/['\/;.\[\]{}\\`]/.test(postDescription)){
-	      showError(postDescriptionInput, 'Post description cannot contain characters such as \', /, ;, ., \\, [], {}, `.');
-  } else if (postDescription.length > 3000) {
-    showError(postDescriptionInput, 'Post description must be below 3000 characters.');
-    valid = false
-  } else {
-	  showSuccess(postDescriptionInput)
-  }
+  // var postDescription = postDescriptionInput.value;
+  // if (/['\/;.\[\]{}\\`]/.test(postDescription)){
+	//       showError(postDescriptionInput, 'Post description cannot contain characters such as \', /, ;, ., \\, [], {}, `.');
+  // } else if (postDescription.length > 3000) {
+  //   showError(postDescriptionInput, 'Post description must be below 3000 characters.');
+  //   valid = false
+  // } else {
+	//   showSuccess(postDescriptionInput)
+  // }
 
 
   // If all validations pass, the form is considered valid
@@ -1211,8 +1225,10 @@ function showinbig(img_card){
 	showinbig_div.removeClass('hidden')
 	showinbig_div.on("click", close_showinbig)
 	const showinbig_slides = $('.showinbig-div .slides')
+	var showinbig_slider = $('.showinbig-div .flexslider')
+
 	// IF showingib_flexslider not set, load it with the post images
-	if (showinbig_slides.html() !== "") {
+	if (showinbig_slides.html() === "") {
 		const post_files = document.querySelectorAll('.img-card img, .img-card source')
 		for (let index in post_files) {
 			let li;
@@ -1233,17 +1249,19 @@ function showinbig(img_card){
 
 		//make the flexslider
 		try {
-			var showinbig_slider = $('.showinbig-div .flexslider');
 			showinbig_slider.flexslider({
 				animation: "slide",
 				video: true,
 				slideshow: false,
-				smoothHeight: true
+				smoothHeight: true,
+				animationSpeed: 600
 			});
 		} catch (err) {
 
 		}
 	}
+
+	stop_nicescroll()
 
 	// show clicked img
 	showinbig_slider.flexslider(getDomIndex(img_card))
@@ -1252,6 +1270,7 @@ function showinbig(img_card){
 function close_showinbig(event){
 	if (event.target === document.querySelector('.showinbig-div')){
 		document.querySelector('.showinbig-div').classList.add('hidden')
+		start_nicescroll()
 	}
 }
 
@@ -1340,6 +1359,9 @@ function edit_post(post_id){
 			post_imgs[i].querySelector('.edit_image').classList.remove('hidden')
 			let make_cover_btn = post_imgs[i].querySelector('.make_cover')
 			let delete_image_btn = post_imgs[i].querySelector('.delete_img')
+
+			// remove show in big function from images
+			post_imgs[i].onclick = ""
 
 			if (make_cover_btn) {
 				make_cover_btn.addEventListener('click', function (event) {
@@ -1809,9 +1831,7 @@ function start_preloader(message){
 	const preloader = document.querySelector('.preloader')
 	preloader.style.display = 'flex'
 	preloader.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
-	try {
-		$('html').getNiceScroll().hide()
-	} catch {}
+	stop_nicescroll()
 	if (message){
 		preloader.querySelector('.preloader_massage').innerText = message
 	} else {
@@ -1820,8 +1840,9 @@ function start_preloader(message){
 }
 
 function hide_preloader(){
-		const preloader = document.querySelector('.preloader')
-		preloader.style.display = 'none'
+	const preloader = document.querySelector('.preloader')
+	preloader.style.display = 'none'
+	start_nicescroll()
 }
 
 window.addEventListener('beforeunload', function (e) {
