@@ -1610,6 +1610,9 @@ ul.tab-links li a.active {
 
 .showinbig-div .flexslider .slides {
     display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    height: 100%;
 }
 
 .flexslider .slides > li {
@@ -1649,7 +1652,6 @@ ul.tab-links li a.active {
     max-width: 100%;
     width: initial;
     box-shadow: -9px 10px 96px -31px rgba(0,0,0,0.89);
-    margin: 0 auto;
 }
 
 @media only screen and (min-width: 600px){

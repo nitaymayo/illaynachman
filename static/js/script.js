@@ -1071,6 +1071,15 @@ if (search_input){
 
 }
 
+
+function start_nicescroll(){
+	$('html').getNiceScroll().show();
+}
+function stop_nicescroll(){
+	$('html').getNiceScroll().hide();
+}
+
+
 // function to execute when user wants to exit modal
 function close_modal(modal){
 	modal.style.display = "none";
@@ -1238,12 +1247,15 @@ function showinbig(img_card){
 				animation: "slide",
 				video: true,
 				slideshow: false,
-				smoothHeight: true
+				smoothHeight: true,
+				animationSpeed: 600
 			});
 		} catch (err) {
 
 		}
 	}
+
+	stop_nicescroll()
 
 	// show clicked img
 	showinbig_slider.flexslider(getDomIndex(img_card))
@@ -1252,6 +1264,7 @@ function showinbig(img_card){
 function close_showinbig(event){
 	if (event.target === document.querySelector('.showinbig-div')){
 		document.querySelector('.showinbig-div').classList.add('hidden')
+		start_nicescroll()
 	}
 }
 
