@@ -256,10 +256,13 @@ def update_post():
 
         bad_files = []
         good_files = []
+        content_count = len(os.listdir(os.curdir + url_for('static', filename="media/posts/post_id{0}".format(post_id))))
         for f in files:
 
             file = request.files.get(f)
-            new_file_name = file.filename.replace(" ", "+")
+            file_name, file_extension = os.path.splitext(file.filename)
+            new_file_name = "{0}{1}".format(content_count, file_extension)
+            content_count += 1
             content_type =''
             if "video" in file.content_type:
                 content_type = "video"

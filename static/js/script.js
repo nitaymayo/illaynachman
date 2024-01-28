@@ -1354,6 +1354,9 @@ function edit_post(post_id){
 			let make_cover_btn = post_imgs[i].querySelector('.make_cover')
 			let delete_image_btn = post_imgs[i].querySelector('.delete_img')
 
+			// remove show in big function from images
+			post_imgs[i].onclick = ""
+
 			if (make_cover_btn) {
 				make_cover_btn.addEventListener('click', function (event) {
 					const img_card = event.target.closest('.img-card')

@@ -239,9 +239,12 @@ def new_post():
     delete_query = f"DELETE FROM image WHERE location = "
     bad_files = []
     good_files = []
+    content_count = 0
     for f in files:
         file = request.files.get(f)
-        new_file_name = file.filename.replace(" ", "+")
+        file_name, file_extension = os.path.splitext(file.filename)
+        new_file_name = "{0}{1}".format(content_count, file_extension)
+        content_count += 1
         # save the file to our photos folder
         content_type = ""
         if ("video" in file.content_type):
@@ -278,49 +281,6 @@ def new_post():
         flash(bad_file_string + "Please try changing their name and make sure they are valid content\n You can upload them by editing your post")
     
     return "uploaded", 201
-
-
-# @homepage.route('/homepage/uploadpostphotos', methods=['POST'])
-# def upload_post_photos_to_temp():
-#     if not session:
-#         return "You need to login", 301
-#     if request.method == 'POST':
-#         temp_dir = f"temp_post_u{session['user_id']}"
-#         to_dir = post.config.destination + '/' + temp_dir
-#         # Delete temp dir if exists
-#         if os.path.exists(to_dir):
-#             shutil.rmtree(to_dir)
-#
-#         os.makedirs(to_dir, exist_ok=True)
-#         file_obj = request.files
-#         bad_files = []
-#         good_files = []
-#         for f in file_obj:
-#             file = request.files.get(f)
-#
-#             # save the file to our photos folder
-#             try:
-#                 file_name = post.save(
-#                     file,
-#                     name=os.path.join(temp_dir, file.filename.replace(" ", "+"))
-#                 )
-#                 good_files.append(file_name)
-#             except Exception as e:
-#                 bad_files.append(file.filename)
-#
-#         if bad_files:
-#             bad_file_string = "some images could not be uploaded:\n"
-#             for i, file in enumerate(bad_files):
-#                 bad_file_string = bad_file_string + f"{i+1}) {file}\n"
-#             flash(bad_file_string + "Please try changing their name and make sure they are valid content\n You can upload them by editing your post")
-#
-#         # if good_files:
-#         #     while len(os.listdir(to_dir)) < len(good_files):
-#         #         pass
-#         return "uploading...", 200
-#
-#     else:
-#         return "Method not allowed", 401
 
 
 @homepage.route('/homepage/gettags')
@@ -384,7 +344,7 @@ def fetchadmindata():
         flash('You are not authorized to do that')
         return "You are not authorized to do that", 303
 
-    query = f"SELECT * FROM user"
+    query = f"SELECT * FROM user ORDER BY user_id DESC"
     users = DBManager().fetch(query)
     if not users:
         return "Server problem or no users in DB", 301
