@@ -191,12 +191,12 @@ def update_post():
 
     # post update query
     query = (f"UPDATE post SET "
-             f"name = '{new_name}', "
-             f"description = '{new_description}', "
+             f"name = %s, "
+             f"description = %s, "
              f"year = {new_year}, "
              f"access= {new_access} "
              f"WHERE post_id = {post_id}")
-    res = dbManager.commit(query)
+    res = dbManager.commit(query, (new_name, new_description))
 
     if res == -1:
         return "Problem with the DB, post not updated", 301
@@ -297,57 +297,57 @@ def update_post():
     return "update success", 201
 
 
-@postpage.route('/postpage/addimagestopost/<int:post_id>', methods=['GET', 'POST'])
-def add_images_to_post(post_id):
-    if not session:
-        return "Please signin", 401
-
-    ## Get post from post table to check if this user is the owner of the post
-    query = f"SELECT * FROM post WHERE post_id = {post_id}"
-    post = dbManager.fetch(query)
-    if not post:
-        flash("post not found")
-        return "post not found", 404
-
-    if session["user_id"] != post[0].user_id and not session['is_admin']:
-        flash("you are not authorized to add photos to this post")
-        return "permission denied", 301
-
-    if request.method == 'POST':
-
-        post_dir = f"post_id{post_id}"
-        to_dir = post_app.config.destination + '/' + post_dir
-        if not os.path.exists(to_dir):
-            os.makedirs(to_dir, exist_ok=True)
-        file_obj = request.files
-        bad_files = []
-        for f in file_obj:
-
-            file = request.files.get(f)
-            new_file_name = f"/{post_dir}/" + file.filename.replace(" ", "+")
-            # try to insert img to db
-            query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '{new_file_name}')"
-            res = dbManager.commit(query)
-            try:
-                # if successful save it to folder, else raise exception
-                if res == 1:
-                    # save the file to our photos folder
-                    file_name = post_app.save(
-                        file,
-                        name=new_file_name.removeprefix('/')
-                    )
-                else:
-                    bad_files.append([file.filename, "server cant save file, try to change file name"])
-            except Exception as e:
-                query = f"DELETE FROM image WHERE post_id={post_id} AND location='{new_file_name}'"
-                res = dbManager.commit(query)
-                bad_files.append([file.filename, e.args[1]])
-
-        if bad_files:
-            bad_file_string = "some images could not be uploaded:\n"
-            for i, file in enumerate(bad_files):
-                bad_file_string = bad_file_string + f"{i + 1}) {file[0]}, error: {file[1]}\n"
-            flash(bad_file_string + "Please try changing their name and make sure they are valid content")
-        return "uploading..."
-    else:
-        return "Method not allowed", 401
+# @postpage.route('/postpage/addimagestopost/<int:post_id>', methods=['GET', 'POST'])
+# def add_images_to_post(post_id):
+#     if not session:
+#         return "Please signin", 401
+#
+#     ## Get post from post table to check if this user is the owner of the post
+#     query = f"SELECT * FROM post WHERE post_id = {post_id}"
+#     post = dbManager.fetch(query)
+#     if not post:
+#         flash("post not found")
+#         return "post not found", 404
+#
+#     if session["user_id"] != post[0].user_id and not session['is_admin']:
+#         flash("you are not authorized to add photos to this post")
+#         return "permission denied", 301
+#
+#     if request.method == 'POST':
+#
+#         post_dir = f"post_id{post_id}"
+#         to_dir = post_app.config.destination + '/' + post_dir
+#         if not os.path.exists(to_dir):
+#             os.makedirs(to_dir, exist_ok=True)
+#         file_obj = request.files
+#         bad_files = []
+#         for f in file_obj:
+#
+#             file = request.files.get(f)
+#             new_file_name = f"/{post_dir}/" + file.filename.replace(" ", "+")
+#             # try to insert img to db
+#             query = f"INSERT INTO image (post_id, location) VALUES ({post_id}, '{new_file_name}')"
+#             res = dbManager.commit(query)
+#             try:
+#                 # if successful save it to folder, else raise exception
+#                 if res == 1:
+#                     # save the file to our photos folder
+#                     file_name = post_app.save(
+#                         file,
+#                         name=new_file_name.removeprefix('/')
+#                     )
+#                 else:
+#                     bad_files.append([file.filename, "server cant save file, try to change file name"])
+#             except Exception as e:
+#                 query = f"DELETE FROM image WHERE post_id={post_id} AND location='{new_file_name}'"
+#                 res = dbManager.commit(query)
+#                 bad_files.append([file.filename, e.args[1]])
+#
+#         if bad_files:
+#             bad_file_string = "some images could not be uploaded:\n"
+#             for i, file in enumerate(bad_files):
+#                 bad_file_string = bad_file_string + f"{i + 1}) {file[0]}, error: {file[1]}\n"
+#             flash(bad_file_string + "Please try changing their name and make sure they are valid content")
+#         return "uploading..."
+#     else:
+#         return "Method not allowed", 401

@@ -1073,10 +1073,14 @@ if (search_input){
 
 
 function start_nicescroll(){
-	$('html').getNiceScroll().show();
+	try {
+		$('html').getNiceScroll().show();
+	} catch {}
 }
 function stop_nicescroll(){
-	$('html').getNiceScroll().hide();
+	try {
+		$('html').getNiceScroll().hide();
+	} catch {}
 }
 
 
@@ -1176,16 +1180,17 @@ function new_post_validation() {
   if (name.trim() === '') {
     showError(nameInput, 'Please enter post name.');
 	valid = false
-  } else {
-	  // Check if name contains restricted characters
-	  var restrictedChars = /[\(\)'\/*;.\[\]{}\\`]/;
-	  if (restrictedChars.test(name)) {
-		showError(nameInput, 'Name cannot contain characters such as (), \', /, ;, ., \\, [], {}, `.');
-		valid = false
-	  } else {
-		  showSuccess(nameInput)
-	  }
   }
+  // else {
+	//   // Check if name contains restricted characters
+	//   var restrictedChars = /[\(\)'\/*;.\[\]{}\\`]/;
+	//   if (restrictedChars.test(name)) {
+	// 	showError(nameInput, 'Name cannot contain characters such as (), \', /, ;, ., \\, [], {}, `.');
+	// 	valid = false
+	//   } else {
+	// 	  showSuccess(nameInput)
+	//   }
+  // }
 
 
 
@@ -1199,15 +1204,15 @@ function new_post_validation() {
   }
 
   // Validation check for post_description length
-  var postDescription = postDescriptionInput.value;
-  if (/['\/;.\[\]{}\\`]/.test(postDescription)){
-	      showError(postDescriptionInput, 'Post description cannot contain characters such as \', /, ;, ., \\, [], {}, `.');
-  } else if (postDescription.length > 3000) {
-    showError(postDescriptionInput, 'Post description must be below 3000 characters.');
-    valid = false
-  } else {
-	  showSuccess(postDescriptionInput)
-  }
+  // var postDescription = postDescriptionInput.value;
+  // if (/['\/;.\[\]{}\\`]/.test(postDescription)){
+	//       showError(postDescriptionInput, 'Post description cannot contain characters such as \', /, ;, ., \\, [], {}, `.');
+  // } else if (postDescription.length > 3000) {
+  //   showError(postDescriptionInput, 'Post description must be below 3000 characters.');
+  //   valid = false
+  // } else {
+	//   showSuccess(postDescriptionInput)
+  // }
 
 
   // If all validations pass, the form is considered valid
@@ -1220,8 +1225,10 @@ function showinbig(img_card){
 	showinbig_div.removeClass('hidden')
 	showinbig_div.on("click", close_showinbig)
 	const showinbig_slides = $('.showinbig-div .slides')
+	var showinbig_slider = $('.showinbig-div .flexslider')
+
 	// IF showingib_flexslider not set, load it with the post images
-	if (showinbig_slides.html() !== "") {
+	if (showinbig_slides.html() === "") {
 		const post_files = document.querySelectorAll('.img-card img, .img-card source')
 		for (let index in post_files) {
 			let li;
@@ -1242,7 +1249,6 @@ function showinbig(img_card){
 
 		//make the flexslider
 		try {
-			var showinbig_slider = $('.showinbig-div .flexslider');
 			showinbig_slider.flexslider({
 				animation: "slide",
 				video: true,

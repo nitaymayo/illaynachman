@@ -195,16 +195,16 @@ def new_post():
 
     # Insert post to db
     query = (f"INSERT INTO post (name, user_id, year, description, access) "
-             f"VALUES ('{post_name}', '{session['user_id']}', '{post_year}', '{post_description}', '{access_type}')")
+             f"VALUES (%s, '{session['user_id']}', '{post_year}', %s, '{access_type}')")
 
-    res = dbManager.commit(query)
+    res = dbManager.commit(query, (post_name, post_description))
 
     if res == -1:
-        return 'Something went wrong, your post did not uploaded'
+        return 'Something went wrong, your post did not uploaded', 301
 
     # Get post ID
-    query = f"SELECT MAX(post_id) as current_post FROM post WHERE user_id = {session['user_id']} and name = '{post_name}' and description = '{post_description}' and year = '{post_year}' and access = '{access_type}'"
-    res = dbManager.fetch(query)
+    query = f"SELECT MAX(post_id) as current_post FROM post WHERE user_id = {session['user_id']} and name = %s and description = %s and year = '{post_year}' and access = '{access_type}'"
+    res = dbManager.fetch(query, (post_name, post_description))
     post_id = res[0].current_post
 
 
@@ -377,3 +377,11 @@ def updateuserdata():
         return json.dumps({'text': "No new data introduced", 'user_ID': data['user_ID'], 'success': True}), 201
     else:
         return json.dumps({'text': "problem with data, user data not updated", 'user_ID': data['user_ID'], 'success': False}), 301
+
+
+def compile_text_for_db(text):
+    text = text.replace("'", "\\'")
+    text = text.replace('"', '\\"')
+    text = text.replace('`', '')
+
+    return str(text)
