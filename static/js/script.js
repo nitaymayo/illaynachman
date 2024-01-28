@@ -1825,9 +1825,7 @@ function start_preloader(message){
 	const preloader = document.querySelector('.preloader')
 	preloader.style.display = 'flex'
 	preloader.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
-	try {
-		$('html').getNiceScroll().hide()
-	} catch {}
+	stop_nicescroll()
 	if (message){
 		preloader.querySelector('.preloader_massage').innerText = message
 	} else {
@@ -1836,8 +1834,9 @@ function start_preloader(message){
 }
 
 function hide_preloader(){
-		const preloader = document.querySelector('.preloader')
-		preloader.style.display = 'none'
+	const preloader = document.querySelector('.preloader')
+	preloader.style.display = 'none'
+	start_nicescroll()
 }
 
 window.addEventListener('beforeunload', function (e) {

@@ -662,7 +662,7 @@ ul li {
     justify-content: center;
     align-items: center;
     flex-flow: column nowrap;
-    position: absolute;
+    position: fixed;
     z-index: 20000;
     background-color: #77777796;
     top: 0;
