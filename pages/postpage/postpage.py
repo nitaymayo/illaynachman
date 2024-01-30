@@ -256,13 +256,22 @@ def update_post():
 
         bad_files = []
         good_files = []
-        content_count = len(os.listdir(os.curdir + url_for('static', filename="media/posts/post_id{0}".format(post_id))))
+
+        files_in_post = [os.path.splitext(os.path.basename(path))[0] for path in os.listdir(os.curdir + url_for('static', filename="media/posts/post_id{0}".format(post_id)))]
+        content_count = 0
+        for file in files_in_post:
+            try:
+                if int(file) > content_count:
+                    content_count = int(file)
+            except Exception as e:
+                pass
+
         for f in files:
 
+            content_count += 1
             file = request.files.get(f)
             file_name, file_extension = os.path.splitext(file.filename)
             new_file_name = "{0}{1}".format(content_count, file_extension)
-            content_count += 1
             content_type =''
             if "video" in file.content_type:
                 content_type = "video"
